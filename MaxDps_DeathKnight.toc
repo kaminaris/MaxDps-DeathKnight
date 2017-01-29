@@ -1,0 +1,8 @@
+## Title: MaxDps_DeathKnight
+## Version: 7.1.5
+## Author: Kaminaris
+## Interface: 70100
+## Dependencies: MaxDps
+## LoadOnDemand: 1
+
+main.lua

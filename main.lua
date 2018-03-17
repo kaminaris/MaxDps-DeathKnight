@@ -170,6 +170,11 @@ function MaxDps.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, talents)
 	--Get wounds on target.
 	local festering, festeringCd, festeringCharges = MaxDps:TargetAura(_FesteringWound, timeShift);
 
+	local scourgeStrike = _ScourgeStrike;
+	if talents[207311] then
+		scourgeStrike = 207311;
+	end
+
 	MaxDps:GlowCooldown(_ArmyoftheDead, MaxDps:SpellAvailable(_ArmyoftheDead , timeShift) and runes >= 3);
 	MaxDps:GlowCooldown(_SummonGargoyle, MaxDps:SpellAvailable(_SummonGargoyle , timeShift));
 
@@ -177,7 +182,7 @@ function MaxDps.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, talents)
 	if MaxDps:Aura(_Necrosis, timeShift) then
 		-- If more then 2 wounds
 		if festeringCharges > 2 then
-			return  _ScourgeStrike;
+			return  scourgeStrike;
 		end
 	end
 

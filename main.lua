@@ -20,6 +20,7 @@ local _AntiMagicBarrier = 205727;
 local _RedThirst = 205723;
 local _WebofPain = 215288;
 local _MasteryBloodShield = 77513;
+local _BloodDrinker = 206931;
 
 -- Frost
 local _IcyTalons = 194878;
@@ -79,20 +80,9 @@ local _ArcaneTorrent = 28730;
 local _SuddenDoom = 49530;
 local _DeathStrike = 49998;
 
--- Talents
-local _isDefile = false;
-local _isRapidDecomposition = false;
-local _isObliteration = false;
-local _isBreathofSindragosa = false;
-
 MaxDps.DeathKnight = {};
 
 function MaxDps.DeathKnight.CheckTalents()
-	MaxDps:CheckTalents();
-	_isRapidDecomposition = MaxDps:HasTalent(_RapidDecomposition);
-	_isObliteration = MaxDps:HasTalent(_Obliteration);
-	_isBreathofSindragosa = MaxDps:HasTalent(_BreathofSindragosa);
-	-- other checking functions
 end
 
 function MaxDps:EnableRotationModule(mode)
@@ -117,47 +107,63 @@ function MaxDps.DeathKnight.Blood(_, timeShift, currentSpell, gcd, talents)
 	local runes, runeCd = MaxDps.DeathKnight.Runes();
 
 	local bb, bbCharges = MaxDps:SpellCharges(_BloodBoil, timeShift);
-	local dad = MaxDps:SpellAvailable(_DeathandDecay, timeShift);
+	local dad, dadCharges = MaxDps:SpellAvailable(_DeathandDecay, timeShift);
 	local cons = MaxDps:SpellAvailable(_Consumption, timeShift);
 
-	local bs, bsCharges = MaxDps:Aura(_BoneShield, timeShift + 4);
-
+	local bs, bsCharges = MaxDps:Aura(_BoneShield, timeShift + 6);
 	local bp = MaxDps:TargetAura(_BloodPlague, timeShift);
 
-
-	if not bs and runes >= 2 then
+	if bsCharges <= 6 and runes >= 2 then
 		return _Marrowrend;
-	end
-
-	if not bp and bbCharges > 0 then
-		return _BloodBoil;
 	end
 
 	if MaxDps:Aura(_CrimsonScourge, timeShift) then
 		return _DeathandDecay;
 	end
 
-	if runicMax - runic < 20 then
-		return _DeathStrike;
-	end
-
-	if bsCharges <= 6 and runes >= 2 then
-		return _Marrowrend;
-	end
-
-	if _isRapidDecomposition and dad and runes >= 3 then
+	if dad and runes >= 2 then
 		return _DeathandDecay;
 	end
 
-	if runes > 3 then
-		return _HeartStrike;
+	if talents[_BloodDrinker] and MaxDps:SpellAvailable(_BloodDrinker, timeShift) then
+		return _BloodDrinker;
+	end
+
+	if runicMax - runic <= 20 then
+		return _DeathStrike;
+	end
+
+	if not bp and bbCharges >= 2 then
+		return _BloodBoil;
+	end
+
+	if dad and runes >= 2 then
+		return _DeathandDecay;
 	end
 
 	if cons then
 		return _Consumption;
 	end
 
-	return _BloodBoil;
+	if not bp and bbCharges >= 1 then
+		return _BloodBoil;
+	end
+
+	if runes > 2 then
+		return _HeartStrike;
+	end
+
+	-- comment this out if survival is a problem
+	if runic >= 60 then
+		return _DeathStrike;
+	end
+	-- comment out the above if survival is a problem
+
+	if bbCharges >= 1 then
+		return _BloodBoil;
+	else
+		return nil;
+	end
 end
 
 function MaxDps.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, talents)
@@ -255,51 +261,49 @@ function MaxDps.DeathKnight.Frost(_, timeShift, currentSpell, gcd, talents)
 	local it, itCharges = MaxDps:Aura(_IcyTalons, timeShift + 2);
 	local oblit = MaxDps:Aura(_Obliteration, timeShift);
 	local km = MaxDps:Aura(_KillingMachine, timeShift);
+	local FSCost = 25;
 
-	MaxDps:GlowCooldown(_Obliteration, _isObliteration and MaxDps:SpellAvailable(_Obliteration, timeShift));
-	MaxDps:GlowCooldown(_BreathofSindragosa, _isBreathofSindragosa and MaxDps:SpellAvailable(_BreathofSindragosa, timeShift));
+	MaxDps:GlowCooldown(_Obliteration, talents[_Obliteration] and MaxDps:SpellAvailable(_Obliteration, timeShift) and runes <= 1);
+	MaxDps:GlowCooldown(_BreathofSindragosa, talents[_BreathofSindragosa] and MaxDps:SpellAvailable(_BreathofSindragosa, timeShift));
 
 	MaxDps:GlowCooldown(_SindragosasFury, MaxDps:SpellAvailable(_SindragosasFury, timeShift));
 	MaxDps:GlowCooldown(_PillarofFrost, MaxDps:SpellAvailable(_PillarofFrost, timeShift));
-	MaxDps:GlowCooldown(_EmpowerRuneWeapon, MaxDps:SpellAvailable(_EmpowerRuneWeapon, timeShift) and runes < 2);
-
-	if itCharges < 3 and runic >= 25 then
-		return _FrostStrike;
-	end
+	MaxDps:GlowCooldown(_EmpowerRuneWeapon, MaxDps:SpellAvailable(_EmpowerRuneWeapon, timeShift) and runes <= 1 and runic <= (runicMax - FSCost));
 
 	if not MaxDps:TargetAura(_FrostFever, timeShift + 2) and runes > 0 then
 		return _HowlingBlast;
 	end
 
-	if runic > 75 then
+	if runic > (runicMax - FSCost) then
 		return _FrostStrike;
 	end
 
-	if MaxDps:Aura(_Rime, timeShift) and not oblit then
-		return _HowlingBlast;
+	if oblit then
+		if km and runes >= 1 then
+			return _Obliterate;
+		elseif runic >= FSCost then
+			return _FrostStrike;
+		end
 	end
 
---	if MaxDps:SpellAvailable(_Obliteration, timeShift) and runes >= 2 and runic >= 25 then
---		return _Obliteration;
---	end
-
-	if oblit and runic >= 25 then
-		return _FrostStrike;
-	end
-
-	if km and runes > 0 then
-		return _Obliterate;
-	end
-
-	if MaxDps:SpellAvailable(_RemorselessWinter, timeShift) and runes > 0 then
+	--RW before Rime/Oblit casts for best use of Gathering Storm
+	if MaxDps:SpellAvailable(_RemorselessWinter, timeShift) and runes >= 1 then
 		return _RemorselessWinter;
 	end
 
-	if runes > 1 then
+	if MaxDps:Aura(_Rime, timeShift) then
+		return _HowlingBlast;
+	end
+
+	if km and runes >= 1 then
 		return _Obliterate;
 	end
 
-	if runic > 40 then
+	if runes >= 2 then
+		return _Obliterate;
+	end
+
+	if runic >= FSCost then
 		return _FrostStrike;
 	else
 		return nil;

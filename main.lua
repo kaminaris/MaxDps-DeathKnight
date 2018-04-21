@@ -181,8 +181,11 @@ function MaxDps.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, talents)
 		scourgeStrike = 207311;
 	end
 
+	local deathanddecay = (talents[_Defile] and _Defile) or _DeathandDecay;
+	local summongargoyle = (talents[_DarkArbiter] and _DarkArbiter) or _SummonGargoyle;
+
 	MaxDps:GlowCooldown(_ArmyoftheDead, MaxDps:SpellAvailable(_ArmyoftheDead , timeShift) and runes >= 3);
-	MaxDps:GlowCooldown(_SummonGargoyle, MaxDps:SpellAvailable(_SummonGargoyle , timeShift));
+	MaxDps:GlowCooldown(summongargoyle, MaxDps:SpellAvailable(summongargoyle , timeShift));
 
 	--Check if Necrosis is active
 	if MaxDps:Aura(_Necrosis, timeShift) then
@@ -234,8 +237,8 @@ function MaxDps.DeathKnight.Unholy(_, timeShift, currentSpell, gcd, talents)
 
 	--Check to run other and stuff
 	if runes <= 2 then
-		if MaxDps:SpellAvailable(_DeathandDecay , timeShift) then
-			return _DeathandDecay;
+		if MaxDps:SpellAvailable(deathanddecay , timeShift) then
+			return deathanddecay;
 		end
 		if MaxDps:SpellAvailable(_DeathStrike , timeShift) then
 			if runic > 85 then

@@ -1,0 +1,6 @@
+package-as: MaxDps_DeathKnight
+enable-nolib-creation: no
+
+ignore:
+    - README.md
+    - CHANGELOG.md

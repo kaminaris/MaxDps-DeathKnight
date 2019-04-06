@@ -75,6 +75,7 @@ function DeathKnight:Unholy()
 	local targets = MaxDps:SmartAoe();
 	local gcd = fd.gcd;
 	local buff = fd.buff;
+	local azerite = fd.azerite;
 	local runes = DeathKnight:Runes(fd.timeShift);
 	local runesMax = UnitPowerMax('player', Runes);
 	local runesDeficit = runesMax - runes;
@@ -98,12 +99,32 @@ function DeathKnight:Unholy()
 
 	-- army_of_the_dead;
 	MaxDps:GlowCooldown(UH.ArmyOfTheDead, cooldown[UH.ArmyOfTheDead].ready and runes >= 3);
-	--unholyApocalypseAsCooldown = false,
-	--unholyDarkTransformationAsCooldown = false,
-	--unholyUnholyFrenzyAsCooldown = false,
+
+	-- summon_gargoyle,if=runic_power.deficit<14;
+	if talents[UH.SummonGargoyle] then
+		MaxDps:GlowCooldown(UH.SummonGargoyle, cooldown[UH.SummonGargoyle].ready and runicPowerDeficit < 14);
+	end
 
 	if DeathKnight.db.unholyApocalypseAsCooldown then
 		MaxDps:GlowCooldown(UH.Apocalypse, cooldown[UH.Apocalypse].ready and debuff[UH.FesteringWound].count >= 4);
+	end
+
+	if DeathKnight.db.unholyDarkTransformationAsCooldown then
+		MaxDps:GlowCooldown(UH.DarkTransformation, cooldown[UH.DarkTransformation].ready);
+	end
+
+	if talents[UH.UnholyFrenzy] and DeathKnight.db.unholyUnholyFrenzyAsCooldown then
+		MaxDps:GlowCooldown(
+			UH.UnholyFrenzy,
+			cooldown[UH.UnholyFrenzy].ready and (
+				debuff[UH.FesteringWound].count < 4 and not (IsEquippedItem(RampingAmplitudeGigavoltEngine) or azerite[A.MagusOfTheDead] > 0) or
+				cooldown[UH.Apocalypse].remains < 2 and (IsEquippedItem(RampingAmplitudeGigavoltEngine) or azerite[A.MagusOfTheDead] > 0) or
+				targets >= 2 and (
+					(cooldown[UH.DeathAndDecay].remains <= gcd and not talents[UH.Defile]) or
+					(cooldown[UH.Defile].remains <= gcd and talents[UH.Defile])
+				)
+			)
+		);
 	end
 
 	-- outbreak,target_if=dot.virulent_plague.remains<=gcd;
@@ -209,7 +230,7 @@ function DeathKnight:UnholyAoe()
 		(
 			(debuff[UH.FesteringWound].up and cooldown[UH.Apocalypse].remains > 5) or
 			debuff[UH.FesteringWound].count > 4
-		) and cooldown[UH.ArmyOfTheDead].remains > 5
+		) --and cooldown[UH.ArmyOfTheDead].remains > 5
 	) then
 		if talents[UH.ClawingShadows] then
 			return UH.ClawingShadows;
@@ -230,7 +251,7 @@ function DeathKnight:UnholyAoe()
 				((debuff[UH.FesteringWound].count < 4 and not buff[UH.UnholyFrenzy].up) or debuff[UH.FesteringWound].count < 3) and
 				cooldown[UH.Apocalypse].remains < 3
 			) or debuff[UH.FesteringWound].count < 1
-		) and cooldown[UH.ArmyOfTheDead].remains > 5
+		) --and cooldown[UH.ArmyOfTheDead].remains > 5
 	) then
 		return UH.FesteringStrike;
 	end
@@ -263,39 +284,32 @@ function DeathKnight:UnholyCooldowns()
 	end
 
 	-- dark_transformation,if=!raid_event.adds.exists|raid_event.adds.in>15;
-	if cooldown[UH.DarkTransformation].ready then
+	if not DeathKnight.db.unholyDarkTransformationAsCooldown and cooldown[UH.DarkTransformation].ready then
 		return UH.DarkTransformation;
 	end
 
-	-- summon_gargoyle,if=runic_power.deficit<14;
-	if talents[UH.SummonGargoyle] and cooldown[UH.SummonGargoyle].ready and runicPowerDeficit < 14 then
-		return UH.SummonGargoyle;
-	end
+	if talents[UH.UnholyFrenzy] and not DeathKnight.db.unholyUnholyFrenzyAsCooldown and cooldown[UH.UnholyFrenzy].ready then
+		-- unholy_frenzy,if=debuff.festering_wound.stack<4&!(equipped.ramping_amplitude_gigavolt_engine|azerite.magus_of_the_dead.enabled);
+		if debuff[UH.FesteringWound].count < 4 and
+			not (IsEquippedItem(RampingAmplitudeGigavoltEngine) or azerite[A.MagusOfTheDead] > 0)
+		then
+			return UH.UnholyFrenzy;
+		end
 
-	-- unholy_frenzy,if=debuff.festering_wound.stack<4&!(equipped.ramping_amplitude_gigavolt_engine|azerite.magus_of_the_dead.enabled);
-	if talents[UH.UnholyFrenzy] and cooldown[UH.UnholyFrenzy].ready and (
-		debuff[UH.FesteringWound].count < 4 and
-		not (IsEquippedItem(RampingAmplitudeGigavoltEngine) or azerite[A.MagusOfTheDead] > 0)
-	) then
-		return UH.UnholyFrenzy;
-	end
+		-- unholy_frenzy,if=cooldown.apocalypse.remains<2&(equipped.ramping_amplitude_gigavolt_engine|azerite.magus_of_the_dead.enabled);
+		if cooldown[UH.Apocalypse].remains < 2 and
+			(IsEquippedItem(RampingAmplitudeGigavoltEngine) or azerite[A.MagusOfTheDead] > 0)
+		then
+			return UH.UnholyFrenzy;
+		end
 
-	-- unholy_frenzy,if=cooldown.apocalypse.remains<2&(equipped.ramping_amplitude_gigavolt_engine|azerite.magus_of_the_dead.enabled);
-	if talents[UH.UnholyFrenzy] and cooldown[UH.UnholyFrenzy].ready and (
-		cooldown[UH.Apocalypse].remains < 2 and
-		(IsEquippedItem(RampingAmplitudeGigavoltEngine) or azerite[A.MagusOfTheDead] > 0)
-	) then
-		return UH.UnholyFrenzy;
-	end
-
-	-- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled));
-	if talents[UH.UnholyFrenzy] and cooldown[UH.UnholyFrenzy].ready and (
-		targets >= 2 and (
+		-- unholy_frenzy,if=active_enemies>=2&((cooldown.death_and_decay.remains<=gcd&!talent.defile.enabled)|(cooldown.defile.remains<=gcd&talent.defile.enabled));
+		if targets >= 2 and (
 			(cooldown[UH.DeathAndDecay].remains <= gcd and not talents[UH.Defile]) or
 			(cooldown[UH.Defile].remains <= gcd and talents[UH.Defile])
-		)
-	) then
-		return UH.UnholyFrenzy;
+		) then
+			return UH.UnholyFrenzy;
+		end
 	end
 
 	-- soul_reaper,target_if=target.time_to_die<8&target.time_to_die>4;
@@ -352,8 +366,8 @@ function DeathKnight:UnholyGeneric()
 	-- scourge_strike,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5;
 	-- clawing_shadows,if=((debuff.festering_wound.up&cooldown.apocalypse.remains>5)|debuff.festering_wound.stack>4)&cooldown.army_of_the_dead.remains>5;
 	if runes >= 1 and (
-		((debuff[UH.FesteringWound].up and cooldown[UH.Apocalypse].remains > 5) or debuff[UH.FesteringWound].count > 4) and
-		cooldown[UH.ArmyOfTheDead].remains > 5
+		((debuff[UH.FesteringWound].up and cooldown[UH.Apocalypse].remains > 5) or debuff[UH.FesteringWound].count > 4)
+			--and cooldown[UH.ArmyOfTheDead].remains > 5
 	) then
 		if talents[UH.ClawingShadows] then
 			return UH.ClawingShadows;
@@ -377,7 +391,7 @@ function DeathKnight:UnholyGeneric()
 				) and cooldown[UH.Apocalypse].remains < 3
 			) or
 				debuff[UH.FesteringWound].count < 1
-		) and cooldown[UH.ArmyOfTheDead].remains > 5
+		) --and cooldown[UH.ArmyOfTheDead].remains > 5
 	) then
 		return UH.FesteringStrike;
 	end

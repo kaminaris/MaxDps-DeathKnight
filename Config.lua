@@ -29,11 +29,15 @@ function DeathKnight:GetConfig()
 					label  = 'Apocalypse as cooldown',
 					column = 12
 				},
+			},
+			[3] = {
 				unholyDarkTransformationAsCooldown = {
 					type   = 'checkbox',
 					label  = 'Dark Transformation as cooldown',
 					column = 12
 				},
+			},
+			[4] = {
 				unholyUnholyFrenzyAsCooldown = {
 					type   = 'checkbox',
 					label  = 'Unholy Frenzy as cooldown',

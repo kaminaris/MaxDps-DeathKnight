@@ -47,6 +47,7 @@ function DeathKnight:Blood()
 	local runicMax = UnitPowerMax('player', RunicPower);
 	local runes, runeCd = DeathKnight:Runes(timeShift);
 
+	MaxDps:GlowEssences();
 	MaxDps:GlowCooldown(BL.DancingRuneWeapon, cooldown[BL.DancingRuneWeapon].ready);
 
 	if talents[BL.Bonestorm] then

@@ -44,6 +44,7 @@ function DeathKnight:Frost()
 	local fever = debuff[FR.FrostFever].remains > 6;
 	local FSCost = 25;
 
+	MaxDps:GlowEssences();
 	MaxDps:GlowCooldown(FR.BreathOfSindragosa, talents[FR.BreathOfSindragosa] and cooldown[FR.BreathOfSindragosa].ready);
 
 	MaxDps:GlowCooldown(FR.FrostwyrmsFury, cooldown[FR.FrostwyrmsFury].ready);

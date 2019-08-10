@@ -97,6 +97,7 @@ function DeathKnight:Unholy()
 	fd.poolingForGargoyle = poolingForGargoyle;
 	fd.canDeathCoil = canDeathCoil;
 
+	MaxDps:GlowEssences();
 	-- army_of_the_dead;
 	MaxDps:GlowCooldown(UH.ArmyOfTheDead, cooldown[UH.ArmyOfTheDead].ready and runes >= 3);
 

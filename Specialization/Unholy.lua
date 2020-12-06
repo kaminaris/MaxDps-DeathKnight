@@ -159,7 +159,7 @@ function DeathKnight:Unholy()
 	end
 
 	-- Use Unholy Assault only if 0-2 stack of Festering Wounds 
-	if not DeathKnight.db.unholyApocalypseAsCooldown and talents[UH.UnholyAssault] and cooldown[UH.UnholyAssault].ready and debuff[UH.FesteringWound].count <= 2 then
+	if not DeathKnight.db.unholyAssaultAsCooldown and talents[UH.UnholyAssault] and cooldown[UH.UnholyAssault].ready and debuff[UH.FesteringWound].count <= 2 then
 		return UH.UnholyAssault;
 	end
 

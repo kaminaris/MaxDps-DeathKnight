@@ -17,7 +17,7 @@ local UH = {
 	-- Talents
 	ClawingShadows     = 207311,
 	UnholyBlight       = 115989,
-	HarbingerOfDoom    = 276023,  -- TODO: Modify rotation to handle two stacks of Sudden Doom
+	HarbingerOfDoom    = 276023, -- TODO: Modify rotation to handle two stacks of Sudden Doom
 	SoulReaper         = 343294,
 	Pestilence         = 277234,
 	Defile             = 152280,
@@ -75,9 +75,9 @@ function DeathKnight:Unholy()
 	-- Replacement spells --
 	------------------------
 	local deathAndDecay = UH.DeathAndDecay;
-	if covenantId == NightFae then 
+	if covenantId == NightFae then
 		deathAndDecay = UH.DeathsDue; -- TODO: This is currently untested.  Make sure Death's Due and Defile play nice together
-	elseif talents[UH.Defile] then 
+	elseif talents[UH.Defile] then
 		deathAndDecay = UH.Defile;
 	end
 
@@ -85,7 +85,7 @@ function DeathKnight:Unholy()
 	if talents[UH.ClawingShadows] then
 		scourgeStrike = UH.ClawingShadows;
 	end
-	
+
 	--------------------
 	-- Glow cooldowns --
 	--------------------
@@ -110,23 +110,23 @@ function DeathKnight:Unholy()
 	if covenantId == Kyrian and DeathKnight.db.shackleTheUnworthyAsCooldown then
 		MaxDps:GlowCooldown(UH.ShackleTheUnworthy, cooldown[UH.ShackleTheUnworthy].ready);
 	end
-	
+
 	if covenantId == Necrolord and DeathKnight.db.abominationLimbAsCooldown then
 		MaxDps:GlowCooldown(UH.AbominationLimb, cooldown[UH.AbominationLimb].ready);
-	end 
+	end
 
 	if covenantId == Venthyr and DeathKnight.db.swarmingMistAsCooldown then
 		MaxDps:GlowCooldown(UH.SwarmingMist, cooldown[UH.SwarmingMist].ready);
-	end 
-	
+	end
+
 	--------------
 	-- Rotation --
 	--------------
 	-- Maintain Virulent Plague
 	if debuff[UH.VirulentPlague].remains <= gcd and runes >= 1 then
-		if talents[UH.UnholyBlight] and cooldown[UH.UnholyBlight].ready then 
+		if talents[UH.UnholyBlight] and cooldown[UH.UnholyBlight].ready then
 			return UH.UnholyBlight;
-		else 
+		else
 			return UH.Outbreak;
 		end
 	end
@@ -155,7 +155,7 @@ function DeathKnight:Unholy()
 			return UH.Apocalypse;
 		elseif fd.runes >= 2 then
 			return UH.FesteringStrike;
-		end 
+		end
 	end
 
 	-- Use Unholy Assault only if 0-2 stack of Festering Wounds 
@@ -179,10 +179,10 @@ function DeathKnight:Unholy()
 	end
 
 	-- Use Death and Decay in AoE situations, or off cooldown with the Pestilence talent
-	if (targets >=3 or talents[UH.Pestilence]) and cooldown[deathAndDecay].ready and fd.runes >= 1 then
+	if (targets >= 3 or talents[UH.Pestilence]) and cooldown[deathAndDecay].ready and fd.runes >= 1 then
 		return deathAndDecay;
 	end
-	
+
 	-- Burst Festering Wounds if able and Apocalypse not ready (don't want to reduce count until after Apocalypse is cast, unless we're treating it as a cooldown)
 	if debuff[UH.FesteringWound].count >= 1 and fd.runes >= 1 and (DeathKnight.db.unholyApocalypseAsCooldown or not cooldown[UH.Apocalypse].ready) then
 		return scourgeStrike;

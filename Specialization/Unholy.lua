@@ -49,15 +49,15 @@ local UH = {
 };
 
 function DeathKnight:Unholy()
-	local fd = MaxDps.FrameData;
-	local cooldown = fd.cooldown;
-	local debuff = fd.debuff;
-	local talents = fd.talents;
-	local targets = MaxDps:SmartAoe();
-	local gcd = fd.gcd;
-	local buff = fd.buff;
-	local runes = DeathKnight:Runes(fd.timeShift);
-	local runicPower = UnitPower('player', RunicPower);
+    local fd = MaxDps.FrameData;
+    local cooldown = fd.cooldown;
+    local debuff = fd.debuff;
+    local talents = fd.talents;
+    local targets = MaxDps:SmartAoe();
+    local gcd = fd.gcd;
+    local buff = fd.buff;
+    local runes = DeathKnight:Runes(fd.timeShift);
+    local runicPower = UnitPower('player', RunicPower);
     local targetHpPercent = MaxDps:TargetPercentHealth() * 100;
 
     local covenantId = fd.covenant.covenantId;
@@ -66,15 +66,14 @@ function DeathKnight:Unholy()
     local NightFae = Enum.CovenantType.NightFae;
     local Kyrian = Enum.CovenantType.Kyrian;
 
-	fd.targets = targets;
-	fd.runes = runes;
-	fd.runesDeficit = runesDeficit;
-	fd.runicPower = runicPower;
-    fd.runicPowerDeficit = runicPowerDeficit;
+    fd.targets = targets;
+    fd.runes = runes;
+    fd.runesDeficit = runesDeficit;
+    fd.runicPower = runicPower;
 
-	------------------------
-	-- Replacement spells --
-	------------------------
+    ------------------------
+    -- Replacement spells --
+    ------------------------
     local deathAndDecay = UH.DeathAndDecay;
     if covenantId == NightFae then 
         deathAndDecay = UH.DeathsDue; -- TODO: This is currently untested.  Make sure Death's Due and Defile play nice together
@@ -85,11 +84,11 @@ function DeathKnight:Unholy()
     local scourgeStrike = UH.ScourgeStrike;
     if talents[UH.ClawingShadows] then
         scourgeStrike = UH.ClawingShadows;
-	end
-	
-	--------------------
-	-- Glow cooldowns --
-	--------------------
+    end
+    
+    --------------------
+    -- Glow cooldowns --
+    --------------------
     MaxDps:GlowCooldown(UH.ArmyOfTheDead, cooldown[UH.ArmyOfTheDead].ready);
 
     if talents[UH.SummonGargoyle] then
@@ -98,16 +97,16 @@ function DeathKnight:Unholy()
 
     if talents[UH.UnholyAssault] then
         MaxDps:GlowCooldown(UH.UnholyAssault, cooldown[UH.UnholyAssault].ready and debuff[UH.FesteringWound].count <= 2);
-	end
-	
-	-- This should technically be a standard part of the rotation, but gripping mobs isn't always the best idea, so use situationally
-	if covenantId == Necrolord then
-		MaxDps:GlowCooldown(UH.AbominationLimb, cooldown[UH.AbominationLimb].ready);
-	end 
-	
-	--------------
-	-- Rotation --
-	--------------
+    end
+    
+    -- This should technically be a standard part of the rotation, but gripping mobs isn't always the best idea, so use situationally
+    if covenantId == Necrolord then
+        MaxDps:GlowCooldown(UH.AbominationLimb, cooldown[UH.AbominationLimb].ready);
+    end 
+    
+    --------------
+    -- Rotation --
+    --------------
     -- Maintain Virulent Plague
     if debuff[UH.VirulentPlague].remains <= gcd and runes >= 1 then
         if talents[UH.UnholyBlight] and cooldown[UH.UnholyBlight].ready then 
@@ -127,8 +126,8 @@ function DeathKnight:Unholy()
     end
     
     -- Use Dark Transformation off cooldown
-	if cooldown[UH.DarkTransformation].ready then
-		return UH.DarkTransformation;
+    if cooldown[UH.DarkTransformation].ready then
+        return UH.DarkTransformation;
     end
 
     -- Use Apocalypse off cooldown, and apply more Festering Wounds if necessary
@@ -156,8 +155,8 @@ function DeathKnight:Unholy()
     end
 
     -- Use Death and Decay in AoE situations, or off cooldown with the Pestilence talent
-	if (targets >=3 or talents[UH.Pestilence]) and cooldown[deathAndDecay].ready and fd.runes >= 1 then
-		return deathAndDecay;
+    if (targets >=3 or talents[UH.Pestilence]) and cooldown[deathAndDecay].ready and fd.runes >= 1 then
+        return deathAndDecay;
     end
     
     -- Burst Festering Wounds if able and Apocalypse not ready (don't want to reduce count until after Apocalypse is cast)
@@ -166,8 +165,8 @@ function DeathKnight:Unholy()
     end
 
     -- Apply Festering Wounds
-	if debuff[UH.FesteringWound].count <= 3 and fd.runes >= 2 then
-		return UH.FesteringStrike;
+    if debuff[UH.FesteringWound].count <= 3 and fd.runes >= 2 then
+        return UH.FesteringStrike;
     end
 
     -- Dump runic power 

@@ -95,13 +95,28 @@ function DeathKnight:Unholy()
 		MaxDps:GlowCooldown(UH.SummonGargoyle, cooldown[UH.SummonGargoyle].ready);
 	end
 
-	if talents[UH.UnholyAssault] then
+	if DeathKnight.db.unholyApocalypseAsCooldown then
+		MaxDps:GlowCooldown(UH.Apocalypse, cooldown[UH.Apocalypse].ready and debuff[UH.FesteringWound].count >= 4);
+	end
+
+	if DeathKnight.db.unholyDarkTransformationAsCooldown then
+		MaxDps:GlowCooldown(UH.DarkTransformation, cooldown[UH.DarkTransformation].ready);
+	end
+
+	if talents[UH.UnholyAssault] and DeathKnight.db.unholyAssaultAsCooldown then
 		MaxDps:GlowCooldown(UH.UnholyAssault, cooldown[UH.UnholyAssault].ready and debuff[UH.FesteringWound].count <= 2);
 	end
+
+	if covenantId == Kyrian and DeathKnight.db.shackleTheUnworthyAsCooldown then
+		MaxDps:GlowCooldown(UH.ShackleTheUnworthy, cooldown[UH.ShackleTheUnworthy].ready);
+	end
 	
-	-- This should technically be a standard part of the rotation, but gripping mobs isn't always the best idea, so use situationally
-	if covenantId == Necrolord then
+	if covenantId == Necrolord and DeathKnight.db.abominationLimbAsCooldown then
 		MaxDps:GlowCooldown(UH.AbominationLimb, cooldown[UH.AbominationLimb].ready);
+	end 
+
+	if covenantId == Venthyr and DeathKnight.db.swarmingMistAsCooldown then
+		MaxDps:GlowCooldown(UH.SwarmingMist, cooldown[UH.SwarmingMist].ready);
 	end 
 	
 	--------------
@@ -117,26 +132,35 @@ function DeathKnight:Unholy()
 	end
 
 	-- Use covenant abilities off cooldown
-	if covenantId == Kyrian and cooldown[UH.ShackleTheUnworthy].ready then
+	if covenantId == Kyrian and not DeathKnight.db.shackleTheUnworthyAsCooldown and cooldown[UH.ShackleTheUnworthy].ready then
 		return UH.ShackleTheUnworthy;
 	end
 
-	if covenantId == Venthyr and cooldown[UH.SwarmingMist].ready then
+	if covenantId == Necrolord and not DeathKnight.db.abominationLimbAsCooldown and cooldown[UH.AbominationLimb].ready then
+		return UH.AbominationLimb;
+	end
+
+	if covenantId == Venthyr and not DeathKnight.db.swarmingMistAsCooldown and cooldown[UH.SwarmingMist].ready then
 		return UH.SwarmingMist;
 	end
-	
+
 	-- Use Dark Transformation off cooldown
-	if cooldown[UH.DarkTransformation].ready then
+	if not DeathKnight.db.unholyDarkTransformationAsCooldown and cooldown[UH.DarkTransformation].ready then
 		return UH.DarkTransformation;
 	end
 
 	-- Use Apocalypse off cooldown, and apply more Festering Wounds if necessary
-	if cooldown[UH.Apocalypse].ready then
+	if not DeathKnight.db.unholyApocalypseAsCooldown and cooldown[UH.Apocalypse].ready then
 		if debuff[UH.FesteringWound].count >= 4 then
 			return UH.Apocalypse;
 		elseif fd.runes >= 2 then
 			return UH.FesteringStrike;
 		end 
+	end
+
+	-- Use Unholy Assault only if 0-2 stack of Festering Wounds 
+	if not DeathKnight.db.unholyApocalypseAsCooldown and talents[UH.UnholyAssault] and cooldown[UH.UnholyAssault].ready and debuff[UH.FesteringWound].count <= 2 then
+		return UH.UnholyAssault;
 	end
 
 	-- Execute when runes are on cooldown
@@ -159,8 +183,8 @@ function DeathKnight:Unholy()
 		return deathAndDecay;
 	end
 	
-	-- Burst Festering Wounds if able and Apocalypse not ready (don't want to reduce count until after Apocalypse is cast)
-	if debuff[UH.FesteringWound].count >= 1 and fd.runes >= 1 and not cooldown[UH.Apocalypse].ready then
+	-- Burst Festering Wounds if able and Apocalypse not ready (don't want to reduce count until after Apocalypse is cast, unless we're treating it as a cooldown)
+	if debuff[UH.FesteringWound].count >= 1 and fd.runes >= 1 and (DeathKnight.db.unholyApocalypseAsCooldown or not cooldown[UH.Apocalypse].ready) then
 		return scourgeStrike;
 	end
 

@@ -17,6 +17,19 @@ DeathKnight.spellMeta = {
 	end
 }
 
+DeathKnight.weaponRunes = {
+	Hysteria 			 = 6243,
+	Razorice 			 = 3370,
+	Sanguination 		 = 6241,
+	Spellwarding 		 = 6242,
+	TheApocalypse 		 = 6245,
+	TheFallenCrusader 	 = 3368,
+	TheStoneskinGargoyle = 3847,
+	UndendingThirst 	 = 6244,
+};
+
+DeathKnight.hasEnchant = {};
+
 function DeathKnight:Enable()
 	DeathKnight:InitializeDatabase();
 	DeathKnight:CreateConfig();
@@ -37,37 +50,19 @@ function DeathKnight:Enable()
 end
 
 function DeathKnight:InitializeWeaponRunes()
-	if self.weaponRunes then return end
-	self.weaponRunes = {
-		Hysteria 			 = 6243,
-		Razorice 			 = 3370,
-		Sanguination 		 = 6241,
-		Spellwarding 		 = 6242,
-		TheApocalypse 		 = 6245,
-		TheFallenCrusader 	 = 3368,
-		TheStoneskinGargoyle = 3847,
-		UndendingThirst 	 = 6244,
-	}
-end
+	DeathKnight.hasEnchant = {};
 
-function DeathKnight:HasWeaponEnchant(enchantId)
-	local mainhand = GetInventoryItemLink('player', 16);
-	if mainhand ~= nil then
-		local _, _, eid = strsplit(":", string.match(mainhand, "item[%-?%d:]+"));
-		if eid == enchantId then
-			return true;
-		end
+	local mainHand = GetInventoryItemLink('player', 16);
+	if mainHand ~= nil then
+		local _, _, eid = strsplit(":", string.match(mainHand, "item[%-?%d:]+"));
+		DeathKnight.hasEnchant[tonumber(eid)] = true;
 	end
 
 	local offhand = GetInventoryItemLink('player', 17);
 	if offhand ~= nil then
 		local _, _, eid = strsplit(":", string.match(offhand, "item[%-?%d:]+"));
-		if eid == enchantId then
-			return true;
-		end
+		DeathKnight.hasEnchant[tonumber(eid)] = true;
 	end
-
-	return false;
 end
 
 function DeathKnight:Runes(timeShift)

@@ -66,6 +66,9 @@ local FR = {
 
 setmetatable(FR, DeathKnight.spellMeta);
 
+local enchant = DeathKnight.hasEnchant;
+local weaponRunes = DeathKnight.weaponRunes;
+
 function DeathKnight:Frost()
 	local fd = MaxDps.FrameData;
 	local cooldown = fd.cooldown;
@@ -76,23 +79,25 @@ function DeathKnight:Frost()
 	local gcd = fd.gcd;
 	local runes = DeathKnight:Runes(fd.timeShift);
 	local runicPower = UnitPower('player', RunicPower);
-	local deathKnightRuneforgeRazorice = DeathKnight:HasWeaponEnchant(DeathKnight.weaponRunes.Razorice);
+	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local deathKnightRuneforgeRazorice = enchant[weaponRunes.Razorice];
 
 	fd.targets = targets;
 	fd.runes = runes;
 	fd.runicPower = runicPower;
+	fd.runicPowerMax = runicPowerMax;
 
 	-- howling_blast,if=!dot.frost_fever.ticking&(talent.icecap|cooldown.breath_of_sindragosa.remains>15|talent.obliteration&cooldown.pillar_of_frost.remains&!buff.killing_machine.up);
 	if runes >= 1 and
 		not debuff[FR.FrostFever].up and
 		(
 			talents[FR.Icecap] or
-				cooldown[FR.BreathOfSindragosa].remains > 15 or
-				(
-					talents[FR.Obliteration] and
-						cooldown[FR.PillarOfFrost].remains and
-						not buff[FR.KillingMachine].up
-				)
+			cooldown[FR.BreathOfSindragosa].remains > 15 or
+			(
+				talents[FR.Obliteration] and
+				cooldown[FR.PillarOfFrost].remains and
+				not buff[FR.KillingMachine].up
+			)
 		)
 	then
 		return FR.HowlingBlast;
@@ -105,21 +110,23 @@ function DeathKnight:Frost()
 		buff[FR.IcyTalons].remains <= gcd and
 		buff[FR.IcyTalons].up and
 		targets >= 2 and
-		( not talents[FR.BreathOfSindragosa] or cooldown[FR.BreathOfSindragosa].remains > 15 )
+		(not talents[FR.BreathOfSindragosa] or cooldown[FR.BreathOfSindragosa].remains > 15)
 	then
 		return FR.GlacialAdvance;
 	end
+
 	-- frost_strike,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&(!talent.breath_of_sindragosa|cooldown.breath_of_sindragosa.remains>15);
 	if runicPower >= 25 and
 		buff[FR.IcyTalons].remains <= gcd and
 		buff[FR.IcyTalons].up and
-		( not talents[FR.BreathOfSindragosa] or cooldown[FR.BreathOfSindragosa].remains > 15 )
+		(not talents[FR.BreathOfSindragosa] or cooldown[FR.BreathOfSindragosa].remains > 15 )
 	then
 		return FR.FrostStrike;
 	end
+
 	local result;
 	-- call_action_list,name=covenants;
-	local result = DeathKnight:FrostCovenants();
+	result = DeathKnight:FrostCovenants();
 	if result then
 		return result;
 	end
@@ -183,8 +190,8 @@ function DeathKnight:FrostGlowCooldowns()
 	local talents = fd.talents;
 	local targets = fd.targets;
 	local covenantId = fd.covenant.covenantId;
-	local deathKnightRuneforgeFallenCrusader = DeathKnight:HasWeaponEnchant(DeathKnight.weaponRunes.FallenCrusader);
-	local deathKnightRuneforgeRazorice = DeathKnight:HasWeaponEnchant(DeathKnight.weaponRunes.Razorice);
+	local deathKnightRuneforgeFallenCrusader = enchant[weaponRunes.FallenCrusader];
+	local deathKnightRuneforgeRazorice = enchant[weaponRunes.Razorice];
 
 	local frostwyrmsFuryReady = DeathKnight.db.frostFrostwyrmsFuryAsCooldown and cooldown[FR.FrostwyrmsFury].ready;
 	local abominationLimbReady = DeathKnight.db.abominationLimbAsCooldown and covenantId == Necrolord and cooldown[FR.AbominationLimb].ready;
@@ -230,10 +237,10 @@ function DeathKnight:FrostAoe()
 	local talents = fd.talents;
 	local gcd = fd.gcd;
 	local covenantId = fd.covenant.covenantId;
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runes = fd.runes;
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
-	local runes = DeathKnight:Runes(fd.timeShift);
 
 	-- remorseless_winter;
 	if cooldown[FR.RemorselessWinter].ready and runes >= 1 then
@@ -314,9 +321,9 @@ function DeathKnight:FrostBosPooling()
 	local targets = fd.targets;
 	local gcd = fd.gcd;
 	local covenantId = fd.covenant.covenantId;
-	local runes = DeathKnight:Runes(fd.timeShift);
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runes = fd.runes;
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runeforge = fd.runeforge;
 	local conduit = fd.covenant.soulbindConduits;
@@ -375,9 +382,9 @@ function DeathKnight:FrostBosTicking()
 	local targets = fd.targets;
 	local gcd = fd.gcd;
 	local covenantId = fd.covenant.covenantId;
-	local runes = DeathKnight:Runes(fd.timeShift);
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runes = fd.runes;
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runeforge = fd.runeforge;
 	local conduit = fd.covenant.soulbindConduits;
@@ -433,8 +440,8 @@ function DeathKnight:FrostColdHeart()
 	local cooldown = fd.cooldown;
 	local buff = fd.buff;
 	local talents = fd.talents;
-	local runes = DeathKnight:Runes(fd.timeShift);
-	local deathKnightRuneforgeFallenCrusader = DeathKnight:HasWeaponEnchant(DeathKnight.weaponRunes.FallenCrusader);
+	local runes = fd.runes;
+	local deathKnightRuneforgeFallenCrusader = enchant[weaponRunes.FallenCrusader];
 
 	-- chains_of_ice,if=fight_remains<gcd;
 	if runes >= 1
@@ -473,13 +480,13 @@ function DeathKnight:FrostCooldowns()
 	local targets = fd.targets;
 	local gcd = fd.gcd;
 	local timeToDie = fd.timeToDie;
-	local runes = DeathKnight:Runes(fd.timeShift);
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runes = fd.runes;
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runeforge = fd.runeforge;
-	local deathKnightRuneforgeFallenCrusader = DeathKnight:HasWeaponEnchant(DeathKnight.weaponRunes.FallenCrusader);
-	local deathKnightRuneforgeRazorice = DeathKnight:HasWeaponEnchant(DeathKnight.weaponRunes.Razorice);
+	local deathKnightRuneforgeFallenCrusader = enchant[weaponRunes.FallenCrusader];
+	local deathKnightRuneforgeRazorice = enchant[weaponRunes.Razorice];
 	local ghoulRemains = cooldown[FR.RaiseDead].remains - (cooldown[FR.RaiseDead].duration - 60);
 
 	-- empower_rune_weapon,if=talent.obliteration&(cooldown.pillar_of_frost.ready&rune.time_to_5>gcd&runic_power.deficit>=10|buff.pillar_of_frost.up&rune.time_to_5>gcd)|fight_remains<20;
@@ -563,9 +570,9 @@ function DeathKnight:FrostCovenants()
 	local buff = fd.buff;
 	local talents = fd.talents;
 	local targets = fd.targets;
-	local runes = DeathKnight:Runes(fd.timeShift);
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runes = fd.runes;
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local covenantId = fd.covenant.covenantId;
 
@@ -619,10 +626,10 @@ function DeathKnight:FrostObliteration()
 	local targets = fd.targets;
 	local gcd = fd.gcd;
 	local covenantId = fd.covenant.covenantId;
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
-	local runes = DeathKnight:Runes(fd.timeShift);
+	local runes = fd.runes;
 	local runeforge = fd.runeforge;
 	local conduit = fd.covenant.soulbindConduits;
 
@@ -689,10 +696,10 @@ function DeathKnight:FrostObliterationPooling()
 	local talents = fd.talents;
 	local targets = fd.targets;
 	local covenantId = fd.covenant.covenantId;
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
-	local runes = DeathKnight:Runes(fd.timeShift);
+	local runes = fd.runes;
 	local runeforge = fd.runeforge;
 	local conduit = fd.covenant.soulbindConduits;
 
@@ -740,13 +747,13 @@ function DeathKnight:FrostStandard()
 	local talents = fd.talents;
 	local gcd = fd.gcd;
 	local covenantId = fd.covenant.covenantId;
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
-	local runes = DeathKnight:Runes(fd.timeShift);
+	local runes = fd.runes;
 	local runeforge = fd.runeforge;
 	local conduit = fd.covenant.soulbindConduits;
-	local deathKnightRuneforgeRazorice = DeathKnight:HasWeaponEnchant(DeathKnight.weaponRunes.Razorice);
+	local deathKnightRuneforgeRazorice = enchant[weaponRunes.Razorice];
 
 	-- remorseless_winter,if=talent.gathering_storm|conduit.everfrost|runeforge.biting_cold;
 	if cooldown[FR.RemorselessWinter].ready and runes >= 1 and (talents[FR.GatheringStorm] or conduit[FR.Everfrost] or runeforge[FR.BitingCold]) then

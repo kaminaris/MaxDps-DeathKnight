@@ -55,13 +55,19 @@ function DeathKnight:InitializeWeaponRunes()
 	local mainHand = GetInventoryItemLink('player', 16);
 	if mainHand ~= nil then
 		local _, _, eid = strsplit(":", string.match(mainHand, "item[%-?%d:]+"));
-		DeathKnight.hasEnchant[tonumber(eid)] = true;
+		eid = tonumber(eid);
+		if eid then
+			DeathKnight.hasEnchant[tonumber(eid)] = true;
+		end
 	end
 
 	local offhand = GetInventoryItemLink('player', 17);
 	if offhand ~= nil then
 		local _, _, eid = strsplit(":", string.match(offhand, "item[%-?%d:]+"));
-		DeathKnight.hasEnchant[tonumber(eid)] = true;
+		eid = tonumber(eid);
+		if eid then
+			DeathKnight.hasEnchant[tonumber(eid)] = true;
+		end
 	end
 end
 

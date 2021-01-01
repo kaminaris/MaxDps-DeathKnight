@@ -122,6 +122,12 @@ function DeathKnight:InitializeDatabase()
 		MaxDpsDeathKnightOptions = defaultOptions;
 	end
 
+	for k, v in pairs(defaultOptions) do
+		if MaxDpsDeathKnightOptions[k] == nil then
+			MaxDpsDeathKnightOptions[k] = v;
+		end
+	end
+
 	self.db = MaxDpsDeathKnightOptions;
 end
 

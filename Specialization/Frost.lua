@@ -221,7 +221,7 @@ function DeathKnight:FrostGlowCooldowns()
 
 		local abominationLimbCooldownTrigger = abominationLimbReady and
 			(
-				(targets == 1 and cooldown[FR.PillarOfFrost].remains < 3) or
+				(targets <= 1 and cooldown[FR.PillarOfFrost].remains < 3) or
 					targets >= 2
 			)
 
@@ -582,7 +582,7 @@ function DeathKnight:FrostCovenants()
 	end
 
 	-- swarming_mist,if=active_enemies=1&runic_power.deficit>3&cooldown.pillar_of_frost.remains<3&!talent.breath_of_sindragosa&(!raid_event.adds.exists|raid_event.adds.in>15);
-	if covenantId == Venthyr and cooldown[FR.SwarmingMist].ready and runes >= 1 and (targets == 1 and runicPowerDeficit > 3 and cooldown[FR.PillarOfFrost].remains < 3 and not talents[FR.BreathOfSindragosa]) then
+	if covenantId == Venthyr and cooldown[FR.SwarmingMist].ready and runes >= 1 and (targets <= 1 and runicPowerDeficit > 3 and cooldown[FR.PillarOfFrost].remains < 3 and not talents[FR.BreathOfSindragosa]) then
 		return FR.SwarmingMist;
 	end
 
@@ -592,12 +592,12 @@ function DeathKnight:FrostCovenants()
 	end
 
 	-- swarming_mist,if=talent.breath_of_sindragosa&(buff.breath_of_sindragosa.up&(active_enemies=1&runic_power.deficit>40|active_enemies>=2&runic_power.deficit>60)|!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains);
-	if covenantId == Venthyr and cooldown[FR.SwarmingMist].ready and runes >= 1 and (talents[FR.BreathOfSindragosa] and ( buff[FR.BreathOfSindragosa].up and ( targets == 1 and runicPowerDeficit > 40 or targets >= 2 and runicPowerDeficit > 60 ) or not buff[FR.BreathOfSindragosa].up and cooldown[FR.BreathOfSindragosa].remains )) then
+	if covenantId == Venthyr and cooldown[FR.SwarmingMist].ready and runes >= 1 and (talents[FR.BreathOfSindragosa] and ( buff[FR.BreathOfSindragosa].up and ( targets <= 1 and runicPowerDeficit > 40 or targets >= 2 and runicPowerDeficit > 60 ) or not buff[FR.BreathOfSindragosa].up and cooldown[FR.BreathOfSindragosa].remains )) then
 		return FR.SwarmingMist;
 	end
 
 	-- abomination_limb,if=active_enemies=1&cooldown.pillar_of_frost.remains<3&(!raid_event.adds.exists|raid_event.adds.in>15);
-	if covenantId == Necrolord and cooldown[FR.AbominationLimb].ready and (targets == 1 and cooldown[FR.PillarOfFrost].remains < 3 and ( targets == 1 )) then
+	if covenantId == Necrolord and cooldown[FR.AbominationLimb].ready and (targets <= 1 and cooldown[FR.PillarOfFrost].remains < 3 and ( targets <= 1 )) then
 		return FR.AbominationLimb;
 	end
 
@@ -607,7 +607,7 @@ function DeathKnight:FrostCovenants()
 	end
 
 	-- shackle_the_unworthy,if=active_enemies=1&cooldown.pillar_of_frost.remains<3&(!raid_event.adds.exists|raid_event.adds.in>15);
-	if covenantId == Kyrian and cooldown[FR.ShackleTheUnworthy].ready and (targets == 1 and cooldown[FR.PillarOfFrost].remains < 3) then
+	if covenantId == Kyrian and cooldown[FR.ShackleTheUnworthy].ready and (targets <= 1 and cooldown[FR.PillarOfFrost].remains < 3) then
 		return FR.ShackleTheUnworthy;
 	end
 
@@ -659,7 +659,7 @@ function DeathKnight:FrostObliteration()
 	end
 
 	-- frost_strike,if=conduit.eradicating_blow&buff.eradicating_blow.stack=2&active_enemies=1;
-	if runicPower >= 25 and (conduit[FR.EradicatingBlow] and buff[FR.EradicatingBlow].count == 2 and targets == 1) then
+	if runicPower >= 25 and (conduit[FR.EradicatingBlow] and buff[FR.EradicatingBlow].count == 2 and targets <= 1) then
 		return FR.FrostStrike;
 	end
 

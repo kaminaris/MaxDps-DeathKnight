@@ -75,6 +75,8 @@ function DeathKnight:Unholy()
 	local petExists = UnitExists('pet');
 	local controlUndeadAura = MaxDps:IntUnitAura('pet', UH.ControlUndead, 'PLAYER', fd.timeShift);
 	local covenantId = fd.covenant.covenantId
+	local runicPower = UnitPower('player', RunicPower);
+	local runicPowerMax = UnitPowerMax('player', RunicPower);
 
 	if talents[UH.ClawingShadows] then
 		UH.WoundSpender = UH.ClawingShadows;
@@ -91,13 +93,17 @@ function DeathKnight:Unholy()
 	end
 
 	-- variable,name=pooling_for_gargoyle,value=cooldown.summon_gargoyle.remains<5&talent.summon_gargoyle;
-	local poolingForGargoyle = talents[UH.SummonGargoyle] and (cooldown[UH.SummonGargoyle].remains < 5) and not DeathKnight.db.unholySummonGargoyleAsCooldown;
+	local poolingForGargoyle = talents[UH.SummonGargoyle] and
+		(cooldown[UH.SummonGargoyle].remains < 5) and
+		not DeathKnight.db.unholySummonGargoyleAsCooldown;
 
 	-- variable,name=st_planning,value=active_enemies=1&(!raid_event.adds.exists|raid_event.adds.in>15);
-	local stPlanning = targets == 1;
+	local stPlanning = targets <= 1;
 
 	fd.targets = targets;
 	fd.runes = runes;
+	fd.runicPower = runicPower;
+	fd.runicPowerMax = runicPowerMax;
 	fd.deathKnightFwoundedTargets = deathKnightFwoundedTargets;
 	fd.deathKnightDisableAotd = deathKnightDisableAotd;
 	fd.petExists = petExists;
@@ -108,17 +114,24 @@ function DeathKnight:Unholy()
 	DeathKnight:UholyGlowCooldowns();
 
 	-- outbreak,if=dot.virulent_plague.refreshable&!talent.unholy_blight&!raid_event.adds.exists;
-	if runes >= 1 and (debuff[UH.VirulentPlague].refreshable and not talents[UH.UnholyBlight] and targets == 1) then
+	if runes >= 1 and (debuff[UH.VirulentPlague].refreshable and not talents[UH.UnholyBlight] and targets <= 1) then
 		return UH.Outbreak;
 	end
 
 	-- outbreak,if=dot.virulent_plague.refreshable&active_enemies>=2&(!talent.unholy_blight|talent.unholy_blight&cooldown.unholy_blight.remains);
-	if runes >= 1 and (debuff[UH.VirulentPlague].refreshable and targets >= 2 and ( not talents[UH.UnholyBlight] or (talents[UH.UnholyBlight] and not cooldown[UH.UnholyBlight].ready ))) then
+	if runes >= 1 and
+		debuff[UH.VirulentPlague].refreshable and
+		targets >= 2 and
+		(not talents[UH.UnholyBlight] or (talents[UH.UnholyBlight] and not cooldown[UH.UnholyBlight].ready))
+	then
 		return UH.Outbreak;
 	end
 
 	-- outbreak,if=runeforge.superstrain&(dot.frost_fever.refreshable|dot.blood_plague.refreshable);
-	if runes >= 1 and (runeforge[UH.SuperstrainBonusId] and ( debuff[UH.FrostFever].refreshable or debuff[UH.BloodPlague].refreshable )) then
+	if runes >= 1 and
+		runeforge[UH.SuperstrainBonusId] and
+		(debuff[UH.FrostFever].refreshable or debuff[UH.BloodPlague].refreshable)
+	then
 		return UH.Outbreak;
 	end
 
@@ -135,7 +148,13 @@ function DeathKnight:Unholy()
 	end
 
 	-- run_action_list,name=aoe_setup,if=active_enemies>=2&(cooldown.death_and_decay.remains<10&!talent.defile|cooldown.defile.remains<10&talent.defile)&!death_and_decay.ticking;
-	if targets >= 2 and ((cooldown[UH.DeathAndDecay].remains < 10 and not talents[UH.Defile]) or (talents[UH.Defile] and cooldown[UH.Defile].remains < 10)) and not debuff[UH.DeathAndDecay].up then
+	if targets >= 2 and
+		(
+			(cooldown[UH.DeathAndDecay].remains < 10 and not talents[UH.Defile]) or
+			(talents[UH.Defile] and cooldown[UH.Defile].remains < 10)
+		) and
+		not debuff[UH.DeathAndDecay].up
+	then
 		return DeathKnight:UnholyAoeSetup();
 	end
 
@@ -145,12 +164,18 @@ function DeathKnight:Unholy()
 	end
 
 	-- run_action_list,name=generic_aoe,if=active_enemies>=2&(!death_and_decay.ticking&(cooldown.death_and_decay.remains>10&!talent.defile|cooldown.defile.remains>10&talent.defile));
-	if targets >= 2 and ( not buff[UH.DeathAndDecayBuff].up and ((cooldown[UH.DeathAndDecay].remains > 10 and not talents[UH.Defile]) or (talents[UH.Defile] and cooldown[UH.Defile].remains > 10)) ) then
+	if targets >= 2 and
+		not buff[UH.DeathAndDecayBuff].up and
+		(
+			(cooldown[UH.DeathAndDecay].remains > 10 and not talents[UH.Defile]) or
+			(talents[UH.Defile] and cooldown[UH.Defile].remains > 10)
+		)
+	then
 		return DeathKnight:UnholyGenericAoe();
 	end
 
 	-- call_action_list,name=generic,if=active_enemies=1;
-	if targets == 1 then
+	if targets <= 1 then
 		result = DeathKnight:UnholyGeneric();
 		if result then
 			return result;
@@ -171,9 +196,15 @@ function DeathKnight:UholyGlowCooldowns()
 	local covenantId = fd.covenant.covenantId;
 	local stPlanning = fd.stPlanning;
 
-	local armyOfTheDeadReady = DeathKnight.db.unholyArmyOfTheDeadAsCooldown and cooldown[UH.ArmyOfTheDead].ready and runes >= 1;
-	local summonGargoyleReady = DeathKnight.db.unholySummonGargoyleAsCooldown and talents[UH.SummonGargoyle] and cooldown[UH.SummonGargoyle].ready;
-	local abominationLimbReady = DeathKnight.db.abominationLimbAsCooldown and covenantId == Necrolord and cooldown[UH.AbominationLimb].ready;
+	local armyOfTheDeadReady = DeathKnight.db.unholyArmyOfTheDeadAsCooldown and
+		cooldown[UH.ArmyOfTheDead].ready and
+		runes >= 1;
+	local summonGargoyleReady = DeathKnight.db.unholySummonGargoyleAsCooldown and
+		talents[UH.SummonGargoyle] and
+		cooldown[UH.SummonGargoyle].ready;
+	local abominationLimbReady = DeathKnight.db.abominationLimbAsCooldown and
+		covenantId == Necrolord and
+		cooldown[UH.AbominationLimb].ready;
 
 	if DeathKnight.db.alwaysGlowCooldowns then
 		MaxDps:GlowCooldown(UH.ArmyOfTheDead, armyOfTheDeadReady);
@@ -185,14 +216,19 @@ function DeathKnight:UholyGlowCooldowns()
 		armyOfTheDeadReady and
 			runes >= 1 and
 			(
-				(talents[UH.UnholyBlight] and cooldown[UH.UnholyBlight].remains < 3 and cooldown[UH.DarkTransformation].remains < 3) or
-					not talents[UH.UnholyBlight]
+				(
+					talents[UH.UnholyBlight] and
+					cooldown[UH.UnholyBlight].remains < 3 and
+					cooldown[UH.DarkTransformation].remains < 3
+				) or
+				not talents[UH.UnholyBlight]
 			);
 
 		local summonGargoyleCooldownTrigger =
 		summonGargoyleReady and
 			talents[UH.UnholyBlight] and
-			(runicPowerDeficit < 14 and
+			(
+				runicPowerDeficit < 14 and
 				(cooldown[UH.UnholyBlight].remains < 10 or debuff[UH.UnholyBlightDot].remains)
 			)
 
@@ -201,21 +237,21 @@ function DeathKnight:UholyGlowCooldowns()
 			(
 				(
 					stPlanning and
-						not covenant.soulbindAbilities[UH.LeadByExample] and
-						not cooldown[UH.Apocalypse].ready and
-						DeathKnight:TimeToRunes(4) > ( 3 + buff[UH.RunicCorruption].remains )
+					not covenant.soulbindAbilities[UH.LeadByExample] and
+					not cooldown[UH.Apocalypse].ready and
+					DeathKnight:TimeToRunes(4) > ( 3 + buff[UH.RunicCorruption].remains )
 				) or
 					(
 						stPlanning and
-							covenant.soulbindAbilities[UH.LeadByExample] and
-							(
-								(talents[UH.UnholyBlight] and not cooldown[UH.UnholyBlight].ready) or
-									(not talents[UH.UnholyBlight] and not cooldown[UH.DarkTransformation].ready )
-							)
+						covenant.soulbindAbilities[UH.LeadByExample] and
+						(
+							(talents[UH.UnholyBlight] and not cooldown[UH.UnholyBlight].ready) or
+								(not talents[UH.UnholyBlight] and not cooldown[UH.DarkTransformation].ready )
+						)
 					) or
 					(
 						targets >= 2 and
-							DeathKnight:TimeToRunes(4) > ( 3 + buff[UH.RunicCorruption].remains )
+						DeathKnight:TimeToRunes(4) > ( 3 + buff[UH.RunicCorruption].remains )
 					)
 			);
 
@@ -231,8 +267,8 @@ function DeathKnight:UnholyAoeBurst()
 	local talents = fd.talents;
 	local targets = fd.targets;
 	local runes = fd.runes;
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runeforge = fd.runeforge
 	local deathKnightFwoundedTargets = fd.deathKnightFwoundedTargets;
@@ -240,22 +276,29 @@ function DeathKnight:UnholyAoeBurst()
 	local covenantId = fd.covenant.covenantId
 
 	-- death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3;
-	if runicPower >= 40 and (buff[UH.DarkTransformation].up and runeforge[UH.DeadliestCoil] and targets <= 3) then
+	if runicPower >= 40 and buff[UH.DarkTransformation].up and runeforge[UH.DeadliestCoil] and targets <= 3 then
 		return UH.DeathCoil;
 	end
 
 	-- epidemic,if=runic_power.deficit<(10+death_knight.fwounded_targets*3)&death_knight.fwounded_targets<6&!variable.pooling_for_gargoyle|buff.swarming_mist.up;
-	if runicPower >= 30 and ((runicPowerDeficit < ( 10 + deathKnightFwoundedTargets * 3 ) and deathKnightFwoundedTargets < 6 and not poolingForGargoyle) or (covenantId == Venthyr and buff[UH.SwarmingMist].up)) then
+	if runicPower >= 30 and (
+		(runicPowerDeficit < ( 10 + deathKnightFwoundedTargets * 3 ) and
+			deathKnightFwoundedTargets < 6 and
+			not poolingForGargoyle
+		) or (
+			covenantId == Venthyr and buff[UH.SwarmingMist].up
+		)
+	) then
 		return UH.Epidemic;
 	end
 
 	-- epidemic,if=runic_power.deficit<25&death_knight.fwounded_targets>5&!variable.pooling_for_gargoyle;
-	if runicPower >= 30 and (runicPowerDeficit < 25 and deathKnightFwoundedTargets > 5 and not poolingForGargoyle) then
+	if runicPower >= 30 and runicPowerDeficit < 25 and deathKnightFwoundedTargets > 5 and not poolingForGargoyle then
 		return UH.Epidemic;
 	end
 
 	-- epidemic,if=!death_knight.fwounded_targets&!variable.pooling_for_gargoyle|fight_remains<5|raid_event.adds.exists&raid_event.adds.remains<5;
-	if runicPower >= 30 and (deathKnightFwoundedTargets == 0 and not poolingForGargoyle) then
+	if runicPower >= 30 and deathKnightFwoundedTargets == 0 and not poolingForGargoyle then
 		return UH.Epidemic;
 	end
 
@@ -265,7 +308,7 @@ function DeathKnight:UnholyAoeBurst()
 	end;
 
 	-- epidemic,if=!variable.pooling_for_gargoyle;
-	if runicPower >= 30 and (not poolingForGargoyle) then
+	if runicPower >= 30 and not poolingForGargoyle then
 		return UH.Epidemic;
 	end
 end
@@ -276,7 +319,7 @@ function DeathKnight:UnholyAoeSetup()
 	local buff = fd.buff;
 	local debuff = fd.debuff;
 	local targets = fd.targets;
-	local runicPower = UnitPower('player', RunicPower);
+	local runicPower = fd.runicPower;
 	local runes = fd.runes;
 	local poolingForGargoyle = fd.poolingForGargoyle;
 	local runeforge = fd.runeforge;
@@ -294,12 +337,12 @@ function DeathKnight:UnholyAoeSetup()
 	end
 
 	-- death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3;
-	if runicPower >= 40 and (buff[UH.DarkTransformation].up and runeforge[UH.DeadliestCoil] and targets <= 3) then
+	if runicPower >= 40 and buff[UH.DarkTransformation].up and runeforge[UH.DeadliestCoil] and targets <= 3 then
 		return UH.DeathCoil;
 	end
 
 	-- epidemic,if=!variable.pooling_for_gargoyle;
-	if runicPower >= 30 and (not poolingForGargoyle) then
+	if runicPower >= 30 and not poolingForGargoyle then
 		return UH.Epidemic;
 	end
 
@@ -321,8 +364,8 @@ function DeathKnight:UnholyCooldowns()
 	local gcd = fd.gcd;
 	local timeToDie = fd.timeToDie;
 	local runes = fd.runes;
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local stPlanning = fd.stPlanning;
 	local deathKnightDisableAotd = fd.deathKnightDisableAotd;
@@ -336,81 +379,177 @@ function DeathKnight:UnholyCooldowns()
 	local controlUndeadAura = fd.controlUndeadAura;
 
 	-- army_of_the_dead,if=cooldown.unholy_blight.remains<3&cooldown.dark_transformation.remains<3&talent.unholy_blight&!soulbind.lead_by_example|!talent.unholy_blight|fight_remains<35
-	if cooldown[UH.ArmyOfTheDead].ready and not DeathKnight.db.unholyArmyOfTheDeadAsCooldown and runes >= 1 and
-		((talents[UH.UnholyBlight] and cooldown[UH.UnholyBlight].remains < 3 and cooldown[UH.DarkTransformation].remains < 3 and not covenant.soulbindAbilities[UH.LeadByExample]) or not talents[UH.UnholyBlight]) then
+	if cooldown[UH.ArmyOfTheDead].ready and
+		not DeathKnight.db.unholyArmyOfTheDeadAsCooldown and
+		runes >= 1 and
+		(
+			(
+				talents[UH.UnholyBlight] and
+					cooldown[UH.UnholyBlight].remains < 3 and
+					cooldown[UH.DarkTransformation].remains < 3 and
+					not covenant.soulbindAbilities[UH.LeadByExample]
+			) or
+				not talents[UH.UnholyBlight]
+		)
+	then
 		return UH.ArmyOfTheDead;
 	end
 
 	-- army_of_the_dead,if=cooldown.unholy_blight.remains<3&cooldown.abomination_limb.ready&soulbind.lead_by_example
-	if cooldown[UH.ArmyOfTheDead].ready and not DeathKnight.db.unholyArmyOfTheDeadAsCooldown and runes >= 1 and
-		((talents[UH.UnholyBlight] and cooldown[UH.UnholyBlight].remains < 3 and covenantId == Necrolord and cooldown[UH.AbominationLimb].ready and not covenant.soulbindAbilities[UH.LeadByExample]))
+	if cooldown[UH.ArmyOfTheDead].ready and
+		not DeathKnight.db.unholyArmyOfTheDeadAsCooldown and
+		runes >= 1 and
+		talents[UH.UnholyBlight] and
+		cooldown[UH.UnholyBlight].remains < 3 and
+		covenantId == Necrolord and
+		cooldown[UH.AbominationLimb].ready and
+		not covenant.soulbindAbilities[UH.LeadByExample]
 	then
 		return UH.ArmyOfTheDead;
 	end
 
 	--# Sync Blight with Dark Transformation if utilizing other Dark Transformation buffs, those being Deadliest Coil, Frenzied Monstrosity or Eternal Hunger. Also checks if conditions are met to instead hold for Apocalypse.
 	-- unholy_blight,if=variable.st_planning&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)&(!runeforge.deadliest_coil|!talent.army_of_the_damned|conduit.convocation_of_the_dead.rank<5)
-	if talents[UH.UnholyBlight] and cooldown[UH.UnholyBlight].ready and runes >= 1 and
-		(stPlanning and ( cooldown[UH.DarkTransformation].remains < gcd or buff[UH.DarkTransformation].up ) and ( not runeforge[UH.DeadliestCoil] or not talents[UH.ArmyOfTheDamned] or (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)))
+	if talents[UH.UnholyBlight] and
+		cooldown[UH.UnholyBlight].ready and
+		runes >= 1 and
+		stPlanning and
+		( cooldown[UH.DarkTransformation].remains < gcd or buff[UH.DarkTransformation].up ) and
+		(
+			not runeforge[UH.DeadliestCoil] or
+			not talents[UH.ArmyOfTheDamned] or
+			(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)
+		)
 	then
 		return UH.UnholyBlight;
 	end
 
 	--# Sync Blight with Apocalypse if the cooldown of Apocalypse is low enough. Requires Deadliest Coil, Convocation of the Dead and Army of the Damned together.
 	-- unholy_blight,if=variable.st_planning&runeforge.deadliest_coil&talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5&cooldown.apocalypse.remains<3&(cooldown.dark_transformation.remains<gcd|buff.dark_transformation.up)
-	if talents[UH.UnholyBlight] and cooldown[UH.UnholyBlight].ready and runes >= 1 and
-		(stPlanning and runeforge[UH.DeadliestCoil] and talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5) and cooldown[UH.Apocalypse].remains < 3 and (cooldown[UH.DarkTransformation].remains < gcd or buff[UH.DarkTransformation].up))
+	if talents[UH.UnholyBlight] and
+		cooldown[UH.UnholyBlight].ready and
+		runes >= 1 and
+		stPlanning and
+		runeforge[UH.DeadliestCoil] and
+		talents[UH.ArmyOfTheDamned] and
+		(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5) and
+		cooldown[UH.Apocalypse].remains < 3 and
+		(cooldown[UH.DarkTransformation].remains < gcd or buff[UH.DarkTransformation].up)
 	then
 		return UH.UnholyBlight;
 	end
 
 	-- unholy_blight,if=active_enemies>=2|fight_remains<21;
-	if talents[UH.UnholyBlight] and cooldown[UH.UnholyBlight].ready and runes >= 1 and (targets >= 2) then
+	if talents[UH.UnholyBlight] and
+		cooldown[UH.UnholyBlight].ready and
+		runes >= 1 and
+		targets >= 2
+	then
 		return UH.UnholyBlight;
 	end
 
 	-- dark_transformation,if=variable.st_planning&(dot.unholy_blight_dot.remains|!talent.unholy_blight);
-	if ghoulActive and (not controlUndeadAura.up) and cooldown[UH.DarkTransformation].ready and (stPlanning and (not talents[UH.UnholyBlight] or debuff[UH.UnholyBlightDot].up)) then
+	if ghoulActive and
+		(not controlUndeadAura.up) and
+		cooldown[UH.DarkTransformation].ready and
+		stPlanning and
+		(not talents[UH.UnholyBlight] or debuff[UH.UnholyBlightDot].up)
+	then
 		return UH.DarkTransformation;
 	end
 
 	-- dark_transformation,if=active_enemies>=2;
-	if ghoulActive and (not controlUndeadAura.up) and cooldown[UH.DarkTransformation].ready and (targets >= 2) then
+	if ghoulActive and
+		not controlUndeadAura.up and
+		cooldown[UH.DarkTransformation].ready and
+		targets >= 2
+	then
 		return UH.DarkTransformation;
 	end
 
 	-- apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&talent.unholy_blight&talent.army_of_the_damned&runeforge.deadliest_coil&conduit.convocation_of_the_dead.rank>=5&dot.unholy_blight_dot.remains;
-	if cooldown[UH.Apocalypse].ready and (targets == 1 and debuff[UH.FesteringWound].count >= 4 and talents[UH.UnholyBlight] and talents[UH.ArmyOfTheDamned] and runeforge[UH.DeadliestCoil] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5) and debuff[UH.UnholyBlightDot].up) then
+	if cooldown[UH.Apocalypse].ready and
+		targets <= 1 and
+		debuff[UH.FesteringWound].count >= 4 and
+		talents[UH.UnholyBlight] and
+		talents[UH.ArmyOfTheDamned] and
+		runeforge[UH.DeadliestCoil] and
+		(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5) and
+		debuff[UH.UnholyBlightDot].up
+	then
 		return UH.Apocalypse;
 	end
 
 	-- apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&talent.unholy_blight&dot.unholy_blight_dot.remains>10&!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5;
-	if cooldown[UH.Apocalypse].ready and (targets == 1 and debuff[UH.FesteringWound].count >= 4 and talents[UH.UnholyBlight] and debuff[UH.UnholyBlightDot].remains > 10 and not talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)) then
+	if cooldown[UH.Apocalypse].ready and
+		targets <= 1 and
+		debuff[UH.FesteringWound].count >= 4 and
+		talents[UH.UnholyBlight] and
+		debuff[UH.UnholyBlightDot].remains > 10 and
+		not talents[UH.ArmyOfTheDamned] and
+		(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)
+	then
 		return UH.Apocalypse;
 	end
 
 	-- apocalypse,if=active_enemies=1&debuff.festering_wound.stack>=4&(!talent.unholy_blight|talent.army_of_the_damned&(!runeforge.deadliest_coil|conduit.convocation_of_the_dead.rank<5)|!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5|fight_remains<16);
-	if cooldown[UH.Apocalypse].ready and (targets == 1 and debuff[UH.FesteringWound].count >= 4 and ( not talents[UH.UnholyBlight] or talents[UH.ArmyOfTheDamned] and ( not runeforge[UH.DeadliestCoil] or (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5 )) or (not talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5 )))) then
+	if cooldown[UH.Apocalypse].ready and
+		targets <= 1 and
+		debuff[UH.FesteringWound].count >= 4 and
+		(
+			not talents[UH.UnholyBlight] or
+				talents[UH.ArmyOfTheDamned] and
+					(
+						not runeforge[UH.DeadliestCoil] or
+						(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)
+					) or (
+						not talents[UH.ArmyOfTheDamned] and
+						(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5)
+			)
+		)
+	then
 		return UH.Apocalypse;
 	end
 
 	-- apocalypse,target_if=max:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack>=4&!death_and_decay.ticking;
-	if cooldown[UH.Apocalypse].ready and (targets >= 2 and debuff[UH.FesteringWound].count >= 4 and not buff[UH.DeathAndDecayBuff].up) then
+	if cooldown[UH.Apocalypse].ready and
+		targets >= 2 and
+		debuff[UH.FesteringWound].count >= 4 and
+		not buff[UH.DeathAndDecayBuff].up
+	then
 		return UH.Apocalypse;
 	end
 
 	-- summon_gargoyle,if=runic_power.deficit<14&(cooldown.unholy_blight.remains<10|dot.unholy_blight_dot.remains);
-	if talents[UH.SummonGargoyle] and cooldown[UH.SummonGargoyle].ready and (not DeathKnight.db.unholySummonGargoyleAsCooldown) and talents[UH.UnholyBlight] and (runicPowerDeficit < 14 and ( cooldown[UH.UnholyBlight].remains < 10 or debuff[UH.UnholyBlightDot].remains )) then
+	if talents[UH.SummonGargoyle] and
+		cooldown[UH.SummonGargoyle].ready and
+		not DeathKnight.db.unholySummonGargoyleAsCooldown and
+		talents[UH.UnholyBlight] and
+		runicPowerDeficit < 14 and
+		(cooldown[UH.UnholyBlight].remains < 10 or debuff[UH.UnholyBlightDot].remains)
+	then
 		return UH.SummonGargoyle;
 	end
 
 	-- unholy_assault,if=variable.st_planning&debuff.festering_wound.stack<2&(pet.apoc_ghoul.active|conduit.convocation_of_the_dead&buff.dark_transformation.up&!pet.army_ghoul.active);
-	if talents[UH.UnholyAssault] and cooldown[UH.UnholyAssault].ready and (stPlanning and debuff[UH.FesteringWound].count < 2 and ( apocGhoulActive or (conduit[UH.ConvocationOfTheDead] and buff[UH.DarkTransformation].up and not armyGhoulActive ))) then
+	if talents[UH.UnholyAssault] and
+		cooldown[UH.UnholyAssault].ready and
+		stPlanning and
+		debuff[UH.FesteringWound].count < 2 and
+		(
+			apocGhoulActive or
+			(conduit[UH.ConvocationOfTheDead] and buff[UH.DarkTransformation].up and not armyGhoulActive)
+		)
+	then
 		return UH.UnholyAssault;
 	end
 
 	-- unholy_assault,target_if=min:debuff.festering_wound.stack,if=active_enemies>=2&debuff.festering_wound.stack<2;
-	if talents[UH.UnholyAssault] and cooldown[UH.UnholyAssault].ready and (targets >= 2 and debuff[UH.FesteringWound].count < 2) then
+	if talents[UH.UnholyAssault] and
+		cooldown[UH.UnholyAssault].ready and
+		targets >= 2 and
+		debuff[UH.FesteringWound].count < 2
+	then
 		return UH.UnholyAssault;
 	end
 
@@ -422,12 +561,19 @@ function DeathKnight:UnholyCooldowns()
 	end
 
 	-- raise_dead,if=!pet.ghoul.active;
-	if cooldown[UH.RaiseDead].ready and (not ghoulActive) then
+	if cooldown[UH.RaiseDead].ready and not ghoulActive then
 		return UH.RaiseDead;
 	end
 
 	-- sacrificial_pact,if=active_enemies>=2&!buff.dark_transformation.up&!cooldown.dark_transformation.ready|fight_remains<gcd;
-	if ghoulActive and not controlUndeadAura.up and cooldown[UH.SacrificialPact].ready and runicPower >= 20 and targets >= 2 and (not buff[UH.DarkTransformation].up) and (not cooldown[UH.DarkTransformation].ready) then
+	if ghoulActive and
+		not controlUndeadAura.up and
+		cooldown[UH.SacrificialPact].ready and
+		runicPower >= 20 and
+		targets >= 2 and
+		not buff[UH.DarkTransformation].up and
+		not cooldown[UH.DarkTransformation].ready
+	then
 		return UH.SacrificialPact;
 	end
 end
@@ -439,8 +585,8 @@ function DeathKnight:UnholyCovenants()
 	local debuff = fd.debuff;
 	local talents = fd.talents;
 	local targets = fd.targets;
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runes = fd.runes;
 	local stPlanning = fd.stPlanning
@@ -448,38 +594,79 @@ function DeathKnight:UnholyCovenants()
 	local covenantId = fd.covenant.covenantId
 
 	-- swarming_mist,if=variable.st_planning&runic_power.deficit>16|fight_remains<11;
-	if covenantId == Venthyr and cooldown[UH.SwarmingMist].ready and runes >= 1 and (stPlanning and runicPowerDeficit > 16) then
+	if covenantId == Venthyr and
+		cooldown[UH.SwarmingMist].ready and
+		runes >= 1 and
+		stPlanning and
+		runicPowerDeficit > 16
+	then
 		return UH.SwarmingMist;
 	end
 
 	-- swarming_mist,if=cooldown.apocalypse.remains&(active_enemies>=2&active_enemies<=5&runic_power.deficit>10+(active_enemies*6)|active_enemies>5&runic_power.deficit>40);
-	if covenantId == Venthyr and cooldown[UH.SwarmingMist].ready and runes >= 1 and (not cooldown[UH.Apocalypse].ready and ( (targets >= 2 and targets <= 5 and runicPowerDeficit > 10 + ( targets * 6 )) or (targets > 5 and runicPowerDeficit > 40 ))) then
+	if covenantId == Venthyr and
+		cooldown[UH.SwarmingMist].ready and
+		runes >= 1 and
+		not cooldown[UH.Apocalypse].ready and
+		(
+			(targets >= 2 and targets <= 5 and runicPowerDeficit > 10 + ( targets * 6 )) or
+				(targets > 5 and runicPowerDeficit > 40 )
+		)
+	then
 		return UH.SwarmingMist;
 	end
 
 	-- abomination_limb,if=variable.st_planning&!soulbind.lead_by_example&cooldown.apocalypse.remains&rune.time_to_4>(3+buff.runic_corruption.remains)|fight_remains<21;
-	if covenantId == Necrolord and cooldown[UH.AbominationLimb].ready and (not DeathKnight.db.abominationLimbAsCooldown) and (stPlanning and not covenant.soulbindAbilities[UH.LeadByExample] and not cooldown[UH.Apocalypse].ready and DeathKnight:TimeToRunes(4) > ( 3 + buff[UH.RunicCorruption].remains )) then
+	if covenantId == Necrolord and
+		cooldown[UH.AbominationLimb].ready and
+		not DeathKnight.db.abominationLimbAsCooldown and
+		stPlanning and
+		not covenant.soulbindAbilities[UH.LeadByExample] and
+		not cooldown[UH.Apocalypse].ready and
+		DeathKnight:TimeToRunes(4) > ( 3 + buff[UH.RunicCorruption].remains )
+	then
 		return UH.AbominationLimb;
 	end
 
 	-- abomination_limb,if=variable.st_planning&soulbind.lead_by_example&(dot.unholy_blight_dot.remains>11|!talent.unholy_blight&cooldown.dark_transformation.remains)
-	if covenantId == Necrolord and cooldown[UH.AbominationLimb].ready and (not DeathKnight.db.abominationLimbAsCooldown) and
-		(stPlanning and covenant.soulbindAbilities[UH.LeadByExample] and ( (talents[UH.UnholyBlight] and debuff[UH.UnholyBlightDot].remains > 11) or (not talents[UH.UnholyBlight] and not cooldown[UH.DarkTransformation].ready ))) then
+	if covenantId == Necrolord and
+		cooldown[UH.AbominationLimb].ready and
+		not DeathKnight.db.abominationLimbAsCooldown and
+		stPlanning and
+		covenant.soulbindAbilities[UH.LeadByExample] and
+		(
+			(talents[UH.UnholyBlight] and debuff[UH.UnholyBlightDot].remains > 11) or
+			(not talents[UH.UnholyBlight] and not cooldown[UH.DarkTransformation].ready)
+		)
+	then
 		return UH.AbominationLimb;
 	end
 
 	-- abomination_limb,if=active_enemies>=2&rune.time_to_4>(3+buff.runic_corruption.remains);
-	if covenantId == Necrolord and cooldown[UH.AbominationLimb].ready and (not DeathKnight.db.abominationLimbAsCooldown) and (targets >= 2 and DeathKnight:TimeToRunes(4) > ( 3 + buff[UH.RunicCorruption].remains )) then
+	if covenantId == Necrolord and
+		cooldown[UH.AbominationLimb].ready and
+		not DeathKnight.db.abominationLimbAsCooldown and
+		targets >= 2 and
+		DeathKnight:TimeToRunes(4) > (3 + buff[UH.RunicCorruption].remains)
+	then
 		return UH.AbominationLimb;
 	end
 
 	-- shackle_the_unworthy,if=variable.st_planning&cooldown.apocalypse.remains|fight_remains<15;
-	if covenantId == Kyrian and cooldown[UH.ShackleTheUnworthy].ready and (stPlanning and not cooldown[UH.Apocalypse].ready) then
+	if covenantId == Kyrian and
+		cooldown[UH.ShackleTheUnworthy].ready and
+		stPlanning and
+		not cooldown[UH.Apocalypse].ready
+	then
 		return UH.ShackleTheUnworthy;
 	end
 
 	-- shackle_the_unworthy,if=active_enemies>=2&(death_and_decay.ticking|raid_event.adds.remains<=14);
-	if covenantId == Kyrian and cooldown[UH.ShackleTheUnworthy].ready and (targets >= 2 and debuff[UH.DeathAndDecay].up) then
+	if covenantId == Kyrian and
+		cooldown[UH.ShackleTheUnworthy].ready and
+		targets >= 2 and
+		debuff[UH.DeathAndDecay].up
+	then
 		return UH.ShackleTheUnworthy;
 	end
 end
@@ -491,8 +678,8 @@ function DeathKnight:UnholyGeneric()
 	local debuff = fd.debuff;
 	local talents = fd.talents;
 	local covenantId = fd.covenant.covenantId;
-	local runicPower = UnitPower('player', RunicPower);
-	local runicPowerMax = UnitPowerMax('player', RunicPower);
+	local runicPower = fd.runicPower;
+	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runes = fd.runes;
 	local poolingForGargoyle = fd.poolingForGargoyle;
@@ -501,17 +688,24 @@ function DeathKnight:UnholyGeneric()
 	local conduit = fd.covenant.soulbindConduits;
 
 	-- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active;
-	if runicPower >= 40 and (buff[UH.SuddenDoom].up and (not poolingForGargoyle or petGargoyle)) then
+	if runicPower >= 40 and
+		buff[UH.SuddenDoom].up and
+		(not poolingForGargoyle or petGargoyle)
+	then
 		return UH.DeathCoil;
 	end
 
 	-- death_coil,if=runic_power.deficit<13&!variable.pooling_for_gargoyle;
-	if runicPower >= 40 and (runicPowerDeficit < 13 and not poolingForGargoyle) then
+	if runicPower >= 40 and runicPowerDeficit < 13 and not poolingForGargoyle then
 		return UH.DeathCoil;
 	end
 
 	-- any_dnd,if=cooldown.apocalypse.remains&(talent.defile.enabled|covenant.night_fae|runeforge.phearomones);
-	if cooldown[UH.AnyDnd].ready and runes >=1 and not cooldown[UH.Apocalypse].ready and ( talents[UH.Defile] or covenantId == NightFae or runeforge[UH.PhearomonesBonusId] ) then
+	if cooldown[UH.AnyDnd].ready and
+		runes >= 1 and
+		not cooldown[UH.Apocalypse].ready and
+		(talents[UH.Defile] or covenantId == NightFae or runeforge[UH.PhearomonesBonusId])
+	then
 		return UH.AnyDnd;
 	end
 
@@ -521,37 +715,80 @@ function DeathKnight:UnholyGeneric()
 	end
 
 	-- wound_spender,if=debuff.festering_wound.up&cooldown.apocalypse.remains>5&(!talent.unholy_blight|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5|!conduit.convocation_of_the_dead);
-	if runes >= 1 and debuff[UH.FesteringWound].up and cooldown[UH.Apocalypse].remains > 5 and ( not talents[UH.UnholyBlight] or (talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)) or (not talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5)) or not conduit[UH.ConvocationOfTheDead] ) then
+	if runes >= 1 and
+		debuff[UH.FesteringWound].up and
+		cooldown[UH.Apocalypse].remains > 5 and
+		(
+			not talents[UH.UnholyBlight] or
+			(talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)) or
+			(not talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5)) or
+			not conduit[UH.ConvocationOfTheDead]
+		)
+	then
 		return UH.WoundSpender;
 	end
 
 	-- wound_spender,if=debuff.festering_wound.up&talent.unholy_blight&(!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5)&(cooldown.unholy_blight.remains>10&!dot.unholy_blight_dot.remains|cooldown.apocalypse.remains>10);
-	if runes >= 1 and debuff[UH.FesteringWound].up and talents[UH.UnholyBlight] and ( not talents[UH.ArmyOfTheDamned] and ((conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5) or talents[UH.ArmyOfTheDamned]) and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5 )) and ( cooldown[UH.UnholyBlight].remains > 10 and (not debuff[UH.UnholyBlightDot].up or cooldown[UH.Apocalypse].remains > 10 )) then
+	if runes >= 1 and
+		debuff[UH.FesteringWound].up and
+		talents[UH.UnholyBlight] and
+		(
+			not talents[UH.ArmyOfTheDamned] and
+			(
+				(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5) or
+				talents[UH.ArmyOfTheDamned]
+			) and (
+				conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5
+			)
+		) and (
+			cooldown[UH.UnholyBlight].remains > 10 and
+			(not debuff[UH.UnholyBlightDot].up or cooldown[UH.Apocalypse].remains > 10 )
+		)
+	then
 		return UH.WoundSpender;
 	end
 
 	-- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle;
-	if runicPower >= 40 and (runicPowerDeficit < 20 and not poolingForGargoyle) then
+	if runicPower >= 40 and runicPowerDeficit < 20 and not poolingForGargoyle then
 		return UH.DeathCoil;
 	end
 
 	-- festering_strike,if=debuff.festering_wound.stack<1;
-	if runes >= 2 and (debuff[UH.FesteringWound].count < 1) then
+	if runes >= 2 and debuff[UH.FesteringWound].count < 1 then
 		return UH.FesteringStrike;
 	end
 
 	-- festering_strike,if=debuff.festering_wound.stack<4&cooldown.apocalypse.remains<5&(!talent.unholy_blight|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5|!conduit.convocation_of_the_dead);
-	if runes >= 2 and (debuff[UH.FesteringWound].count < 4 and cooldown[UH.Apocalypse].remains < 5 and ( not talents[UH.UnholyBlight] or (talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)) or (not talents[UH.ArmyOfTheDamned] and conduit[UH.ConvocationOfTheDead] >= 5) or not conduit[UH.ConvocationOfTheDead] )) then
+	if runes >= 2 and
+		debuff[UH.FesteringWound].count < 4 and
+		cooldown[UH.Apocalypse].remains < 5 and
+		(
+			not talents[UH.UnholyBlight] or
+				(talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)) or
+				(not talents[UH.ArmyOfTheDamned] and conduit[UH.ConvocationOfTheDead] >= 5) or
+				not conduit[UH.ConvocationOfTheDead]
+		)
+	then
 		return UH.FesteringStrike;
 	end
 
 	-- festering_strike,if=debuff.festering_wound.stack<4&talent.unholy_blight&(!talent.army_of_the_damned&conduit.convocation_of_the_dead.rank<5|talent.army_of_the_damned&conduit.convocation_of_the_dead.rank>=5)&(cooldown.unholy_blight.remains<10|cooldown.apocalypse.remains<10&dot.unholy_blight_dot.remains);
-	if runes >= 2 and (debuff[UH.FesteringWound].count < 4 and talents[UH.UnholyBlight] and ( (not talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)) or (talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5 ))) and ( cooldown[UH.UnholyBlight].remains < 10 or (cooldown[UH.Apocalypse].remains < 10 and debuff[UH.UnholyBlightDot].remains ))) then
+	if runes >= 2 and
+		debuff[UH.FesteringWound].count < 4 and
+		talents[UH.UnholyBlight] and
+		(
+			(not talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)) or
+			(talents[UH.ArmyOfTheDamned] and (conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5 ))
+		) and (
+			cooldown[UH.UnholyBlight].remains < 10 or
+			(cooldown[UH.Apocalypse].remains < 10 and debuff[UH.UnholyBlightDot].remains )
+		)
+	then
 		return UH.FesteringStrike;
 	end
 
 	-- death_coil,if=!variable.pooling_for_gargoyle;
-	if runicPower >= 40 and (not poolingForGargoyle) then
+	if runicPower >= 40 and not poolingForGargoyle then
 		return UH.DeathCoil;
 	end
 end
@@ -562,41 +799,50 @@ function DeathKnight:UnholyGenericAoe()
 	local buff = fd.buff;
 	local debuff = fd.debuff;
 	local targets = fd.targets;
-	local runicPower = UnitPower('player', RunicPower);
+	local runicPower = fd.runicPower;
 	local runes = fd.runes;
 	local runeforge = fd.runeforge;
 	local poolingForGargoyle = fd.poolingForGargoyle;
 
 	-- death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3;
-	if runicPower >= 40 and (buff[UH.DarkTransformation].up and runeforge[UH.DeadliestCoil] and targets <= 3) then
+	if runicPower >= 40 and buff[UH.DarkTransformation].up and runeforge[UH.DeadliestCoil] and targets <= 3 then
 		return UH.DeathCoil;
 	end
 
 	-- epidemic,if=buff.sudden_doom.react;
-	if runicPower >= 30 and (buff[UH.SuddenDoom].count) then
+	if runicPower >= 30 and buff[UH.SuddenDoom].up then
 		return UH.Epidemic;
 	end
 
 	-- epidemic,if=!variable.pooling_for_gargoyle;
-	if runicPower >= 30 and (not poolingForGargoyle) then
+	if runicPower >= 30 and not poolingForGargoyle then
 		return UH.Epidemic;
 	end
 
 	-- wound_spender,target_if=max:debuff.festering_wound.stack,if=(cooldown.apocalypse.remains>5&debuff.festering_wound.up|debuff.festering_wound.stack>4)&(fight_remains<cooldown.death_and_decay.remains+10|fight_remains>cooldown.apocalypse.remains);
-	if runes >= 1 and debuff[UH.FesteringWound].count >= 5 and ( cooldown[UH.Apocalypse].remains > 5 and debuff[UH.FesteringWound].up or debuff[UH.FesteringWound].count > 4 )
+	if runes >= 1 and
+		debuff[UH.FesteringWound].count >= 5 and
+		(cooldown[UH.Apocalypse].remains > 5 and debuff[UH.FesteringWound].up or debuff[UH.FesteringWound].count > 4)
 	-- and ( fightRemains < cooldown[UH.DeathAndDecay].remains + 10 or fightRemains > cooldown[UH.Apocalypse].remains )
-	-- TODO: Find a way to get the remaining fight time.  Consider modifying timeToDie logic to track multiple targets, and base fight time on longest timeToDie
+	-- TODO: Find a way to get the remaining fight time.
+	-- TODO: Consider modifying timeToDie logic to track multiple targets, and base fight time on longest timeToDie
 	then
 		return UH.WoundSpender;
 	end
 
 	-- festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3|debuff.festering_wound.stack<1;
-	if runes >= 2 and debuff[UH.FesteringWound].count >= 5 and (debuff[UH.FesteringWound].count <= 3 and cooldown[UH.Apocalypse].remains < 3 or debuff[UH.FesteringWound].count < 1) then
+	if runes >= 2 and
+		debuff[UH.FesteringWound].count >= 5 and
+		(
+			debuff[UH.FesteringWound].count <= 3 and cooldown[UH.Apocalypse].remains < 3 or
+			debuff[UH.FesteringWound].count < 1
+		)
+	then
 		return UH.FesteringStrike;
 	end
 
 	-- festering_strike,target_if=min:debuff.festering_wound.stack,if=cooldown.apocalypse.remains>5&debuff.festering_wound.stack<1;
-	if runes >= 2 and (cooldown[UH.Apocalypse].remains > 5 and debuff[UH.FesteringWound].count < 1) then
+	if runes >= 2 and cooldown[UH.Apocalypse].remains > 5 and debuff[UH.FesteringWound].count < 1 then
 		return UH.FesteringStrike;
 	end
 end

@@ -33,7 +33,7 @@ local FR = {
 	RemorselessWinter 	= 196770,
 	Frostscythe 		= 207230,
 	GatheringStorm 		= 194912,
-	Rime 				= 59057,
+	Rime 				= 59052,
 	Obliterate 			= 49020,
 	DeathAndDecay 		= 43265,
 	DeathAndDecayBuff 	= 188290,
@@ -210,12 +210,6 @@ function DeathKnight:FrostGlowCooldowns()
 					(
 						targets >= 2 and
 							(buff[FR.PillarOfFrost].up and buff[FR.PillarOfFrost].remains < gcd)
-					) or
-					(
-						talents[FR.Obliteration] and
-							not buff[FR.PillarOfFrost].up and
-							(buff[FR.UnholyStrength].up or not deathKnightRuneforgeFallenCrusader) and
-							(debuff[FR.Razorice].count == 5 or not deathKnightRuneforgeRazorice)
 					)
 			);
 
@@ -258,7 +252,7 @@ function DeathKnight:FrostAoe()
 	end
 
 	-- howling_blast,if=buff.rime.up;
-	if runes >= 1 and buff[FR.Rime].up then
+	if buff[FR.Rime].up then
 		return FR.HowlingBlast;
 	end
 
@@ -329,7 +323,7 @@ function DeathKnight:FrostBosPooling()
 	local conduit = fd.covenant.soulbindConduits;
 
 	-- howling_blast,if=buff.rime.up;
-	if runes >= 1 and (buff[FR.Rime].up) then
+	if buff[FR.Rime].up then
 		return FR.HowlingBlast;
 	end
 
@@ -400,7 +394,11 @@ function DeathKnight:FrostBosTicking()
 	end
 
 	-- howling_blast,if=buff.rime.up&(runic_power.deficit<55|rune.time_to_3<=gcd|spell_targets.howling_blast>=2);
-	if runes >= 1 and (buff[FR.Rime].up and ( runicPowerDeficit < 55 or DeathKnight:TimeToRunes(3) <= gcd or targets >= 2 )) then
+	if buff[FR.Rime].up and (
+		runicPowerDeficit < 55 or
+		DeathKnight:TimeToRunes(3) <= gcd or
+		targets >= 2
+	) then
 		return FR.HowlingBlast;
 	end
 
@@ -430,7 +428,7 @@ function DeathKnight:FrostBosTicking()
 	end
 
 	-- howling_blast,if=buff.rime.up;
-	if runes >= 1 and (buff[FR.Rime].up) then
+	if buff[FR.Rime].up then
 		return FR.HowlingBlast;
 	end
 end
@@ -529,7 +527,12 @@ function DeathKnight:FrostCooldowns()
 	end
 
 	-- frostwyrms_fury,if=buff.pillar_of_frost.remains<gcd&buff.pillar_of_frost.up&!talent.obliteration;
-	if cooldown[FR.FrostwyrmsFury].ready and not DeathKnight.db.frostFrostwyrmsFuryAsCooldown and (buff[FR.PillarOfFrost].remains < gcd and buff[FR.PillarOfFrost].up and not talents[FR.Obliteration]) then
+	if cooldown[FR.FrostwyrmsFury].ready and
+		not DeathKnight.db.frostFrostwyrmsFuryAsCooldown and
+		buff[FR.PillarOfFrost].remains < gcd and
+		buff[FR.PillarOfFrost].up --and
+	--	not talents[FR.Obliteration]
+	then
 		return FR.FrostwyrmsFury;
 	end
 
@@ -539,9 +542,9 @@ function DeathKnight:FrostCooldowns()
 	end
 
 	-- frostwyrms_fury,if=talent.obliteration&!buff.pillar_of_frost.up&((buff.unholy_strength.up|!death_knight.runeforge.fallen_crusader)&(debuff.razorice.stack=5|!death_knight.runeforge.razorice));
-	if cooldown[FR.FrostwyrmsFury].ready and not DeathKnight.db.frostFrostwyrmsFuryAsCooldown and (talents[FR.Obliteration] and not buff[FR.PillarOfFrost].up and ( ( buff[FR.UnholyStrength].up or not deathKnightRuneforgeFallenCrusader ) and ( debuff[FR.Razorice].count == 5 or not deathKnightRuneforgeRazorice ) )) then
-		return FR.FrostwyrmsFury;
-	end
+	--if cooldown[FR.FrostwyrmsFury].ready and not DeathKnight.db.frostFrostwyrmsFuryAsCooldown and (talents[FR.Obliteration] and not buff[FR.PillarOfFrost].up and ( ( buff[FR.UnholyStrength].up or not deathKnightRuneforgeFallenCrusader ) and ( debuff[FR.Razorice].count == 5 or not deathKnightRuneforgeRazorice ) )) then
+	--	return FR.FrostwyrmsFury;
+	--end
 
 	-- hypothermic_presence,if=talent.breath_of_sindragosa&runic_power.deficit>40&rune>=3&buff.pillar_of_frost.up|!talent.breath_of_sindragosa&runic_power.deficit>=25;
 	if talents[FR.HypothermicPresence] and cooldown[FR.HypothermicPresence].ready and (talents[FR.BreathOfSindragosa] and runicPowerDeficit > 40 and runes >= 3 and buff[FR.PillarOfFrost].up or not talents[FR.BreathOfSindragosa] and runicPowerDeficit >= 25) then
@@ -554,7 +557,11 @@ function DeathKnight:FrostCooldowns()
 	end
 
 	-- sacrificial_pact,if=active_enemies>=2&(pet.ghoul.remains<gcd|target.time_to_die<gcd);
-	if cooldown[FR.SacrificialPact].ready and runicPower >= 20 and (targets >= 2 and ( ghoulRemains < gcd or timeToDie < gcd )) then
+	if cooldown[FR.SacrificialPact].ready and
+		runicPower >= 20 and
+		targets >= 2 and
+		ghoulRemains < 2
+	then
 		return FR.SacrificialPact;
 	end
 
@@ -597,12 +604,22 @@ function DeathKnight:FrostCovenants()
 	end
 
 	-- abomination_limb,if=active_enemies=1&cooldown.pillar_of_frost.remains<3&(!raid_event.adds.exists|raid_event.adds.in>15);
-	if covenantId == Necrolord and cooldown[FR.AbominationLimb].ready and (targets <= 1 and cooldown[FR.PillarOfFrost].remains < 3 and ( targets <= 1 )) then
+	if covenantId == Necrolord and
+		not DeathKnight.db.abominationLimbAsCooldown and
+		cooldown[FR.AbominationLimb].ready and
+		targets <= 1 and
+		cooldown[FR.PillarOfFrost].remains < 3 and
+		targets <= 1
+	then
 		return FR.AbominationLimb;
 	end
 
 	-- abomination_limb,if=active_enemies>=2;
-	if covenantId == Necrolord and cooldown[FR.AbominationLimb].ready and (targets >= 2) then
+	if covenantId == Necrolord and
+		not DeathKnight.db.abominationLimbAsCooldown and
+		cooldown[FR.AbominationLimb].ready and
+		targets >= 2
+	then
 		return FR.AbominationLimb;
 	end
 
@@ -664,7 +681,7 @@ function DeathKnight:FrostObliteration()
 	end
 
 	-- howling_blast,if=buff.rime.up&spell_targets.howling_blast>=2;
-	if runes >= 1 and (buff[FR.Rime].up and targets >= 2) then
+	if buff[FR.Rime].up and targets >= 2 then
 		return FR.HowlingBlast;
 	end
 
@@ -679,7 +696,7 @@ function DeathKnight:FrostObliteration()
 	end
 
 	-- howling_blast,if=buff.rime.up;
-	if runes >= 1 and (buff[FR.Rime].up) then
+	if buff[FR.Rime].up then
 		return FR.HowlingBlast;
 	end
 
@@ -709,7 +726,7 @@ function DeathKnight:FrostObliterationPooling()
 	end
 
 	-- howling_blast,if=buff.rime.up;
-	if runes >= 1 and (buff[FR.Rime].up) then
+	if buff[FR.Rime].up then
 		return FR.HowlingBlast;
 	end
 
@@ -776,7 +793,7 @@ function DeathKnight:FrostStandard()
 	end
 
 	-- howling_blast,if=buff.rime.up;
-	if runes >= 1 and (buff[FR.Rime].up) then
+	if buff[FR.Rime].up then
 		return FR.HowlingBlast;
 	end
 

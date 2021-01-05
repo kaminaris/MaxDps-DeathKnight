@@ -512,14 +512,14 @@ function DeathKnight:UnholyCooldowns()
 		debuff[UH.FesteringWound].count >= 4 and
 		(
 			not talents[UH.UnholyBlight] or
-				talents[UH.ArmyOfTheDamned] and
-					(
-						not runeforge[UH.DeadliestCoil] or
-						(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)
-					) or (
-						not talents[UH.ArmyOfTheDamned] and
-						(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5)
-			)
+			talents[UH.ArmyOfTheDamned] and
+				(
+					not runeforge[UH.DeadliestCoil] or
+					(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)
+				) or (
+					not talents[UH.ArmyOfTheDamned] and
+					(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5)
+				)
 		)
 	then
 		return UH.Apocalypse;
@@ -841,7 +841,6 @@ function DeathKnight:UnholyGenericAoe()
 	if runes >= 2 and
 		debuff[UH.FesteringWound].count <= 3 and cooldown[UH.Apocalypse].remains < 3 or
 		debuff[UH.FesteringWound].count < 1
-
 	then
 		return UH.FesteringStrike;
 	end

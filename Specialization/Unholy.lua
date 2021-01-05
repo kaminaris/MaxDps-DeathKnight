@@ -761,7 +761,7 @@ function DeathKnight:UnholyGeneric()
 		talents[UH.UnholyBlight] and
 		(
 			(not talents[UH.ArmyOfTheDamned] and (not conduit[UH.ConvocationOfTheDead] or conduit[UH.ConvocationOfTheDead] < 5)) or
-			(talents[UH.ArmyOfTheDamned] and conduit[UH.ConvocationOfTheDead] >= 5)
+			(talents[UH.ArmyOfTheDamned] and conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5)
 		) and
 		(
 			(cooldown[UH.UnholyBlight].remains > 10 and not debuff[UH.UnholyBlightDot].up) or
@@ -788,7 +788,7 @@ function DeathKnight:UnholyGeneric()
 		(
 			not talents[UH.UnholyBlight] or
 			(talents[UH.ArmyOfTheDamned] and (not conduit[UH.ConvocationOfTheDead] or conduit[UH.ConvocationOfTheDead] < 5)) or
-			(not talents[UH.ArmyOfTheDamned] and conduit[UH.ConvocationOfTheDead] >= 5) or
+			(not talents[UH.ArmyOfTheDamned] and conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5) or
 			not conduit[UH.ConvocationOfTheDead]
 		)
 	then

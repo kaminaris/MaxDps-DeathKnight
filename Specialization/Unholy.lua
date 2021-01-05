@@ -39,7 +39,7 @@ local UH = {
 	ArmyOfTheDamned      = 276837,
 	UnholyBlightDot 	 = 115994,
 	UnholyAssault 		 = 207289,
-	SoulReaper 			 = 130736,
+	SoulReaper 			 = 343294,
 	SacrificialPact 	 = 327574,
 	AbominationLimb 	 = 315443,
 	LeadByExample	 	 = 342156,
@@ -74,6 +74,7 @@ function DeathKnight:Unholy()
 	local deathKnightDisableAotd = DeathKnight.db.unholyArmyOfTheDeadAsCooldown;
 	local petExists = UnitExists('pet');
 	local controlUndeadAura = MaxDps:IntUnitAura('pet', UH.ControlUndead, 'PLAYER', fd.timeShift);
+	local darkTransformationAura = MaxDps:IntUnitAura('pet', UH.DarkTransformation, nil, fd.timeShift);
 	local covenantId = fd.covenant.covenantId
 	local runicPower = UnitPower('player', RunicPower);
 	local runicPowerMax = UnitPowerMax('player', RunicPower);
@@ -108,6 +109,7 @@ function DeathKnight:Unholy()
 	fd.deathKnightDisableAotd = deathKnightDisableAotd;
 	fd.petExists = petExists;
 	fd.controlUndeadAura = controlUndeadAura;
+	fd.darkTransformationAura = darkTransformationAura;
 	fd.poolingForGargoyle = poolingForGargoyle;
 	fd.stPlanning = stPlanning;
 
@@ -274,9 +276,10 @@ function DeathKnight:UnholyAoeBurst()
 	local deathKnightFwoundedTargets = fd.deathKnightFwoundedTargets;
 	local poolingForGargoyle = fd.poolingForGargoyle;
 	local covenantId = fd.covenant.covenantId
+	local darkTransformationAura = fd.darkTransformationAura;
 
 	-- death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3;
-	if runicPower >= 40 and buff[UH.DarkTransformation].up and runeforge[UH.DeadliestCoil] and targets <= 3 then
+	if runicPower >= 40 and darkTransformationAura.up and runeforge[UH.DeadliestCoil] and targets <= 3 then
 		return UH.DeathCoil;
 	end
 
@@ -323,6 +326,7 @@ function DeathKnight:UnholyAoeSetup()
 	local runes = fd.runes;
 	local poolingForGargoyle = fd.poolingForGargoyle;
 	local runeforge = fd.runeforge;
+	local darkTransformationAura = fd.darkTransformationAura;
 
 	--[[
 		NOTE: The SIMC priority list includes selectively applying Festering Wounds to multiple targets, and casting Death and Decay when 5+ targets are wounded,
@@ -337,7 +341,7 @@ function DeathKnight:UnholyAoeSetup()
 	end
 
 	-- death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3;
-	if runicPower >= 40 and buff[UH.DarkTransformation].up and runeforge[UH.DeadliestCoil] and targets <= 3 then
+	if runicPower >= 40 and darkTransformationAura.up and runeforge[UH.DeadliestCoil] and targets <= 3 then
 		return UH.DeathCoil;
 	end
 
@@ -377,6 +381,15 @@ function DeathKnight:UnholyCooldowns()
 	local armyGhoulActive = cooldown[UH.ArmyOfTheDead].duration - cooldown[UH.ArmyOfTheDead].remains <= 30;
 	local ghoulActive = fd.petExists;
 	local controlUndeadAura = fd.controlUndeadAura;
+	local darkTransformationAura = fd.darkTransformationAura;
+	local targetHpPercent = MaxDps:TargetPercentHealth() * 100;
+
+	-- soul_reaper,target_if=target.time_to_pct_35<5&target.time_to_die>5;
+	-- TODO: Implement "timeToPct" functionality.  Restrict to bosses/elites?
+	-- Note: Removed timeToDie functionality as it seems inconsistent.  Boosted priority (was below Unholy Assault)
+	if talents[UH.SoulReaper] and cooldown[UH.SoulReaper].ready and runes >= 1 and targetHpPercent <= 35 then
+		return UH.SoulReaper;
+	end
 
 	-- army_of_the_dead,if=cooldown.unholy_blight.remains<3&cooldown.dark_transformation.remains<3&talent.unholy_blight&!soulbind.lead_by_example|!talent.unholy_blight|fight_remains<35
 	if cooldown[UH.ArmyOfTheDead].ready and
@@ -414,7 +427,7 @@ function DeathKnight:UnholyCooldowns()
 		cooldown[UH.UnholyBlight].ready and
 		runes >= 1 and
 		stPlanning and
-		( cooldown[UH.DarkTransformation].remains < gcd or buff[UH.DarkTransformation].up ) and
+		( cooldown[UH.DarkTransformation].remains < gcd or darkTransformationAura.up ) and
 		(
 			not runeforge[UH.DeadliestCoil] or
 			not talents[UH.ArmyOfTheDamned] or
@@ -434,7 +447,7 @@ function DeathKnight:UnholyCooldowns()
 		talents[UH.ArmyOfTheDamned] and
 		(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5) and
 		cooldown[UH.Apocalypse].remains < 3 and
-		(cooldown[UH.DarkTransformation].remains < gcd or buff[UH.DarkTransformation].up)
+		(cooldown[UH.DarkTransformation].remains < gcd or darkTransformationAura.up)
 	then
 		return UH.UnholyBlight;
 	end
@@ -498,14 +511,14 @@ function DeathKnight:UnholyCooldowns()
 		debuff[UH.FesteringWound].count >= 4 and
 		(
 			not talents[UH.UnholyBlight] or
-				talents[UH.ArmyOfTheDamned] and
-					(
-						not runeforge[UH.DeadliestCoil] or
-						(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)
-					) or (
-						not talents[UH.ArmyOfTheDamned] and
-						(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5)
-			)
+			talents[UH.ArmyOfTheDamned] and
+				(
+					not runeforge[UH.DeadliestCoil] or
+					(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] < 5)
+				) or (
+					not talents[UH.ArmyOfTheDamned] and
+					(conduit[UH.ConvocationOfTheDead] and conduit[UH.ConvocationOfTheDead] >= 5)
+				)
 		)
 	then
 		return UH.Apocalypse;
@@ -538,7 +551,7 @@ function DeathKnight:UnholyCooldowns()
 		debuff[UH.FesteringWound].count < 2 and
 		(
 			apocGhoulActive or
-			(conduit[UH.ConvocationOfTheDead] and buff[UH.DarkTransformation].up and not armyGhoulActive)
+			(conduit[UH.ConvocationOfTheDead] and darkTransformationAura.up and not armyGhoulActive)
 		)
 	then
 		return UH.UnholyAssault;
@@ -553,13 +566,6 @@ function DeathKnight:UnholyCooldowns()
 		return UH.UnholyAssault;
 	end
 
-	-- soul_reaper,target_if=target.time_to_pct_35<5&target.time_to_die>5;
-	-- TODO: Implement "timeToPct" functionality.  Restrict to bosses/elites?
-	-- Note: Removed timeToDie functionality, as it seems inconsistent, and won't result in much lost DPS in this scenario
-	if talents[UH.SoulReaper] and cooldown[UH.SoulReaper].ready and runes >= 1 then
-		return UH.SoulReaper;
-	end
-
 	-- raise_dead,if=!pet.ghoul.active;
 	if cooldown[UH.RaiseDead].ready and not ghoulActive then
 		return UH.RaiseDead;
@@ -569,9 +575,10 @@ function DeathKnight:UnholyCooldowns()
 	if ghoulActive and
 		not controlUndeadAura.up and
 		cooldown[UH.SacrificialPact].ready and
+		cooldown[UH.RaiseDead].ready and
 		runicPower >= 20 and
 		targets >= 2 and
-		not buff[UH.DarkTransformation].up and
+		not darkTransformationAura.up and
 		not cooldown[UH.DarkTransformation].ready
 	then
 		return UH.SacrificialPact;
@@ -688,8 +695,7 @@ function DeathKnight:UnholyGeneric()
 	local conduit = fd.covenant.soulbindConduits;
 
 	-- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active;
-	if runicPower >= 40 and
-		buff[UH.SuddenDoom].up and
+	if buff[UH.SuddenDoom].up and
 		(not poolingForGargoyle or petGargoyle)
 	then
 		return UH.DeathCoil;
@@ -803,14 +809,15 @@ function DeathKnight:UnholyGenericAoe()
 	local runes = fd.runes;
 	local runeforge = fd.runeforge;
 	local poolingForGargoyle = fd.poolingForGargoyle;
+	local darkTransformationAura = fd.darkTransformationAura;
 
 	-- death_coil,if=buff.dark_transformation.up&runeforge.deadliest_coil&active_enemies<=3;
-	if runicPower >= 40 and buff[UH.DarkTransformation].up and runeforge[UH.DeadliestCoil] and targets <= 3 then
+	if runicPower >= 40 and darkTransformationAura.up and runeforge[UH.DeadliestCoil] and targets <= 3 then
 		return UH.DeathCoil;
 	end
 
 	-- epidemic,if=buff.sudden_doom.react;
-	if runicPower >= 30 and buff[UH.SuddenDoom].up then
+	if buff[UH.SuddenDoom].up then
 		return UH.Epidemic;
 	end
 
@@ -821,7 +828,6 @@ function DeathKnight:UnholyGenericAoe()
 
 	-- wound_spender,target_if=max:debuff.festering_wound.stack,if=(cooldown.apocalypse.remains>5&debuff.festering_wound.up|debuff.festering_wound.stack>4)&(fight_remains<cooldown.death_and_decay.remains+10|fight_remains>cooldown.apocalypse.remains);
 	if runes >= 1 and
-		debuff[UH.FesteringWound].count >= 5 and
 		(cooldown[UH.Apocalypse].remains > 5 and debuff[UH.FesteringWound].up or debuff[UH.FesteringWound].count > 4)
 	-- and ( fightRemains < cooldown[UH.DeathAndDecay].remains + 10 or fightRemains > cooldown[UH.Apocalypse].remains )
 	-- TODO: Find a way to get the remaining fight time.
@@ -832,11 +838,8 @@ function DeathKnight:UnholyGenericAoe()
 
 	-- festering_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack<=3&cooldown.apocalypse.remains<3|debuff.festering_wound.stack<1;
 	if runes >= 2 and
-		debuff[UH.FesteringWound].count >= 5 and
-		(
-			debuff[UH.FesteringWound].count <= 3 and cooldown[UH.Apocalypse].remains < 3 or
-			debuff[UH.FesteringWound].count < 1
-		)
+		debuff[UH.FesteringWound].count <= 3 and cooldown[UH.Apocalypse].remains < 3 or
+		debuff[UH.FesteringWound].count < 1
 	then
 		return UH.FesteringStrike;
 	end

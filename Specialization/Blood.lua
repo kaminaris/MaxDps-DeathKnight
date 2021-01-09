@@ -248,11 +248,13 @@ function DeathKnight:BloodStandard()
 	local runicPower = fd.runicPower;
 	local runicPowerMax = UnitPowerMax('player', RunicPower);
 	local runicPowerDeficit = runicPowerMax - runicPower;
+	local timeTo3Runes = DeathKnight:TimeToRunes(3);
+	local timeTo4Runes = DeathKnight:TimeToRunes(4);
 
 	-- blood_tap,if=rune<=2&rune.time_to_4>gcd&charges_fractional>=1.8;
 	if talents[BL.BloodTap] and
 		runes <= 2 and
-		DeathKnight:TimeToRunes(4) > gcd and
+		timeTo4Runes > gcd and
 		cooldown[BL.BloodTap].charges >= 1.8
 	then
 		return BL.BloodTap;
@@ -279,7 +281,7 @@ function DeathKnight:BloodStandard()
 	if runes >= 2 and
 		(covenantId ~= Necrolord or buff[BL.AbominationLimb].up) and
 		(
-			buff[BL.BoneShield].remains <= DeathKnight:TimeToRunes(3) or
+			buff[BL.BoneShield].remains <= timeTo3Runes or
 				buff[BL.BoneShield].remains <= ( gcd + cooldown[BL.Blooddrinker].remains * (talents[BL.Blooddrinker] and 1 or 0) * 2 ) or
 				buff[BL.BoneShield].count < 3
 		) and
@@ -362,7 +364,7 @@ function DeathKnight:BloodStandard()
 
 	-- heart_strike,if=buff.dancing_rune_weapon.up|rune.time_to_4<gcd;
 	if runes >= 1 and
-		(buff[BL.DancingRuneWeapon].up or DeathKnight:TimeToRunes(4) < gcd)
+		(buff[BL.DancingRuneWeapon].up or timeTo4Runes < gcd)
 	then
 		return BL.HeartStrike;
 	end
@@ -375,7 +377,7 @@ function DeathKnight:BloodStandard()
 	-- blood_tap,if=rune.time_to_3>gcd;
 	if talents[BL.BloodTap] and
 		cooldown[BL.BloodTap].charges >= 1 and
-		DeathKnight:TimeToRunes(3) > gcd
+		timeTo3Runes > gcd
 	then
 		return BL.BloodTap;
 	end
@@ -406,7 +408,7 @@ function DeathKnight:BloodStandard()
 
 	-- heart_strike,if=(rune>1&(rune.time_to_3<gcd|buff.bone_shield.stack>7));
 	if runes > 1 and
-		(DeathKnight:TimeToRunes(3) < gcd  or buff[BL.BoneShield].count > 7)
+		(timeTo3Runes < gcd  or buff[BL.BoneShield].count > 7)
 	then
 		return BL.HeartStrike;
 	end

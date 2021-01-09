@@ -717,7 +717,9 @@ function DeathKnight:UnholyGeneric()
 	local conduit = fd.covenant.soulbindConduits;
 
 	-- death_coil,if=buff.sudden_doom.react&!variable.pooling_for_gargoyle|pet.gargoyle.active;
-	if buff[UH.SuddenDoom].up and not poolingForGargoyle or ((runicPower >= 40 or (runeforge[UH.DeadliestCoil] and runicPower >= 30)) and petGargoyle)
+	if buff[UH.SuddenDoom].up and
+		not poolingForGargoyle or
+		((runicPower >= 40 or (runeforge[UH.DeadliestCoil] and runicPower >= 30)) and petGargoyle)
 	then
 		return UH.DeathCoil;
 	end
@@ -772,7 +774,10 @@ function DeathKnight:UnholyGeneric()
 	end
 
 	-- death_coil,if=runic_power.deficit<20&!variable.pooling_for_gargoyle;
-	if (runicPower >= 40 or (runeforge[UH.DeadliestCoil] and runicPower >= 30)) and runicPowerDeficit < 20 and not poolingForGargoyle then
+	if (runicPower >= 40 or (runeforge[UH.DeadliestCoil] and runicPower >= 30)) and
+		runicPowerDeficit < 20 and
+		not poolingForGargoyle
+	then
 		return UH.DeathCoil;
 	end
 

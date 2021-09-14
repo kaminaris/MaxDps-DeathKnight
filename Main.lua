@@ -102,8 +102,21 @@ function DeathKnight:TimeToRunes(desiredRunes)
 
 	local runes = {};
 	local readyRuneCount = 0;
+	local duration = 1;
+        for i = 1, 6 do
+            _, refresh, _ = GetRuneCooldown(i);
+            if type(refresh) == "number" and refresh > 0 then
+                duration = refresh
+            end
+        end
 	for i = 1, 6 do
-		local start, duration, runeReady = GetRuneCooldown(i);
+		local start, _, runeReady = GetRuneCooldown(i);
+		if type(start) ~= "number" and not runeReady then
+			start = GetTime()
+		end
+                if type(start) ~= "number" and runeReady then
+                    start = 0
+                end
 		runes[i] = {
 			start = start,
 			duration = duration

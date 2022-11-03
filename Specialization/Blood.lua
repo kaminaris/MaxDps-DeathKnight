@@ -16,32 +16,25 @@ local NightFae = Enum.CovenantType.NightFae;
 local Kyrian = Enum.CovenantType.Kyrian;
 
 local BL = {
-	RaiseDead             = 46585,
-	Blooddrinker          = 206931,
-	DancingRuneWeapon     = 49028,
-	DancingRuneWeaponBuff = 81256,
-	DeathsDue             = 324128,
-	DeathsDueBuff         = 324165,
-	BloodBoil             = 50842,
-	DeathStrike           = 49998,
-	HeartStrike           = 206930,
-	DeathAndDecay         = 43265,
-	DeathAndDecayBuff     = 188290,
-	CrimsonScourge        = 81141,
-	SacrificialPact       = 327574,
-	SwarmingMist          = 311648,
-	Marrowrend            = 195182,
-	BoneShield            = 195181,
-	AbominationLimb       = 315443,
-	ShackleTheUnworthy    = 312202,
-	BloodTap              = 221699,
-	Tombstone             = 219809,
-	Heartbreaker          = 221536,
-	Hemostasis            = 273947,
-	RelishInBlood         = 317610,
-	Bonestorm             = 194844,
-	RapidDecomposition    = 194662,
-	Consumption           = 274156,
+	BloodBoil             	= 50842,
+	Blooddrinker          	= 206931,
+	BloodTap              	= 221699,
+	BoneShield            	= 195181,
+	Bonestorm             	= 194844,
+	Consumption           	= 274156,
+	CrimsonScourge        	= 81141,
+	DancingRuneWeapon     	= 49028,
+	DancingRuneWeaponBuff 	= 81256,
+	DeathsCaress			= 195292,
+	Heartbreaker          	= 221536,
+	HeartStrike           	= 206930,
+	Hemostasis            	= 273947,
+	Marrowrend            	= 195182,
+	RapidDecomposition    	= 194662,
+	RelishInBlood         	= 317610,
+	ShackleTheUnworthy    	= 312202,
+	SwarmingMist          	= 311648,
+	Tombstone             	= 219809,
 };
 
 setmetatable(BL, DeathKnight.spellMeta);
@@ -56,64 +49,112 @@ function DeathKnight:Blood()
 	local runes = DeathKnight:Runes(fd.timeShift);
 	local runicPower = UnitPower('player', RunicPower);
 	local targets = MaxDps:SmartAoe();
-
+	local targetHpPercent = MaxDps:TargetPercentHealth() * 100;
+	fd.targetHpPercent = targetHpPercent;
+	
 	fd.targets = targets;
 	fd.runes = runes;
 	fd.runicPower = runicPower;
 
-	if covenantId == NightFae then
-		BL.DeathAndDecay = BL.DeathsDue;
-	end
-
 	DeathKnight:BloodGlowCooldowns();
-
-	-- raise_dead;
-	if cooldown[BL.RaiseDead].ready then
-		return BL.RaiseDead;
+	
+	if talents[COMMON.SoulReaper] and targetHpPercent <= 35 and cooldown[COMMON.SoulReaper].ready then
+		return COMMON.SoulReaper;
 	end
 
-	-- blooddrinker,if=!buff.dancing_rune_weapon.up&(!covenant.night_fae|buff.deaths_due.remains>7);
-	if talents[BL.Blooddrinker] and
-		cooldown[BL.Blooddrinker].ready and
-		runes >= 1 and
-		currentSpell ~= BL.Blooddrinker and
-		(
-			not buff[BL.DancingRuneWeaponBuff].up and
-				(covenantId ~= NightFae or buff[BL.DeathsDueBuff].remains > 7 )
-		)
-	then
-		return BL.Blooddrinker;
+	if buff[BL.DancingRuneWeaponBuff].up then
+		return DeathKnight:DancingRuneWeaponUp();
+	end
+	if not buff[BL.DancingRuneWeaponBuff].up then
+		return DeathKnight:DancingRuneWeaponNotUp();
 	end
 
-	-- blood_boil,if=charges>=2&(covenant.kyrian|buff.dancing_rune_weapon.up);
-	if cooldown[BL.BloodBoil].charges >= 2 and
-		( covenantId == Kyrian or buff[BL.DancingRuneWeapon].up )
-	then
+end
+
+function DeathKnight:DancingRuneWeaponUp()
+	local fd = MaxDps.FrameData;
+	local buff = fd.buff;
+	local runicPower = fd.runicPower;
+	local debuff = fd.debuff;
+	local cooldown = fd.cooldown;
+	local runes = fd.runes;
+	local covenantId = fd.covenant.covenantId;
+	
+	local deathAndDecay;
+	
+	if covenantId == NightFae then
+		deathAndDecay = COMMON.DeathsDue;
+	else
+		deathAndDecay = COMMON.DeathAndDecay;
+	end
+
+	if buff[BL.DancingRuneWeaponBuff].remains < 4 and buff[BL.BoneShield].remains < 20 then
+		return BL.Marrowrend;
+	end
+	
+	if not debuff[COMMON.DeathAndDecay].up and cooldown[COMMON.DeathAndDecay].ready then
+		return deathAndDecay;
+	end
+	
+	if buff[BL.BoneShield].count <= 2 then
+		return BL.DeathsCaress;
+	end
+	
+	if runicPower >= 75 or buff[COMMON.IcyTalons].remains < 3 then
+		return COMMON.DeathStrike;
+	end
+	
+	if cooldown[BL.BloodBoil].charges >= 2 then
 		return BL.BloodBoil;
 	end
-
-	-- raise_dead;
-	if cooldown[BL.RaiseDead].ready then
-		return BL.RaiseDead;
+	
+	if runes >= 3 then
+		return BL.HeartStrike;
 	end
+end
 
-	-- death_strike,if=fight_remains<3;
-	if runicPower >= 45
-	--and (fightRemains < 3)
-	then
-		return BL.DeathStrike;
+function DeathKnight:DancingRuneWeaponNotUp()
+	local fd = MaxDps.FrameData;
+	local buff = fd.buff;
+	local runicPower = fd.runicPower;
+	local debuff = fd.debuff;
+	local cooldown = fd.cooldown;
+	local runes = fd.runes;
+	local covenantId = fd.covenant.covenantId;
+	
+	local deathAndDecay;
+	
+	if covenantId == NightFae then
+		deathAndDecay = COMMON.DeathsDue;
+	else
+		deathAndDecay = COMMON.DeathAndDecay;
 	end
-
-	-- call_action_list,name=covenants;
-	local result = DeathKnight:BloodCovenants();
-	if result then
-		return result;
+	
+	if buff[BL.BoneShield].remains < 4 then
+		return BL.DeathsCaress;
 	end
-
-	-- call_action_list,name=standard;
-	result = DeathKnight:BloodStandard();
-	if result then
-		return result;
+	if not buff[COMMON.DeathAndDecayBuff].up and cooldown[COMMON.DeathAndDecay].ready then
+		return deathAndDecay;
+	end
+	
+	if runes >= 2 and buff[BL.BoneShield].count <= 4 then
+		return BL.Marrowrend;
+	end
+	
+	if runes < 2 and buff[BL.BoneShield].count <= 4 then
+		return BL.DeathsCaress;
+	end
+	
+	if runicPower >= 75 or buff[COMMON.IcyTalons].remains < 3 then
+		return COMMON.DeathStrike;
+	end
+	
+	if cooldown[BL.BloodBoil].charges >= 2 then
+		return BL.BloodBoil;
+	end
+	
+	if runes >= 3 then
+		return BL.HeartStrike;
 	end
 end
 
@@ -124,18 +165,24 @@ function DeathKnight:BloodGlowCooldowns()
 	local talents = fd.talents;
 	local covenantId = fd.covenant.covenantId;
 
-	local abominationLimbReady = DeathKnight.db.abominationLimbAsCooldown and covenantId == Necrolord and cooldown[BL.AbominationLimb].ready;
-	local dancingRuneWeaponReady = DeathKnight.db.bloodDancingRuneWeaponAsCooldown and cooldown[BL.DancingRuneWeapon].ready;
+	local abominationLimbReady = covenantId == Necrolord and cooldown[COMMON.AbominationLimb].ready;
+	local abominationLimbTalentReady = talents[COMMON.AbominationLimbTalent] and cooldown[COMMON.AbominationLimbTalent].ready;
+	local dancingRuneWeaponReady = talents[BL.DancingRuneWeapon] and cooldown[BL.DancingRuneWeapon].ready;
+	local boneStormReady = talents[BL.Bonestorm] and cooldown[BL.Bonestorm].ready;
+	local empowerRuneweaponReady = talents[COMMON.EmpowerRuneWeapon] and cooldown[COMMON.EmpowerRuneWeapon].ready;
 
 	if DeathKnight.db.alwaysGlowCooldowns then
-		MaxDps:GlowCooldown(BL.AbominationLimb, abominationLimbReady);
+		MaxDps:GlowCooldown(COMMON.AbominationLimb, abominationLimbReady);
+		MaxDps:GlowCooldown(COMMON.AbominationLimbTalent, abominationLimbTalentReady);
+		MaxDps:GlowCooldown(BL.Bonestorm, boneStormReady);
+		MaxDps:GlowCooldown(COMMON.EmpowerRuneWeapon, empowerRuneweaponReady);
 		MaxDps:GlowCooldown(BL.DancingRuneWeapon, dancingRuneWeaponReady);
 	else
-		local abominationLimbCooldownTrigger = abominationLimbReady and not buff[BL.DancingRuneWeapon].up;
-		local dancingRuneWeaponCooldownTrigger = dancingRuneWeaponReady and (not talents[BL.Blooddrinker] or not cooldown[BL.Blooddrinker].ready)
-
-		MaxDps:GlowCooldown(BL.AbominationLimb, abominationLimbCooldownTrigger);
-		MaxDps:GlowCooldown(BL.DancingRuneWeapon, dancingRuneWeaponCooldownTrigger);
+		MaxDps:GlowCooldown(BL.Bonestorm, boneStormReady);
+		MaxDps:GlowCooldown(COMMON.EmpowerRuneWeapon, empowerRuneweaponReady);
+		MaxDps:GlowCooldown(COMMON.AbominationLimb, abominationLimbReady);
+		MaxDps:GlowCooldown(COMMON.AbominationLimbTalent, abominationLimbTalentReady);
+		MaxDps:GlowCooldown(BL.DancingRuneWeapon, dancingRuneWeaponReady);
 	end
 end
 
@@ -149,7 +196,7 @@ function DeathKnight:BloodCovenants()
 	local covenantId = fd.covenant.covenantId;
 	local runes = fd.runes;
 	local runicPower = fd.runicPower;
-	local ghoulRemains = cooldown[BL.RaiseDead].remains - (cooldown[BL.RaiseDead].duration - 60);
+	local ghoulRemains = cooldown[COMMON.RaiseDead].remains - (cooldown[COMMON.RaiseDead].duration - 60);
 
 	-- death_strike,if=covenant.night_fae&buff.deaths_due.remains>6&runic_power>70;
 	if runicPower >= 45 and
@@ -157,7 +204,7 @@ function DeathKnight:BloodCovenants()
 		buff[BL.DeathsDueBuff].remains > 6 and
 		runicPower > 70
 	then
-		return BL.DeathStrike;
+		return COMMON.DeathStrike;
 	end
 
 	-- heart_strike,if=covenant.night_fae&death_and_decay.ticking&((buff.deaths_due.up|buff.dancing_rune_weapon.up)&buff.deaths_due.remains<6);
@@ -182,13 +229,13 @@ function DeathKnight:BloodCovenants()
 	end
 
 	-- sacrificial_pact,if=(!covenant.night_fae|buff.deaths_due.remains>6)&!buff.dancing_rune_weapon.up&(pet.ghoul.remains<10|target.time_to_die<gcd);
-	if cooldown[BL.SacrificialPact].ready and ghoulRemains > 0 and runicPower >= 20 and
+	if cooldown[COMMON.SacrificialPact].ready and ghoulRemains > 0 and runicPower >= 20 and
 		(
 			(covenantId ~= NightFae or buff[BL.DeathsDueBuff].remains > 6) and
 				not buff[BL.DancingRuneWeapon].up and
 				(ghoulRemains < 10 or timeToDie < gcd)
 		) then
-		return BL.SacrificialPact;
+		return COMMON.SacrificialPact;
 	end
 
 	-- death_strike,if=covenant.venthyr&runic_power>70&cooldown.swarming_mist.remains<3;
@@ -196,7 +243,7 @@ function DeathKnight:BloodCovenants()
 		runicPower > 70 and
 		cooldown[BL.SwarmingMist].remains < 3
 	then
-		return BL.DeathStrike;
+		return COMMON.DeathStrike;
 	end
 
 	-- swarming_mist,if=!buff.dancing_rune_weapon.up;
@@ -294,7 +341,7 @@ function DeathKnight:BloodStandard()
 	if runicPower >= 45 and
 		runicPowerDeficit <= 70
 	then
-		return BL.DeathStrike;
+		return COMMON.DeathStrike;
 	end
 
 	-- marrowrend,if=buff.bone_shield.stack<6&runic_power.deficit>=15&(!covenant.night_fae|buff.deaths_due.remains>5);
@@ -350,7 +397,7 @@ function DeathKnight:BloodStandard()
 				timeToDie < 10
 		)
 	then
-		return BL.DeathStrike;
+		return COMMON.DeathStrike;
 	end
 
 	-- death_and_decay,if=spell_targets.death_and_decay>=3;

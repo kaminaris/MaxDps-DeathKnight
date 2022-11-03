@@ -11,6 +11,22 @@ local GetInventoryItemLink = GetInventoryItemLink;
 local DeathKnight = MaxDps:NewModule('DeathKnight');
 addonTable.DeathKnight = DeathKnight;
 
+COMMON = {
+	AbominationLimb       	= 315443,
+	AbominationLimbTalent 	= 383269,
+	DeathAndDecay         	= 43265,
+	DeathAndDecayBuff     	= 374271,
+	DeathCoil		 	 	= 47541,
+	DeathsDue             	= 324128,
+	DeathsDueBuff         	= 324165,
+	DeathStrike           	= 49998,
+	EmpowerRuneWeapon 		= 47568,
+	IcyTalons				= 194879,
+	RaiseDead             	= 46585,
+	SacrificialPact       	= 327574,
+	SoulReaper 			 	= 343294,
+};
+
 DeathKnight.spellMeta = {
 	__index = function(t, k)
 		print('Spell Key ' .. k .. ' not found!');
@@ -140,4 +156,4 @@ function DeathKnight:TimeToRunes(desiredRunes)
 	-- Otherwise, we need to wait for the slowest of our three regenerating runes, plus the full regen time needed for the remaining rune(s)
 	local rune = runes[readyRuneCount + 3];
 	return rune.duration + rune.start - time + rune.duration;
-end
+end 

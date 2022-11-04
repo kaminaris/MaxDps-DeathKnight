@@ -11,6 +11,21 @@ local GetInventoryItemLink = GetInventoryItemLink;
 local DeathKnight = MaxDps:NewModule('DeathKnight');
 addonTable.DeathKnight = DeathKnight;
 
+COMMON = {
+	AbominationLimbTalent 	= 383269,
+	DeathAndDecay         	= 43265,
+	DeathAndDecayBuff     	= 374271,
+	DeathCoil		 	 	= 47541,
+	DeathsDue             	= 324128,
+	DeathsDueBuff         	= 324165,
+	DeathStrike				= 49998,
+	EmpowerRuneWeapon		= 47568,
+	IcyTalons				= 194879,
+	RaiseDead             	= 46585,
+	SacrificialPact       	= 327574,
+	SoulReaper 			 	= 343294,
+};
+
 DeathKnight.spellMeta = {
 	__index = function(t, k)
 		print('Spell Key ' .. k .. ' not found!');
@@ -102,8 +117,21 @@ function DeathKnight:TimeToRunes(desiredRunes)
 
 	local runes = {};
 	local readyRuneCount = 0;
+	local duration = 1;
+        for i = 1, 6 do
+            _, refresh, _ = GetRuneCooldown(i);
+            if type(refresh) == "number" and refresh > 0 then
+                duration = refresh
+            end
+        end
 	for i = 1, 6 do
-		local start, duration, runeReady = GetRuneCooldown(i);
+		local start, _, runeReady = GetRuneCooldown(i);
+		if type(start) ~= "number" and not runeReady then
+			start = GetTime()
+		end
+                if type(start) ~= "number" and runeReady then
+                    start = 0
+                end
 		runes[i] = {
 			start = start,
 			duration = duration

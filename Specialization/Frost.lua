@@ -13,58 +13,35 @@ local GetTime = GetTime;
 local RunicPower = Enum.PowerType.RunicPower;
 local Runes = Enum.PowerType.Runes;
 
-local Necrolord = Enum.CovenantType.Necrolord;
-local Venthyr = Enum.CovenantType.Venthyr;
-local NightFae = Enum.CovenantType.NightFae;
-local Kyrian = Enum.CovenantType.Kyrian;
-
 local FR = {
-	HowlingBlast 		= 49184,
-	FrostFever 			= 55095,
-	Icecap 				= 207126,
+	Avalanche 			= 207142,
+	BitingCold 			= 377056,
 	BreathOfSindragosa 	= 152279,
-	Obliteration 		= 281238,
-	PillarOfFrost 		= 51271,
-	KillingMachine 		= 51128,
-	KillingMachineBuff 	= 51124,
-	GlacialAdvance 		= 194913,
-	IcyTalons 			= 194878,
-	FrostStrike 		= 49143,
+	ChainsOfIce 		= 45524,
 	ColdHeart 			= 281208,
 	ColdHeartBuff 		= 281209,
+	Everfrost 			= 376938,
+	FrostFever 			= 55095,
+	Frostscythe 		= 207230,
+	FrostStrike 		= 49143,
+	FrostwyrmsFury 		= 279302,
+	GatheringStorm 		= 194912,
+	GlacialAdvance 		= 194913,
+	HornOfWinter 		= 57330,
+	HowlingBlast 		= 49184,
+	Icecap 				= 207126,
+	KillingMachine 		= 51128,
+	KillingMachineBuff 	= 51124,
+	Obliterate 			= 49020,
+	Obliteration 		= 281238,
+	PillarOfFrost 		= 51271,
 	Razorice 			= 51714,
 	RemorselessWinter 	= 196770,
-	Frostscythe 		= 207230,
-	GatheringStorm 		= 194912,
 	Rime 				= 59052,
-	Obliterate 			= 49020,
-	DeathAndDecay 		= 43265,
-	DeathAndDecayBuff 	= 188290,
-	DeathsDue 			= 324128,
-	DeathsDueBuff	 	= 324165,
 	RunicAttenuation 	= 207104,
-	HornOfWinter 		= 57330,
-	ChainsOfIce 		= 45524,
-	UnholyStrength 		= 53365,
-	EmpowerRuneWeapon 	= 47568,
-	FrostwyrmsFury 		= 279302,
-	HypothermicPresence	= 321995,
-	RaiseDead 			= 46585,
-	SacrificialPact		= 327574,
-	SwarmingMist		= 311648,
-	AbominationLimb 	= 315443,
 	ShackleTheUnworthy 	= 312202,
-	Avalanche 			= 207142,
-	UnleashedFrenzy 	= 122,
-	FrozenPulse 		= 194909,
-
-	-- Conduit ids
-	EradicatingBlow 	= 83,
-	Everfrost 			= 91,
-
-	-- Legendary ids
-	BitingCold 			= 6945,
-	Phearomones 		= 6954,
+	SwarmingMist		= 311648,
+	UnholyStrength 		= 53365,
 };
 
 setmetatable(FR, DeathKnight.spellMeta);
@@ -88,6 +65,7 @@ function DeathKnight:Frost()
 	local timeTo3Runes = DeathKnight:TimeToRunes(3);
 	local timeTo4Runes = DeathKnight:TimeToRunes(4);
 	local timeTo5Runes = DeathKnight:TimeToRunes(5);
+	local targetHpPercent = MaxDps:TargetPercentHealth() * 100;
 
 	fd.targets = targets;
 	fd.runes = runes;
@@ -99,6 +77,10 @@ function DeathKnight:Frost()
 	fd.timeTo5Runes = timeTo5Runes;
 
 	DeathKnight:FrostGlowCooldowns();
+	
+	if talents[COMMON.SoulReaper] and targetHpPercent <= 35 and cooldown[COMMON.SoulReaper].ready then
+		return COMMON.SoulReaper;
+	end
 
 	-- howling_blast,if=!dot.frost_fever.ticking&(talent.icecap|cooldown.breath_of_sindragosa.remains>15|talent.obliteration&cooldown.pillar_of_frost.remains&!buff.killing_machine.up);
 	if runes >= 1 and
@@ -120,8 +102,8 @@ function DeathKnight:Frost()
 	if talents[FR.GlacialAdvance] and
 		cooldown[FR.GlacialAdvance].ready and
 		runicPower >= 30 and
-		buff[FR.IcyTalons].remains <= gcd and
-		buff[FR.IcyTalons].up and
+		buff[COMMON.IcyTalons].remains <= gcd and
+		buff[COMMON.IcyTalons].up and
 		targets >= 2 and
 		(not talents[FR.BreathOfSindragosa] or cooldown[FR.BreathOfSindragosa].remains > 15)
 	then
@@ -130,19 +112,14 @@ function DeathKnight:Frost()
 
 	-- frost_strike,if=buff.icy_talons.remains<=gcd&buff.icy_talons.up&(!talent.breath_of_sindragosa|cooldown.breath_of_sindragosa.remains>15);
 	if runicPower >= 25 and
-		buff[FR.IcyTalons].remains <= gcd and
-		buff[FR.IcyTalons].up and
+		buff[COMMON.IcyTalons].remains <= gcd and
+		buff[COMMON.IcyTalons].up and
 		(not talents[FR.BreathOfSindragosa] or cooldown[FR.BreathOfSindragosa].remains > 15 )
 	then
 		return FR.FrostStrike;
 	end
 
 	local result;
-	-- call_action_list,name=covenants;
-	result = DeathKnight:FrostCovenants();
-	if result then
-		return result;
-	end
 
 	-- call_action_list,name=cooldowns;
 	result = DeathKnight:FrostCooldowns();
@@ -202,16 +179,15 @@ function DeathKnight:FrostGlowCooldowns()
 	local debuff = fd.debuff;
 	local talents = fd.talents;
 	local targets = fd.targets;
-	local covenantId = fd.covenant.covenantId;
 	local deathKnightRuneforgeFallenCrusader = enchant[weaponRunes.FallenCrusader];
 	local deathKnightRuneforgeRazorice = enchant[weaponRunes.Razorice];
 
 	local frostwyrmsFuryReady = DeathKnight.db.frostFrostwyrmsFuryAsCooldown and cooldown[FR.FrostwyrmsFury].ready;
-	local abominationLimbReady = DeathKnight.db.abominationLimbAsCooldown and covenantId == Necrolord and cooldown[FR.AbominationLimb].ready;
+	local abominationLimbReady = DeathKnight.db.abominationLimbAsCooldown and talents[COMMON.AbominationLimbTalent] and cooldown[COMMON.AbominationLimbTalent].ready;
 
 	if DeathKnight.db.alwaysGlowCooldowns then
 		MaxDps:GlowCooldown(FR.FrostwyrmsFury, frostwyrmsFuryReady);
-		MaxDps:GlowCooldown(FR.AbominationLimb, abominationLimbReady);
+		MaxDps:GlowCooldown(COMMON.AbominationLimbTalent, abominationLimbReady);
 	else
 		local frostwyrmsFuryCooldownTrigger = frostwyrmsFuryReady and
 			(
@@ -240,7 +216,7 @@ function DeathKnight:FrostGlowCooldowns()
 			)
 
 		MaxDps:GlowCooldown(FR.FrostwyrmsFury, frostwyrmsFuryCooldownTrigger);
-		MaxDps:GlowCooldown(FR.AbominationLimb, abominationLimbCooldownTrigger);
+		MaxDps:GlowCooldown(COMMON.AbominationLimbTalent, abominationLimbCooldownTrigger);
 	end
 end
 
@@ -250,7 +226,6 @@ function DeathKnight:FrostAoe()
 	local buff = fd.buff;
 	local talents = fd.talents;
 	local gcd = fd.gcd;
-	local covenantId = fd.covenant.covenantId;
 	local runes = fd.runes;
 	local runicPower = fd.runicPower;
 	local runicPowerMax = fd.runicPowerMax;
@@ -276,24 +251,6 @@ function DeathKnight:FrostAoe()
 		return FR.HowlingBlast;
 	end
 
-	-- obliterate,if=death_and_decay.ticking&covenant.night_fae&buff.deaths_due.stack>8;
-	if runes >= 2 and
-		buff[FR.DeathAndDecayBuff].up and
-		covenantId == NightFae and
-		buff[FR.DeathsDueBuff].count > 8
-	then
-		return FR.Obliterate;
-	end
-
-	-- frostscythe,if=buff.killing_machine.react&(!death_and_decay.ticking&covenant.night_fae|!covenant.night_fae);
-	if talents[FR.Frostscythe] and
-		runes >= 1 and
-		buff[FR.KillingMachineBuff].up and
-		((covenantId == NightFae and not buff[FR.DeathAndDecayBuff].up) or covenantId ~= NightFae)
-	then
-		return FR.Frostscythe;
-	end
-
 	-- glacial_advance,if=runic_power.deficit<(15+talent.runic_attenuation*3);
 	if talents[FR.GlacialAdvance] and
 		cooldown[FR.GlacialAdvance].ready and
@@ -308,11 +265,7 @@ function DeathKnight:FrostAoe()
 		return FR.FrostStrike;
 	end
 
-	-- frostscythe,if=!death_and_decay.ticking&covenant.night_fae|!covenant.night_fae;
-	if talents[FR.Frostscythe] and
-		runes >= 1 and
-		((not buff[FR.DeathAndDecayBuff].up and covenantId == NightFae) or covenantId ~= NightFae)
-	then
+	if talents[FR.Frostscythe] and runes >= 1 then
 		return FR.Frostscythe;
 	end
 
@@ -344,13 +297,11 @@ function DeathKnight:FrostBosPooling()
 	local talents = fd.talents;
 	local targets = fd.targets;
 	local gcd = fd.gcd;
-	local covenantId = fd.covenant.covenantId;
 	local runes = fd.runes;
 	local runicPower = fd.runicPower;
 	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runeforge = fd.runeforge;
-	local conduit = fd.covenant.soulbindConduits;
 	local timeTo4Runes = fd.timeTo4Runes;
 	local timeTo5Runes = fd.timeTo5Runes;
 
@@ -359,12 +310,12 @@ function DeathKnight:FrostBosPooling()
 		return FR.HowlingBlast;
 	end
 
-	-- remorseless_winter,if=active_enemies>=2|rune.time_to_5<=gcd&(talent.gathering_storm|conduit.everfrost|runeforge.biting_cold);
+	-- remorseless_winter,if=active_enemies>=2|rune.time_to_5<=gcd&(talent.gathering_storm|runeforge.biting_cold);
 	if cooldown[FR.RemorselessWinter].ready and
 		runes >= 1 and
 		(
 			targets >= 2 or
-			timeTo5Runes <= gcd and ( talents[FR.GatheringStorm] or conduit[FR.Everfrost] or runeforge[FR.BitingCold])
+			timeTo5Runes <= gcd and ( talents[FR.GatheringStorm] or runeforge[FR.BitingCold])
 		)
 	then
 		return FR.RemorselessWinter;
@@ -389,23 +340,11 @@ function DeathKnight:FrostBosPooling()
 		return FR.FrostStrike;
 	end
 
-	-- frostscythe,if=buff.killing_machine.react&runic_power.deficit>(15+talent.runic_attenuation*3)&spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae);
-	if talents[FR.Frostscythe] and
-		runes >= 1 and
-		buff[FR.KillingMachineBuff].up and
-		runicPowerDeficit > (15 + (talents[FR.RunicAttenuation] and 1 or 0) * 3) and
-		targets >= 2 and
-		(buff[FR.DeathsDueBuff].count == 8 or not buff[FR.DeathAndDecayBuff].up or covenantId ~= NightFae)
-	then
-		return FR.Frostscythe;
-	end
-
-	-- frostscythe,if=runic_power.deficit>=(35+talent.runic_attenuation*3)&spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae);
+	-- frostscythe,if=runic_power.deficit>=(35+talent.runic_attenuation*3)&spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking);
 	if talents[FR.Frostscythe] and
 		runes >= 1 and
 		runicPowerDeficit >= (35 + (talents[FR.RunicAttenuation] and 1 or 0) * 3) and
-		targets >= 2 and
-		(buff[FR.DeathsDueBuff].count == 8 or not buff[FR.DeathAndDecayBuff].up or covenantId ~= NightFae)
+		targets >= 2 
 	then
 		return FR.Frostscythe;
 	end
@@ -434,13 +373,11 @@ function DeathKnight:FrostBosTicking()
 	local talents = fd.talents;
 	local targets = fd.targets;
 	local gcd = fd.gcd;
-	local covenantId = fd.covenant.covenantId;
 	local runes = fd.runes;
 	local runicPower = fd.runicPower;
 	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runeforge = fd.runeforge;
-	local conduit = fd.covenant.soulbindConduits;
 	local timeTo3Runes = fd.timeTo3Runes;
 	local timeTo4Runes = fd.timeTo4Runes;
 
@@ -449,10 +386,10 @@ function DeathKnight:FrostBosTicking()
 		return FR.Obliterate;
 	end
 
-	-- remorseless_winter,if=talent.gathering_storm|conduit.everfrost|runeforge.biting_cold|active_enemies>=2;
+	-- remorseless_winter,if=talent.gathering_storm|runeforge.biting_cold|active_enemies>=2;
 	if cooldown[FR.RemorselessWinter].ready and
 		runes >= 1 and
-		(talents[FR.GatheringStorm] or conduit[FR.Everfrost] or runeforge[FR.BitingCold] or targets >= 2)
+		(talents[FR.GatheringStorm] or talents[FR.Everfrost] or runeforge[FR.BitingCold] or targets >= 2)
 	then
 		return FR.RemorselessWinter;
 	end
@@ -467,13 +404,11 @@ function DeathKnight:FrostBosTicking()
 		return FR.Obliterate;
 	end
 
-	-- frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2&(!death_and_decay.ticking&covenant.night_fae|!covenant.night_fae);
+	-- frostscythe,if=buff.killing_machine.up&spell_targets.frostscythe>=2&(!death_and_decay.ticking);
 	if talents[FR.Frostscythe] and
 		runes >= 1 and
 		buff[FR.KillingMachineBuff].up and
-		targets >= 2 and
-		(not buff[FR.DeathAndDecayBuff].up and covenantId == NightFae or covenantId ~= NightFae)
-	then
+		targets >= 2 then
 		return FR.Frostscythe;
 	end
 
@@ -486,11 +421,10 @@ function DeathKnight:FrostBosTicking()
 		return FR.HornOfWinter;
 	end
 
-	-- frostscythe,if=spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae);
+	-- frostscythe,if=spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking);
 	if talents[FR.Frostscythe] and
 		runes >= 1 and
-		targets >= 2 and
-		(buff[FR.DeathsDueBuff].count == 8 or not buff[FR.DeathAndDecayBuff].up or covenantId ~= NightFae)
+		targets >= 2
 	then
 		return FR.Frostscythe;
 	end
@@ -594,7 +528,7 @@ function DeathKnight:FrostCooldowns()
 	end
 
 	-- empower_rune_weapon,if=talent.obliteration&(cooldown.pillar_of_frost.ready&rune.time_to_5>gcd&runic_power.deficit>=10|buff.pillar_of_frost.up&rune.time_to_5>gcd)|fight_remains<20;
-	if cooldown[FR.EmpowerRuneWeapon].ready and
+	if cooldown[COMMON.EmpowerRuneWeapon].ready and
 		talents[FR.Obliteration] and
 		(
 			cooldown[FR.PillarOfFrost].ready and timeTo5Runes > gcd and runicPowerDeficit >= 10 or
@@ -602,23 +536,23 @@ function DeathKnight:FrostCooldowns()
 		)
 	-- or fightRemains < 20)
 	then
-		return FR.EmpowerRuneWeapon;
+		return COMMON.EmpowerRuneWeapon;
 	end
 
 	-- empower_rune_weapon,if=talent.breath_of_sindragosa&runic_power.deficit>40&rune.time_to_5>gcd&(buff.breath_of_sindragosa.up|fight_remains<20);
-	if cooldown[FR.EmpowerRuneWeapon].ready and
+	if cooldown[COMMON.EmpowerRuneWeapon].ready and
 		talents[FR.BreathOfSindragosa] and
 		runicPowerDeficit > 40 and
 		timeTo5Runes > gcd and
 		buff[FR.BreathOfSindragosa].up
 	-- or fightRemains < 20 ))
 	then
-		return FR.EmpowerRuneWeapon;
+		return COMMON.EmpowerRuneWeapon;
 	end
 
 	-- empower_rune_weapon,if=talent.icecap&rune<3;
-	if cooldown[FR.EmpowerRuneWeapon].ready and talents[FR.Icecap] and runes < 3 then
-		return FR.EmpowerRuneWeapon;
+	if cooldown[COMMON.EmpowerRuneWeapon].ready and talents[FR.Icecap] and runes < 3 then
+		return COMMON.EmpowerRuneWeapon;
 	end
 
 	-- pillar_of_frost,if=talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.remains|cooldown.breath_of_sindragosa.ready&runic_power.deficit<60);
@@ -682,124 +616,27 @@ function DeathKnight:FrostCooldowns()
 		return FR.FrostwyrmsFury;
 	end
 
-	-- hypothermic_presence,if=talent.breath_of_sindragosa&runic_power.deficit>40&rune>=3&buff.pillar_of_frost.up|!talent.breath_of_sindragosa&runic_power.deficit>=25;
-	if talents[FR.HypothermicPresence] and
-		cooldown[FR.HypothermicPresence].ready and
-		(
-			talents[FR.BreathOfSindragosa] and runicPowerDeficit > 40 and runes >= 3 and buff[FR.PillarOfFrost].up or
-			not talents[FR.BreathOfSindragosa] and runicPowerDeficit >= 25
-		)
-	then
-		return FR.HypothermicPresence;
-	end
-
 	-- raise_dead,if=buff.pillar_of_frost.up;
-	if cooldown[FR.RaiseDead].ready and buff[FR.PillarOfFrost].up then
-		return FR.RaiseDead;
+	if cooldown[COMMON.RaiseDead].ready and buff[FR.PillarOfFrost].up then
+		return COMMON.RaiseDead;
 	end
 
 	-- sacrificial_pact,if=active_enemies>=2&(pet.ghoul.remains<gcd|target.time_to_die<gcd);
-	if cooldown[FR.SacrificialPact].ready and
+	if cooldown[COMMON.SacrificialPact].ready and
 		runicPower >= 20 and
 		targets >= 2 and
 		ghoulActive and
 		ghoulRemains < gcd
 	then
-		return FR.SacrificialPact;
+		return COMMON.SacrificialPact;
 	end
 
-	-- death_and_decay,if=active_enemies>5|runeforge.phearomones;
-	if cooldown[FR.DeathAndDecay].ready and
+	-- death_and_decay,if=active_enemies>5;
+	if cooldown[COMMON.DeathAndDecay].ready and
 		runes >= 1 and
-		(targets > 5 or runeforge[FR.Phearomones])
+		(targets > 5)
 	then
-		return FR.DeathAndDecay;
-	end
-end
-
-function DeathKnight:FrostCovenants()
-	local fd = MaxDps.FrameData;
-	local cooldown = fd.cooldown;
-	local buff = fd.buff;
-	local talents = fd.talents;
-	local targets = fd.targets;
-	local runes = fd.runes;
-	local runicPower = fd.runicPower;
-	local runicPowerMax = fd.runicPowerMax;
-	local runicPowerDeficit = runicPowerMax - runicPower;
-	local covenantId = fd.covenant.covenantId;
-
-	-- deaths_due,if=raid_event.adds.in>15|!raid_event.adds.exists|active_enemies>=2;
-	if covenantId == NightFae and cooldown[FR.DeathsDue].ready and runes >= 1 and targets >= 2 then
-		return FR.DeathsDue;
-	end
-
-	-- swarming_mist,if=active_enemies=1&runic_power.deficit>3&cooldown.pillar_of_frost.remains<3&!talent.breath_of_sindragosa&(!raid_event.adds.exists|raid_event.adds.in>15);
-	if covenantId == Venthyr and
-		cooldown[FR.SwarmingMist].ready and
-		runes >= 1 and
-		targets <= 1 and
-		runicPowerDeficit > 3 and
-		cooldown[FR.PillarOfFrost].remains < 3 and
-		not talents[FR.BreathOfSindragosa]
-	then
-		return FR.SwarmingMist;
-	end
-
-	-- swarming_mist,if=active_enemies>=2&!talent.breath_of_sindragosa;
-	if covenantId == Venthyr and
-		cooldown[FR.SwarmingMist].ready and
-		runes >= 1 and
-		targets >= 2 and
-		not talents[FR.BreathOfSindragosa]
-	then
-		return FR.SwarmingMist;
-	end
-
-	-- swarming_mist,if=talent.breath_of_sindragosa&(buff.breath_of_sindragosa.up&(active_enemies=1&runic_power.deficit>40|active_enemies>=2&runic_power.deficit>60)|!buff.breath_of_sindragosa.up&cooldown.breath_of_sindragosa.remains);
-	if covenantId == Venthyr and
-		cooldown[FR.SwarmingMist].ready and
-		runes >= 1 and
-		talents[FR.BreathOfSindragosa] and
-		(
-			buff[FR.BreathOfSindragosa].up and (targets <= 1 and runicPowerDeficit > 40 or targets >= 2 and runicPowerDeficit > 60) or
-			not buff[FR.BreathOfSindragosa].up and cooldown[FR.BreathOfSindragosa].remains
-		)
-	then
-		return FR.SwarmingMist;
-	end
-
-	-- abomination_limb,if=active_enemies=1&cooldown.pillar_of_frost.remains<3&(!raid_event.adds.exists|raid_event.adds.in>15);
-	if covenantId == Necrolord and
-		cooldown[FR.AbominationLimb].ready and
-		not DeathKnight.db.abominationLimbAsCooldown and
-		targets <= 1 and
-		cooldown[FR.PillarOfFrost].remains < 3
-	then
-		return FR.AbominationLimb;
-	end
-
-	-- abomination_limb,if=active_enemies>=2;
-	if covenantId == Necrolord and
-		cooldown[FR.AbominationLimb].ready and
-		not DeathKnight.db.abominationLimbAsCooldown and
-		targets >= 2
-	then
-		return FR.AbominationLimb;
-	end
-
-	-- shackle_the_unworthy,if=active_enemies=1&cooldown.pillar_of_frost.remains<3&(!raid_event.adds.exists|raid_event.adds.in>15);
-	if covenantId == Kyrian and
-		cooldown[FR.ShackleTheUnworthy].ready and
-		targets <= 1 and
-		cooldown[FR.PillarOfFrost].remains < 3
-	then
-		return FR.ShackleTheUnworthy;
-	end
-
-	-- shackle_the_unworthy,if=active_enemies>=2;
-	if covenantId == Kyrian and cooldown[FR.ShackleTheUnworthy].ready and (targets >= 2) then
-		return FR.ShackleTheUnworthy;
+		return COMMON.DeathAndDecay;
 	end
 end
 
@@ -811,20 +648,18 @@ function DeathKnight:FrostObliteration()
 	local talents = fd.talents;
 	local targets = fd.targets;
 	local gcd = fd.gcd;
-	local covenantId = fd.covenant.covenantId;
 	local runicPower = fd.runicPower;
 	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runes = fd.runes;
 	local runeforge = fd.runeforge;
-	local conduit = fd.covenant.soulbindConduits;
 	local timeTo2Runes = fd.timeTo2Runes;
 
-	-- remorseless_winter,if=active_enemies>=3&(talent.gathering_storm|conduit.everfrost|runeforge.biting_cold);
+	-- remorseless_winter,if=active_enemies>=3&(talent.gathering_storm|runeforge.biting_cold);
 	if cooldown[FR.RemorselessWinter].ready and
 		runes >= 1 and
 		targets >= 3 and
-		(talents[FR.GatheringStorm] or conduit[FR.Everfrost] or runeforge[FR.BitingCold])
+		(talents[FR.GatheringStorm] or runeforge[FR.BitingCold])
 	then
 		return FR.RemorselessWinter;
 	end
@@ -834,12 +669,10 @@ function DeathKnight:FrostObliteration()
 		return FR.HowlingBlast;
 	end
 
-	-- frostscythe,if=buff.killing_machine.react&spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking|!covenant.night_fae);
+	-- frostscythe,if=buff.killing_machine.react&spell_targets.frostscythe>=2&(buff.deaths_due.stack=8|!death_and_decay.ticking);
 	if talents[FR.Frostscythe] and
 		runes >= 1 and
-		buff[FR.KillingMachineBuff].up and targets >= 2 and
-		(buff[FR.DeathsDueBuff].count == 8 or not buff[FR.DeathAndDecayBuff].up or covenantId ~= NightFae)
-	then
+		buff[FR.KillingMachineBuff].up and targets >= 2 then
 		return FR.Frostscythe;
 	end
 
@@ -858,11 +691,6 @@ function DeathKnight:FrostObliteration()
 		)
 	then
 		return FR.GlacialAdvance;
-	end
-
-	-- frost_strike,if=conduit.eradicating_blow&buff.eradicating_blow.stack=2&active_enemies=1;
-	if runicPower >= 25 and conduit[FR.EradicatingBlow] and buff[FR.EradicatingBlow].count == 2 and targets <= 1 then
-		return FR.FrostStrike;
 	end
 
 	-- howling_blast,if=buff.rime.up&spell_targets.howling_blast>=2;
@@ -902,18 +730,16 @@ function DeathKnight:FrostObliterationPooling()
 	local buff = fd.buff;
 	local talents = fd.talents;
 	local targets = fd.targets;
-	local covenantId = fd.covenant.covenantId;
 	local runicPower = fd.runicPower;
 	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runes = fd.runes;
 	local runeforge = fd.runeforge;
-	local conduit = fd.covenant.soulbindConduits;
 
-	-- remorseless_winter,if=talent.gathering_storm|conduit.everfrost|runeforge.biting_cold|active_enemies>=2;
+	-- remorseless_winter,if=talent.gathering_storm|runeforge.biting_cold|active_enemies>=2;
 	if cooldown[FR.RemorselessWinter].ready and
 		runes >= 1 and
-		(talents[FR.GatheringStorm] or conduit[FR.Everfrost] or runeforge[FR.BitingCold] or targets >= 2)
+		(talents[FR.GatheringStorm] or runeforge[FR.BitingCold] or targets >= 2)
 	then
 		return FR.RemorselessWinter;
 	end
@@ -948,12 +774,10 @@ function DeathKnight:FrostObliterationPooling()
 		return FR.Obliterate;
 	end
 
-	-- frostscythe,if=active_enemies>=4&(!death_and_decay.ticking&covenant.night_fae|!covenant.night_fae);
+	-- frostscythe,if=active_enemies>=4&);
 	if talents[FR.Frostscythe] and
 		runes >= 1 and
-		targets >= 4 and
-		((not buff[FR.DeathAndDecayBuff].up and covenantId == NightFae) or covenantId ~= NightFae)
-	then
+		targets >= 4 then
 		return FR.Frostscythe;
 	end
 end
@@ -965,20 +789,18 @@ function DeathKnight:FrostStandard()
 	local debuff = fd.debuff;
 	local talents = fd.talents;
 	local gcd = fd.gcd;
-	local covenantId = fd.covenant.covenantId;
 	local runicPower = fd.runicPower;
 	local runicPowerMax = fd.runicPowerMax;
 	local runicPowerDeficit = runicPowerMax - runicPower;
 	local runes = fd.runes;
 	local runeforge = fd.runeforge;
-	local conduit = fd.covenant.soulbindConduits;
 	local deathKnightRuneforgeRazorice = enchant[weaponRunes.Razorice];
 	local timeTo4Runes = fd.timeTo4Runes;
 
-	-- remorseless_winter,if=talent.gathering_storm|conduit.everfrost|runeforge.biting_cold;
+	-- remorseless_winter,if=talent.gathering_storm|runeforge.biting_cold;
 	if cooldown[FR.RemorselessWinter].ready and
 		runes >= 1 and
-		(talents[FR.GatheringStorm] or conduit[FR.Everfrost] or runeforge[FR.BitingCold])
+		(talents[FR.GatheringStorm] or runeforge[FR.BitingCold])
 	then
 		return FR.RemorselessWinter;
 	end
@@ -998,28 +820,13 @@ function DeathKnight:FrostStandard()
 		return FR.FrostStrike;
 	end
 
-	-- frost_strike,if=conduit.eradicating_blow&buff.eradicating_blow.stack=2|conduit.unleashed_frenzy&buff.unleashed_frenzy.remains<3&buff.unleashed_frenzy.up;
-	if runicPower >= 25 and
-		(
-			conduit[FR.EradicatingBlow] and buff[FR.EradicatingBlow].count == 2 or
-			conduit[FR.UnleashedFrenzy] and buff[FR.UnleashedFrenzy].remains < 3 and buff[FR.UnleashedFrenzy].up
-		)
-	then
-		return FR.FrostStrike;
-	end
-
 	-- howling_blast,if=buff.rime.up;
 	if buff[FR.Rime].up then
 		return FR.HowlingBlast;
 	end
 
-	-- obliterate,if=!buff.frozen_pulse.up&talent.frozen_pulse|buff.killing_machine.react|death_and_decay.ticking&covenant.night_fae&buff.deaths_due.stack>8|rune.time_to_4<=gcd;
-	if runes >= 2 and (
-		not buff[FR.FrozenPulse].up and talents[FR.FrozenPulse] or
-		buff[FR.KillingMachineBuff].up or
-		(buff[FR.DeathAndDecayBuff].up and covenantId == NightFae and buff[FR.DeathsDueBuff].count > 8) or
-		timeTo4Runes <= gcd
-	) then
+	-- obliterate,if=!buff.frozen_pulse.up&talent.frozen_pulse|buff.killing_machine.react|death_and_decay.ticking|rune.time_to_4<=gcd;
+	if runes >= 2 and (buff[FR.KillingMachineBuff].up or timeTo4Runes <= gcd) then
 		return FR.Obliterate;
 	end
 

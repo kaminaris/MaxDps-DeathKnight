@@ -11,11 +11,6 @@ local UnitExists = UnitExists;
 local RunicPower = Enum.PowerType.RunicPower;
 local GetTotemInfo = GetTotemInfo;
 
-local Necrolord = Enum.CovenantType.Necrolord;
-local Venthyr = Enum.CovenantType.Venthyr;
-local NightFae = Enum.CovenantType.NightFae;
-local Kyrian = Enum.CovenantType.Kyrian;
-
 local UH = {			
 	Apocalypse 			 = 275699,	
 	ArmyOfTheDamned      = 276837,				
@@ -69,7 +64,6 @@ function DeathKnight:Unholy()
 	local petExists = UnitExists('pet');
 	local controlUndeadAura = MaxDps:IntUnitAura('pet', UH.ControlUndead, 'PLAYER', fd.timeShift);
 	local darkTransformationAura = MaxDps:IntUnitAura('pet', UH.DarkTransformation, nil, fd.timeShift);
-	local covenantId = fd.covenant.covenantId
 	local runicPower = UnitPower('player', RunicPower);
 	local runicPowerMax = UnitPowerMax('player', RunicPower);
 	local targetHpPercent = MaxDps:TargetPercentHealth() * 100;
@@ -84,8 +78,6 @@ function DeathKnight:Unholy()
 
 	if talents[UH.Defile] then
 		UH.AnyDnd = UH.Defile;
-	elseif covenantId == NightFae then
-		UH.AnyDnd = COMMON.DeathsDue;
 	else
 		UH.AnyDnd = COMMON.DeathAndDecay;
 	end
@@ -140,12 +132,6 @@ function DeathKnight:Unholy()
 				return UH.UnholyBlight;
 			end
 		end
-	end
-
-	-- call_action_list,name=covenants;
-	local result = DeathKnight:UnholyCovenants();
-	if result then
-		return result;
 	end
 
 	if targets <= 1 then
@@ -253,8 +239,6 @@ function DeathKnight:UnolyGlowCooldowns()
 	local runes = fd.runes;
 	local runicPowerDeficit = fd.runicPowerDeficit;
 	local targets = fd.targets;
-	local covenant = fd.covenant;
-	local covenantId = fd.covenant.covenantId;
 	local stPlanning = fd.stPlanning;
 	local timeTo4Runes = fd.timeTo4Runes;
 	local ghoulActive = fd.petExists;
@@ -270,13 +254,7 @@ function DeathKnight:UnolyGlowCooldowns()
 		talents[UH.SummonGargoyle] and
 		cooldown[UH.SummonGargoyle].ready;
 
-	local abominationLimbReady = DeathKnight.db.abominationLimbAsCooldown and
-		covenantId == Necrolord and
-		cooldown[COMMON.AbominationLimb].ready;
-		
-	local abominationLimbTalentReady = DeathKnight.db.abominationLimbAsCooldown and
-		covenantId == Necrolord and
-		cooldown[COMMON.AbominationLimbTalent].ready;
+	local abominationLimbReady = DeathKnight.db.abominationLimbAsCooldown and talents[COMMON.AbominationLimbTalent] and cooldown[COMMON.AbominationLimbTalent].ready;
 
 	local sacrificialPactReady = DeathKnight.db.unholySacrificialPactAsCooldown and
 		cooldown[COMMON.SacrificialPact].ready and
@@ -289,8 +267,7 @@ function DeathKnight:UnolyGlowCooldowns()
 	if DeathKnight.db.alwaysGlowCooldowns then
 		MaxDps:GlowCooldown(UH.ArmyOfTheDead, armyOfTheDeadReady);
 		MaxDps:GlowCooldown(UH.SummonGargoyle, summonGargoyleReady);
-		MaxDps:GlowCooldown(COMMON.AbominationLimb, abominationLimbReady);
-		MaxDps:GlowCooldown(COMMON.AbominationLimbTalent, abominationLimbTalentReady);
+		MaxDps:GlowCooldown(COMMON.AbominationLimbTalent, abominationLimbReady);
 		MaxDps:GlowCooldown(COMMON.SacrificialPact, sacrificialPactReady);
 		MaxDps:GlowCooldown(COMMON.EmpowerRuneWeapon, empowerRuneweaponReady);
 	else
@@ -303,17 +280,15 @@ function DeathKnight:UnolyGlowCooldowns()
 					(
 						talents[UH.UnholyBlight] and
 						cooldown[UH.UnholyBlight].remains < 3 and
-						cooldown[UH.DarkTransformation].remains < 3 and
-						not covenant.soulbindAbilities[UH.LeadByExample]
+						cooldown[UH.DarkTransformation].remains < 3
 					) or
 					not talents[UH.UnholyBlight]
 				) or
 				(
 					talents[UH.UnholyBlight] and
 					cooldown[UH.UnholyBlight].remains < 3 and
-					covenantId == Necrolord and
-					(cooldown[COMMON.AbominationLimb].ready or DeathKnight.db.abominationLimbAsCooldown) and
-					covenant.soulbindAbilities[UH.LeadByExample]
+					talents[COMMON.AbominationLimbTalent] and
+					(cooldown[COMMON.AbominationLimbTalent].ready or DeathKnight.db.abominationLimbAsCooldown)
 				)
 			);
 
@@ -328,13 +303,11 @@ function DeathKnight:UnolyGlowCooldowns()
 			(
 				(
 					stPlanning and
-					not covenant.soulbindAbilities[UH.LeadByExample] and
 					not cooldown[UH.Apocalypse].ready and
 					timeTo4Runes > ( 3 + buff[UH.RunicCorruption].remains )
 				) or
 				(
 					stPlanning and
-					covenant.soulbindAbilities[UH.LeadByExample] and
 					(
 						(talents[UH.UnholyBlight] and not cooldown[UH.UnholyBlight].ready) or
 							(not talents[UH.UnholyBlight] and not cooldown[UH.DarkTransformation].ready )
@@ -355,105 +328,12 @@ function DeathKnight:UnolyGlowCooldowns()
 
 		MaxDps:GlowCooldown(UH.ArmyOfTheDead, armyOfTheDeadCooldownTrigger);
 		MaxDps:GlowCooldown(UH.SummonGargoyle, summonGargoyleCooldownTrigger);
-		MaxDps:GlowCooldown(COMMON.AbominationLimb, abominationLimbCooldownTrigger);
+		MaxDps:GlowCooldown(COMMON.AbominationLimbTalent, abominationLimbCooldownTrigger);
 		MaxDps:GlowCooldown(COMMON.SacrificialPact, sacrificialPactTrigger);
 		MaxDps:GlowCooldown(COMMON.EmpowerRuneWeapon, empowerRuneweaponReady);
 	end
 end
 
-function DeathKnight:UnholyCovenants()
-	local fd = MaxDps.FrameData;
-	local cooldown = fd.cooldown;
-	local buff = fd.buff;
-	local debuff = fd.debuff;
-	local talents = fd.talents;
-	local targets = fd.targets;
-	local runicPower = fd.runicPower;
-	local runicPowerMax = fd.runicPowerMax;
-	local runicPowerDeficit = runicPowerMax - runicPower;
-	local runes = fd.runes;
-	local stPlanning = fd.stPlanning
-	local covenant = fd.covenant;
-	local covenantId = fd.covenant.covenantId
-	local timeTo4Runes = fd.timeTo4Runes;
-
-	-- swarming_mist,if=variable.st_planning&runic_power.deficit>16|fight_remains<11;
-	if covenantId == Venthyr and
-		cooldown[UH.SwarmingMist].ready and
-		runes >= 1 and
-		stPlanning and
-		runicPowerDeficit > 16
-	then
-		return UH.SwarmingMist;
-	end
-
-	-- swarming_mist,if=cooldown.apocalypse.remains&(active_enemies>=2&active_enemies<=5&runic_power.deficit>10+(active_enemies*6)|active_enemies>5&runic_power.deficit>40);
-	if covenantId == Venthyr and
-		cooldown[UH.SwarmingMist].ready and
-		runes >= 1 and
-		not cooldown[UH.Apocalypse].ready and
-		(
-			(targets >= 2 and targets <= 5 and runicPowerDeficit > 10 + ( targets * 6 )) or
-				(targets > 5 and runicPowerDeficit > 40 )
-		)
-	then
-		return UH.SwarmingMist;
-	end
-
-	-- abomination_limb,if=variable.st_planning&!soulbind.lead_by_example&cooldown.apocalypse.remains&rune.time_to_4>(3+buff.runic_corruption.remains)|fight_remains<21;
-	if covenantId == Necrolord and
-		cooldown[COMMON.AbominationLimb].ready and
-		not DeathKnight.db.abominationLimbAsCooldown and
-		stPlanning and
-		not covenant.soulbindAbilities[UH.LeadByExample] and
-		not cooldown[UH.Apocalypse].ready and
-		timeTo4Runes > ( 3 + buff[UH.RunicCorruption].remains )
-	then
-		return COMMON.AbominationLimb;
-	end
-
-	-- abomination_limb,if=variable.st_planning&soulbind.lead_by_example&(dot.unholy_blight_dot.remains>11|!talent.unholy_blight&cooldown.dark_transformation.remains)
-	if covenantId == Necrolord and
-		cooldown[COMMON.AbominationLimb].ready and
-		not DeathKnight.db.abominationLimbAsCooldown and
-		stPlanning and
-		covenant.soulbindAbilities[UH.LeadByExample] and
-		(
-			(talents[UH.UnholyBlight] and debuff[UH.UnholyBlightDot].remains > 11) or
-			(not talents[UH.UnholyBlight] and not cooldown[UH.DarkTransformation].ready)
-		)
-	then
-		return COMMON.AbominationLimb;
-	end
-
-	-- abomination_limb,if=active_enemies>=2&rune.time_to_4>(3+buff.runic_corruption.remains);
-	if covenantId == Necrolord and
-		cooldown[COMMON.AbominationLimb].ready and
-		not DeathKnight.db.abominationLimbAsCooldown and
-		targets >= 2 and
-		timeTo4Runes > (3 + buff[UH.RunicCorruption].remains)
-	then
-		return COMMON.AbominationLimb;
-	end
-
-	-- shackle_the_unworthy,if=variable.st_planning&cooldown.apocalypse.remains|fight_remains<15;
-	if covenantId == Kyrian and
-		cooldown[UH.ShackleTheUnworthy].ready and
-		stPlanning and
-		not cooldown[UH.Apocalypse].ready
-	then
-		return UH.ShackleTheUnworthy;
-	end
-
-	-- shackle_the_unworthy,if=active_enemies>=2&(death_and_decay.ticking|raid_event.adds.remains<=14);
-	if covenantId == Kyrian and
-		cooldown[UH.ShackleTheUnworthy].ready and
-		targets >= 2 and
-		debuff[COMMON.DeathAndDecay].up
-	then
-		return UH.ShackleTheUnworthy;
-	end
-end
 
 function DeathKnight:WoundedTargets()
 	local fd = MaxDps.FrameData;

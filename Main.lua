@@ -12,15 +12,14 @@ local DeathKnight = MaxDps:NewModule('DeathKnight');
 addonTable.DeathKnight = DeathKnight;
 
 COMMON = {
-	AbominationLimb       	= 315443,
 	AbominationLimbTalent 	= 383269,
 	DeathAndDecay         	= 43265,
 	DeathAndDecayBuff     	= 374271,
 	DeathCoil		 	 	= 47541,
 	DeathsDue             	= 324128,
 	DeathsDueBuff         	= 324165,
-	DeathStrike           	= 49998,
-	EmpowerRuneWeapon 		= 47568,
+	DeathStrike				= 49998,
+	EmpowerRuneWeapon		= 47568,
 	IcyTalons				= 194879,
 	RaiseDead             	= 46585,
 	SacrificialPact       	= 327574,

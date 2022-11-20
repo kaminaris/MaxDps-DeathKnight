@@ -264,6 +264,7 @@ function DeathKnight:UnolyGlowCooldowns()
 		
 	local empowerRuneweaponReady = talents[COMMON.EmpowerRuneWeapon] and cooldown[COMMON.EmpowerRuneWeapon].ready;
 
+	MaxDps:GlowCooldown(UH.UnholyAssault, talents[UH.UnholyAssault] and cooldown[UH.UnholyAssault].ready);
 	if DeathKnight.db.alwaysGlowCooldowns then
 		MaxDps:GlowCooldown(UH.ArmyOfTheDead, armyOfTheDeadReady);
 		MaxDps:GlowCooldown(UH.SummonGargoyle, summonGargoyleReady);

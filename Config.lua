@@ -1,10 +1,10 @@
-local _, addonTable = ...;
-local StdUi = LibStub('StdUi');
+local _, addonTable = ...
+local StdUi = LibStub('StdUi')
 
 --- @type MaxDps
 if not MaxDps then return end
-local MaxDps = MaxDps;
-local DeathKnight = addonTable.DeathKnight;
+local MaxDps = MaxDps
+local DeathKnight = addonTable.DeathKnight
 
 local defaultOptions = {
 	alwaysGlowCooldowns = true,
@@ -14,7 +14,7 @@ local defaultOptions = {
 	unholySummonGargoyleAsCooldown = false,
 	unholySacrificialPactAsCooldown = true,
 	frostFrostwyrmsFuryAsCooldown = true,
-};
+}
 
 function DeathKnight:GetConfig()
 	local config = {
@@ -116,49 +116,49 @@ function DeathKnight:GetConfig()
 				},
 			},
 		},
-	};
+	}
 
-	return config;
+	return config
 end
 
 
 function DeathKnight:InitializeDatabase()
-	if self.db then return end;
+	if self.db then return end
 
 	if not MaxDpsDeathKnightOptions then
-		MaxDpsDeathKnightOptions = defaultOptions;
+		MaxDpsDeathKnightOptions = defaultOptions
 	end
 
 	for k, v in pairs(defaultOptions) do
 		if MaxDpsDeathKnightOptions[k] == nil then
-			MaxDpsDeathKnightOptions[k] = v;
+			MaxDpsDeathKnightOptions[k] = v
 		end
 	end
 
-	self.db = MaxDpsDeathKnightOptions;
+	self.db = MaxDpsDeathKnightOptions
 end
 
 function DeathKnight:CreateConfig()
 	if self.optionsFrame then
-		return;
+		return
 	end
 
-	local optionsFrame = StdUi:PanelWithTitle(nil, 100, 100, 'Death Knight Options');
-	self.optionsFrame = optionsFrame;
-	optionsFrame:Hide();
-	optionsFrame.name = 'Death Knight';
-	optionsFrame.parent = 'MaxDps';
+	local optionsFrame = StdUi:PanelWithTitle(nil, 100, 100, 'Death Knight Options')
+	self.optionsFrame = optionsFrame
+	optionsFrame:Hide()
+	optionsFrame.name = 'Death Knight'
+	optionsFrame.parent = 'MaxDps'
 
-	StdUi:BuildWindow(self.optionsFrame, self:GetConfig());
+	StdUi:BuildWindow(self.optionsFrame, self:GetConfig())
 
-	StdUi:EasyLayout(optionsFrame, { padding = { top = 40 } });
+	StdUi:EasyLayout(optionsFrame, { padding = { top = 40 } })
 
 	optionsFrame:SetScript('OnShow', function(of)
-		of:DoLayout();
-	end);
+		of:DoLayout()
+	end)
 
-	--InterfaceOptions_AddCategory(optionsFrame);
-	--InterfaceCategoryList_Update();
-	--InterfaceOptionsOptionsFrame_RefreshCategories();
-	--InterfaceAddOnsList_Update();
+	--InterfaceOptions_AddCategory(optionsFrame)
+	--InterfaceCategoryList_Update()
+	--InterfaceOptionsOptionsFrame_RefreshCategories()
+	--InterfaceAddOnsList_Update()
 end

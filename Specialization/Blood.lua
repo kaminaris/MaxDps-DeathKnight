@@ -61,16 +61,15 @@ local RunicPower
 local RunicPowerMax
 local RunicPowerDeficit
 
-local trinket_1_buffs
-local trinket_2_buffs
-local trinket_1_exclude
-local trinket_2_exclude
+local Blood = {}
+
 local death_strike_dump_amount
 local bone_shield_refresh_value
 local heart_strike_rp_drw
 local heart_strike_rp
 
 local function CheckSpellCosts(spell,spellstring)
+    if not IsSpellKnownOrOverridesKnown(spell) then return false end
     if spellstring == 'TouchofDeath' then
         if targethealthPerc < 15 then
             return true
@@ -88,20 +87,15 @@ local function CheckSpellCosts(spell,spellstring)
     return true
 end
 
-local function PreCombatUpdate()
-death_strike_dump_amount = 65
-if not talents[classtable.DeathsCaress] or talents[classtable.Consumption] or talents[classtable.Blooddrinker] then
-    bone_shield_refresh_value = 4
-else
-    bone_shield_refresh_value = 5
-end
+local function GetTotemDuration(name)
+    for index=1,MAX_TOTEMS do
+        local arg1, totemName, startTime, duration, icon = GetTotemInfo(index)
+        local est_dur = round(startTime+duration-GetTime())
+        if (totemName == name and est_dur and est_dur > 0) then return est_dur else return 0 end
+    end
 end
 
-local function trinkets()
-end
-local function racials()
-end
-local function drw_up()
+function Blood:drw_up()
     if (MaxDps:FindSpell(classtable.BloodBoil) and CheckSpellCosts(classtable.BloodBoil, 'BloodBoil')) and (not debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.BloodBoil].ready then
         return classtable.BloodBoil
     end
@@ -114,10 +108,10 @@ local function drw_up()
     if (MaxDps:FindSpell(classtable.Marrowrend) and CheckSpellCosts(classtable.Marrowrend, 'Marrowrend')) and (( buff[classtable.BoneShieldBuff].remains <= 4 or buff[classtable.BoneShieldBuff].count <bone_shield_refresh_value ) and RunicPowerDeficit >20) and cooldown[classtable.Marrowrend].ready then
         return classtable.Marrowrend
     end
-    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targets == 1 and MaxDps:GetTimeToPct(35) <5 and ttd >( debuff[classtable.SoulReaperDeBuff].up + 5 )) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targets == 1 and MaxDps:GetTimeToPct(35) <5 and ttd >( debuff[classtable.SoulReaperDeBuff].remains + 5 )) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
-    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (MaxDps:GetTimeToPct(35) <5 and targets >= 2 and ttd >( debuff[classtable.SoulReaperDeBuff].up + 5 )) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (MaxDps:GetTimeToPct(35) <5 and targets >= 2 and ttd >( debuff[classtable.SoulReaperDeBuff].remains + 5 ) and debuff[classtable.SoulReaperDeBuff].remains) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
     if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( talents[classtable.SanguineGround] or talents[classtable.UnholyGround] )) and cooldown[classtable.DeathandDecay].ready then
@@ -126,11 +120,11 @@ local function drw_up()
     if (MaxDps:FindSpell(classtable.BloodBoil) and CheckSpellCosts(classtable.BloodBoil, 'BloodBoil')) and (targets >2 and cooldown[classtable.BloodBoil].charges >= 1.1) and cooldown[classtable.BloodBoil].ready then
         return classtable.BloodBoil
     end
-    heart_strike_rp_drw = ( 25 + targets * (talents[classtable.Heartbreaker] and 1 or 0) * 2 )
+    heart_strike_rp_drw = ( 25 + targets * talents[classtable.Heartbreaker] * 2 )
     if (MaxDps:FindSpell(classtable.DeathStrike) and CheckSpellCosts(classtable.DeathStrike, 'DeathStrike')) and (RunicPowerDeficit <= heart_strike_rp_drw or RunicPower >= death_strike_dump_amount) and cooldown[classtable.DeathStrike].ready then
         return classtable.DeathStrike
     end
-    if (MaxDps:FindSpell(classtable.Consumption) and CheckSpellCosts(classtable.Consumption, 'Consumption') and talents[classtable.Consumption]) and cooldown[classtable.Consumption].ready then
+    if (MaxDps:FindSpell(classtable.Consumption) and CheckSpellCosts(classtable.Consumption, 'Consumption')) and cooldown[classtable.Consumption].ready then
         return classtable.Consumption
     end
     if (MaxDps:FindSpell(classtable.BloodBoil) and CheckSpellCosts(classtable.BloodBoil, 'BloodBoil')) and (cooldown[classtable.BloodBoil].charges >= 1.1 and buff[classtable.HemostasisBuff].count <5) and cooldown[classtable.BloodBoil].ready then
@@ -140,7 +134,8 @@ local function drw_up()
         return classtable.HeartStrike
     end
 end
-local function standard()
+
+function Blood:standard()
     if (MaxDps:FindSpell(classtable.Tombstone) and CheckSpellCosts(classtable.Tombstone, 'Tombstone')) and (buff[classtable.BoneShieldBuff].count >5 and Runes >= 2 and RunicPowerDeficit >= 30 and not talents[classtable.ShatteringBone] or ( talents[classtable.ShatteringBone] and debuff[classtable.DeathandDecayDebuff].up ) and cooldown[classtable.DancingRuneWeapon].remains >= 25) and cooldown[classtable.Tombstone].ready then
         return classtable.Tombstone
     end
@@ -148,19 +143,19 @@ local function standard()
     if (MaxDps:FindSpell(classtable.DeathStrike) and CheckSpellCosts(classtable.DeathStrike, 'DeathStrike')) and (buff[classtable.CoagulopathyBuff].remains <= gcd or buff[classtable.IcyTalonsBuff].remains <= gcd or RunicPower >= death_strike_dump_amount or RunicPowerDeficit <= heart_strike_rp or ttd <10) and cooldown[classtable.DeathStrike].ready then
         return classtable.DeathStrike
     end
-    if (MaxDps:FindSpell(classtable.DeathsCaress) and CheckSpellCosts(classtable.DeathsCaress, 'DeathsCaress') and talents[classtable.DeathsCaress]) and (( buff[classtable.BoneShieldBuff].remains <= 4 or ( buff[classtable.BoneShieldBuff].count <bone_shield_refresh_value + 1 ) ) and RunicPowerDeficit >10 and not ( talents[classtable.InsatiableBlade] and cooldown[classtable.DancingRuneWeapon].remains <buff[classtable.BoneShieldBuff].remains ) and not talents[classtable.Consumption] and not talents[classtable.Blooddrinker] and DeathKnight:TimeToRunes(3) >gcd) and cooldown[classtable.DeathsCaress].ready then
+    if (MaxDps:FindSpell(classtable.DeathsCaress) and CheckSpellCosts(classtable.DeathsCaress, 'DeathsCaress')) and (( buff[classtable.BoneShieldBuff].remains <= 4 or ( buff[classtable.BoneShieldBuff].count <bone_shield_refresh_value + 1 ) ) and RunicPowerDeficit >10 and not ( talents[classtable.InsatiableBlade] and cooldown[classtable.DancingRuneWeapon].remains <buff[classtable.BoneShieldBuff].remains ) and not talents[classtable.Consumption] and not talents[classtable.Blooddrinker] and DeathKnight:TimeToRunes(3) >gcd) and cooldown[classtable.DeathsCaress].ready then
         return classtable.DeathsCaress
     end
     if (MaxDps:FindSpell(classtable.Marrowrend) and CheckSpellCosts(classtable.Marrowrend, 'Marrowrend')) and (( buff[classtable.BoneShieldBuff].remains <= 4 or buff[classtable.BoneShieldBuff].count <bone_shield_refresh_value ) and RunicPowerDeficit >20 and not ( talents[classtable.InsatiableBlade] and cooldown[classtable.DancingRuneWeapon].remains <buff[classtable.BoneShieldBuff].remains )) and cooldown[classtable.Marrowrend].ready then
         return classtable.Marrowrend
     end
-    if (MaxDps:FindSpell(classtable.Consumption) and CheckSpellCosts(classtable.Consumption, 'Consumption') and talents[classtable.Consumption]) and cooldown[classtable.Consumption].ready then
+    if (MaxDps:FindSpell(classtable.Consumption) and CheckSpellCosts(classtable.Consumption, 'Consumption')) and cooldown[classtable.Consumption].ready then
         return classtable.Consumption
     end
-    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targets == 1 and MaxDps:GetTimeToPct(35) <5 and ttd >( debuff[classtable.SoulReaperDeBuff].up + 5 )) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targets == 1 and MaxDps:GetTimeToPct(35) <5 and ttd >( debuff[classtable.SoulReaperDeBuff].remains + 5 )) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
-    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (MaxDps:GetTimeToPct(35) <5 and targets >= 2 and ttd >( debuff[classtable.SoulReaperDeBuff].up + 5 )) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (MaxDps:GetTimeToPct(35) <5 and targets >= 2 and ttd >( debuff[classtable.SoulReaperDeBuff].remains + 5 ) and debuff[classtable.SoulReaperDeBuff].remains) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
     if (MaxDps:FindSpell(classtable.Bonestorm) and CheckSpellCosts(classtable.Bonestorm, 'Bonestorm')) and (RunicPower >= 100) and cooldown[classtable.Bonestorm].ready then
@@ -211,28 +206,69 @@ function DeathKnight:Blood()
     RunicPowerDeficit = RunicPowerMax - RunicPower
     classtable.BloodPlagueDeBuff = 55078
     classtable.BoneShieldBuff = 195181
-    classtable.DeathandDecayDebuff = 0
+    classtable.DeathandDecayDebuff = 52212
     classtable.CoagulopathyBuff = 391481
     classtable.IcyTalonsBuff = 194879
     classtable.SoulReaperDeBuff = 0
     classtable.HemostasisBuff = 273947
-    PreCombatUpdate()
-    local trinketsCheck = trinkets()
-    if trinketsCheck then
-        return trinketsCheck
+
+    death_strike_dump_amount = 65
+    if not talents[classtable.DeathsCaress] or talents[classtable.Consumption] or talents[classtable.Blooddrinker] then
+        bone_shield_refresh_value = 4
+    else
+        bone_shield_refresh_value = 5
     end
-    local racialsCheck = racials()
-    if racialsCheck then
-        return racialsCheck
+    if (MaxDps:FindSpell(classtable.RaiseDead) and CheckSpellCosts(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
+        return classtable.RaiseDead
     end
-    local drw_upCheck = drw_up()
+    --if (MaxDps:FindSpell(classtable.IceboundFortitude) and CheckSpellCosts(classtable.IceboundFortitude, 'IceboundFortitude')) and (not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up ) and ( target.cooldown.pause_action.remains >= 8 or target.cooldown.pause_action.duration >0 )) and cooldown[classtable.IceboundFortitude].ready then
+    --    return classtable.IceboundFortitude
+    --end
+    if (MaxDps:FindSpell(classtable.VampiricBlood) and CheckSpellCosts(classtable.VampiricBlood, 'VampiricBlood')) and (not buff[classtable.VampiricBloodBuff].up and not buff[classtable.VampiricStrengthBuff].up) and cooldown[classtable.VampiricBlood].ready then
+        return classtable.VampiricBlood
+    end
+    if (MaxDps:FindSpell(classtable.VampiricBlood) and CheckSpellCosts(classtable.VampiricBlood, 'VampiricBlood')) and (not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.IceboundFortitudeBuff].up or buff[classtable.VampiricBloodBuff].up or buff[classtable.VampiricStrengthBuff].up ) ) and cooldown[classtable.VampiricBlood].ready then
+        return classtable.VampiricBlood
+    end
+    if (MaxDps:FindSpell(classtable.DeathsCaress) and CheckSpellCosts(classtable.DeathsCaress, 'DeathsCaress')) and (not buff[classtable.BoneShieldBuff].up) and cooldown[classtable.DeathsCaress].ready then
+        return classtable.DeathsCaress
+    end
+    if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( talents[classtable.UnholyGround] or talents[classtable.SanguineGround] or targets >3 or buff[classtable.CrimsonScourgeBuff].up )) and cooldown[classtable.DeathandDecay].ready then
+        return classtable.DeathandDecay
+    end
+    if (MaxDps:FindSpell(classtable.DeathStrike) and CheckSpellCosts(classtable.DeathStrike, 'DeathStrike')) and (buff[classtable.CoagulopathyBuff].remains <= gcd or buff[classtable.IcyTalonsBuff].remains <= gcd or RunicPower >= death_strike_dump_amount or RunicPowerDeficit <= heart_strike_rp or ttd <10) and cooldown[classtable.DeathStrike].ready then
+        return classtable.DeathStrike
+    end
+    if (MaxDps:FindSpell(classtable.Blooddrinker) and CheckSpellCosts(classtable.Blooddrinker, 'Blooddrinker')) and (not buff[classtable.DancingRuneWeaponBuff].up) and cooldown[classtable.Blooddrinker].ready then
+        return classtable.Blooddrinker
+    end
+    if (MaxDps:FindSpell(classtable.SacrificialPact) and CheckSpellCosts(classtable.SacrificialPact, 'SacrificialPact')) and (not buff[classtable.DancingRuneWeaponBuff].up and ( GetTotemDuration('Risen Ghoul') <2 or ttd <gcd )) and cooldown[classtable.SacrificialPact].ready then
+        return classtable.SacrificialPact
+    end
+    if (MaxDps:FindSpell(classtable.BloodTap) and CheckSpellCosts(classtable.BloodTap, 'BloodTap')) and (( Runes <= 2 and DeathKnight:TimeToRunes(4) >gcd and cooldown[classtable.BloodTap].charges >= 1.8 ) or DeathKnight:TimeToRunes(3) >gcd) and cooldown[classtable.BloodTap].ready then
+        return classtable.BloodTap
+    end
+    if (MaxDps:FindSpell(classtable.GorefiendsGrasp) and CheckSpellCosts(classtable.GorefiendsGrasp, 'GorefiendsGrasp')) and (talents[classtable.TighteningGrasp]) and cooldown[classtable.GorefiendsGrasp].ready then
+        return classtable.GorefiendsGrasp
+    end
+    if (MaxDps:FindSpell(classtable.EmpowerRuneWeapon) and CheckSpellCosts(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (Runes <6 and RunicPowerDeficit >5) and cooldown[classtable.EmpowerRuneWeapon].ready then
+        return classtable.EmpowerRuneWeapon
+    end
+    if (MaxDps:FindSpell(classtable.AbominationLimb) and CheckSpellCosts(classtable.AbominationLimb, 'AbominationLimb')) and cooldown[classtable.AbominationLimb].ready then
+        return classtable.AbominationLimb
+    end
+    if (MaxDps:FindSpell(classtable.DancingRuneWeapon) and CheckSpellCosts(classtable.DancingRuneWeapon, 'DancingRuneWeapon')) and (not buff[classtable.DancingRuneWeaponBuff].up) and cooldown[classtable.DancingRuneWeapon].ready then
+        return classtable.DancingRuneWeapon
+    end
     if (buff[classtable.DancingRuneWeaponBuff].up) then
+        local drw_upCheck = Blood:drw_up()
         if drw_upCheck then
-            return drw_up()
+            return Blood:drw_up()
         end
     end
-    local standardCheck = standard()
+    local standardCheck = Blood:standard()
     if standardCheck then
         return standardCheck
     end
+
 end

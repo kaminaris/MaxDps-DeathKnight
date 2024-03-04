@@ -209,7 +209,7 @@ function DeathKnight:Blood()
     classtable.DeathandDecayDebuff = 52212
     classtable.CoagulopathyBuff = 391481
     classtable.IcyTalonsBuff = 194879
-    classtable.SoulReaperDeBuff = 0
+    classtable.SoulReaperDeBuff = 343294
     classtable.HemostasisBuff = 273947
 
     death_strike_dump_amount = 65

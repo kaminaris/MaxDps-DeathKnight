@@ -120,7 +120,7 @@ function Blood:drw_up()
     if (MaxDps:FindSpell(classtable.BloodBoil) and CheckSpellCosts(classtable.BloodBoil, 'BloodBoil')) and (targets >2 and cooldown[classtable.BloodBoil].charges >= 1.1) and cooldown[classtable.BloodBoil].ready then
         return classtable.BloodBoil
     end
-    heart_strike_rp_drw = ( 25 + targets * talents[classtable.Heartbreaker] * 2 )
+    heart_strike_rp_drw = ( 25 + targets * (talents[classtable.Heartbreaker] and 1 or 0) * 2 )
     if (MaxDps:FindSpell(classtable.DeathStrike) and CheckSpellCosts(classtable.DeathStrike, 'DeathStrike')) and (RunicPowerDeficit <= heart_strike_rp_drw or RunicPower >= death_strike_dump_amount) and cooldown[classtable.DeathStrike].ready then
         return classtable.DeathStrike
     end

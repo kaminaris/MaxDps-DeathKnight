@@ -108,10 +108,10 @@ function Blood:drw_up()
     if (MaxDps:FindSpell(classtable.Marrowrend) and CheckSpellCosts(classtable.Marrowrend, 'Marrowrend')) and (( buff[classtable.BoneShieldBuff].remains <= 4 or buff[classtable.BoneShieldBuff].count <bone_shield_refresh_value ) and RunicPowerDeficit >20) and cooldown[classtable.Marrowrend].ready then
         return classtable.Marrowrend
     end
-    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targets == 1 and MaxDps:GetTimeToPct(35) <5 and ttd >( debuff[classtable.SoulReaperDeBuff].remains + 5 )) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targets == 1 and targetHP <35 ) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
-    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (MaxDps:GetTimeToPct(35) <5 and targets >= 2 and ttd >( debuff[classtable.SoulReaperDeBuff].remains + 5 ) and debuff[classtable.SoulReaperDeBuff].remains) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targetHP <35 and targets >= 2 ) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
     if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( talents[classtable.SanguineGround] or talents[classtable.UnholyGround] )) and cooldown[classtable.DeathandDecay].ready then
@@ -152,10 +152,10 @@ function Blood:standard()
     if (MaxDps:FindSpell(classtable.Consumption) and CheckSpellCosts(classtable.Consumption, 'Consumption')) and cooldown[classtable.Consumption].ready then
         return classtable.Consumption
     end
-    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targets == 1 and MaxDps:GetTimeToPct(35) <5 and ttd >( debuff[classtable.SoulReaperDeBuff].remains + 5 )) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targets == 1 and targetHP <35 ) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
-    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (MaxDps:GetTimeToPct(35) <5 and targets >= 2 and ttd >( debuff[classtable.SoulReaperDeBuff].remains + 5 ) and debuff[classtable.SoulReaperDeBuff].remains) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targetHP <35 and targets >= 2 ) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
     if (MaxDps:FindSpell(classtable.Bonestorm) and CheckSpellCosts(classtable.Bonestorm, 'Bonestorm')) and (RunicPower >= 100) and cooldown[classtable.Bonestorm].ready then

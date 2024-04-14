@@ -213,6 +213,7 @@ function DeathKnight:Blood()
     classtable.HemostasisBuff = 273947
 
     death_strike_dump_amount = 65
+    heart_strike_rp = ( 10 + targets * (talents[classtable.Heartbreaker] and 1 or 0) * 2 )
     if not talents[classtable.DeathsCaress] or talents[classtable.Consumption] or talents[classtable.Blooddrinker] then
         bone_shield_refresh_value = 4
     else

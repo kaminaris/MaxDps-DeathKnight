@@ -7,6 +7,7 @@
 ## SavedVariables: MaxDpsDeathKnightOptions
 ## X-Curse-Project-ID: 258275
 ## X-WoWI-ID: 24638
+## X-Wago-ID: QNlqwY6e
 
 Main.lua
 Config.lua

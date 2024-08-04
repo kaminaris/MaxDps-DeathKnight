@@ -532,19 +532,19 @@ function DeathKnight:Frost()
     RunicPowerMax = UnitPowerMax('player', RunicPowerPT)
     RunicPowerDeficit = RunicPowerMax - RunicPower
     classtable.KillingMachineBuff = 51124
-    classtable.DeathandDecayBuff = 0
+    classtable.DeathandDecayBuff = 52212
     classtable.FrostFeverDeBuff = 55095
     classtable.RazoriceDeBuff = 51714
     classtable.RimeBuff = 59052
     classtable.EmpowerRuneWeaponBuff = 47568
-    classtable.MograinesMightBuff = 0
+    classtable.MograinesMightBuff = 444505
     classtable.ColdHeartBuff = 281209
     classtable.PillarofFrostBuff = 51271
     classtable.UnholyStrengthBuff = 53365
-    classtable.ReapersMarkDebuffDeBuff = 0
+    classtable.ReapersMarkDebuffDeBuff = 439594
     classtable.BreathofSindragosaBuff = 152279
-    classtable.MarkofFyralathDeBuff = 0
-    classtable.AFeastofSoulsBuff = 0
+    classtable.MarkofFyralathDeBuff = 414532
+    classtable.AFeastofSoulsBuff = 440861
     classtable.UnleashedFrenzyBuff = 376907
     classtable.IcyTalonsBuff = 194879
 

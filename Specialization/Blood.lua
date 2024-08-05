@@ -141,7 +141,7 @@ function Blood:drw_up()
     if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (MaxDps:GetTimeToPct(35) <5 and targets >= 2 and ttd >( debuff[classtable.SoulReaperDeBuff].remains + 5 )) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
-    if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( talents[classtable.SanguineGround] or talents[classtable.UnholyGround] )) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( talents[classtable.SanguineGround] or talents[classtable.UnholyGround] )) and cooldown[classtable.DeathandDecay].charges >= cooldown[classtable.DeathandDecay].maxCharges and cooldown[classtable.DeathandDecay].ready then
         return classtable.DeathandDecay
     end
     if (MaxDps:FindSpell(classtable.BloodBoil) and CheckSpellCosts(classtable.BloodBoil, 'BloodBoil')) and (targets >2 and cooldown[classtable.BloodBoil].charges >= 1.1) and cooldown[classtable.BloodBoil].ready then
@@ -278,7 +278,7 @@ function DeathKnight:Blood()
     if (MaxDps:FindSpell(classtable.DeathsCaress) and CheckSpellCosts(classtable.DeathsCaress, 'DeathsCaress')) and (not buff[classtable.BoneShieldBuff].up) and cooldown[classtable.DeathsCaress].ready then
         return classtable.DeathsCaress
     end
-    if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( talents[classtable.UnholyGround] or talents[classtable.SanguineGround] or targets >3 or buff[classtable.CrimsonScourgeBuff].up )) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( talents[classtable.UnholyGround] or talents[classtable.SanguineGround] or targets >3 or buff[classtable.CrimsonScourgeBuff].up )) and cooldown[classtable.DeathandDecay].charges >= cooldown[classtable.DeathandDecay].maxCharges and cooldown[classtable.DeathandDecay].ready then
         return classtable.DeathandDecay
     end
     if (MaxDps:FindSpell(classtable.DeathStrike) and CheckSpellCosts(classtable.DeathStrike, 'DeathStrike')) and (buff[classtable.CoagulopathyBuff].remains <= gcd or buff[classtable.IcyTalonsBuff].remains <= gcd or RunicPower >= death_strike_dump_amount or RunicPowerDeficit <= heart_strike_rp or ttd <10) and cooldown[classtable.DeathStrike].ready then
@@ -304,11 +304,6 @@ function DeathKnight:Blood()
         MaxDps:GlowCooldown(classtable.GorefiendsGrasp, cooldown[classtable.GorefiendsGrasp].ready)
     else
         MaxDps:GlowCooldown(classtable.GorefiendsGrasp, false)
-    end
-    if (MaxDps:FindSpell(classtable.EmpowerRuneWeapon) and CheckSpellCosts(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (Runes <6 and RunicPowerDeficit >5) and cooldown[classtable.EmpowerRuneWeapon].ready then
-        MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
-    else
-        MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, false)
     end
     if (MaxDps:FindSpell(classtable.AbominationLimb) and CheckSpellCosts(classtable.AbominationLimb, 'AbominationLimb')) and cooldown[classtable.AbominationLimb].ready then
         MaxDps:GlowCooldown(classtable.AbominationLimb, cooldown[classtable.AbominationLimb].ready)

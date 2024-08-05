@@ -285,10 +285,10 @@ function Unholy:aoe()
     if (MaxDps:FindSpell(classtable.Epidemic) and CheckSpellCosts(classtable.Epidemic, 'Epidemic')) and (not pooling_runic_power) and cooldown[classtable.Epidemic].ready then
         return classtable.Epidemic
     end
-    if (MaxDps:FindSpell(classtable.FesteringStrike) and CheckSpellCosts(classtable.FesteringStrike, 'FesteringStrike')) and (cooldown[classtable.Apocalypse].duration <gcd and debuff[classtable.FesteringWoundDeBuff].count == 0 or buff[classtable.FesteringScytheBuff].up) and cooldown[classtable.FesteringStrike].ready then
+    if (MaxDps:FindSpell(classtable.FesteringStrike) and CheckSpellCosts(classtable.FesteringStrike, 'FesteringStrike')) and (cooldown[classtable.Apocalypse].remains <gcd and debuff[classtable.FesteringWoundDeBuff].count == 0 or buff[classtable.FesteringScytheBuff].up) and cooldown[classtable.FesteringStrike].ready then
         return classtable.FesteringStrike
     end
-    if (MaxDps:FindSpell(classtable.WoundSpender) and CheckSpellCosts(classtable.WoundSpender, 'WoundSpender')) and (debuff[classtable.FesteringWoundDeBuff].count >= 1 and cooldown[classtable.Apocalypse].duration >gcd) and cooldown[classtable.WoundSpender].ready then
+    if (MaxDps:FindSpell(classtable.WoundSpender) and CheckSpellCosts(classtable.WoundSpender, 'WoundSpender')) and (debuff[classtable.FesteringWoundDeBuff].count >= 1 and cooldown[classtable.Apocalypse].remains >gcd) and cooldown[classtable.WoundSpender].ready then
         return classtable.WoundSpender
     end
     if (MaxDps:FindSpell(classtable.FesteringStrike) and CheckSpellCosts(classtable.FesteringStrike, 'FesteringStrike')) and (debuff[classtable.FesteringWoundDeBuff].count <4) and cooldown[classtable.FesteringStrike].ready then
@@ -316,20 +316,18 @@ function Unholy:aoe_burst()
     end
 end
 function Unholy:cds()
-    if (MaxDps:FindSpell(classtable.DarkTransformation) and CheckSpellCosts(classtable.DarkTransformation, 'DarkTransformation')) and (( st_planning or adds_remain ) and ( cooldown[classtable.Apocalypse].duration <8 or not talents[classtable.Apocalypse] or targets >= 1 )) and cooldown[classtable.DarkTransformation].ready then
+    if (MaxDps:FindSpell(classtable.DarkTransformation) and CheckSpellCosts(classtable.DarkTransformation, 'DarkTransformation')) and (( st_planning or adds_remain ) and ( cooldown[classtable.Apocalypse].remains <8 or not talents[classtable.Apocalypse] or targets >= 1 )) and cooldown[classtable.DarkTransformation].ready then
         MaxDps:GlowCooldown(classtable.DarkTransformation, cooldown[classtable.DarkTransformation].ready)
     else
         MaxDps:GlowCooldown(classtable.DarkTransformation, false)
     end
-    if (MaxDps:FindSpell(classtable.UnholyAssault) and CheckSpellCosts(classtable.UnholyAssault, 'UnholyAssault')) and (( st_planning or adds_remain ) and ( cooldown[classtable.Apocalypse].duration <gcd * 2 or not talents[classtable.Apocalypse] or targets >= 2 and buff[classtable.DarkTransformationBuff].up )) and cooldown[classtable.UnholyAssault].ready then
+    if (MaxDps:FindSpell(classtable.UnholyAssault) and CheckSpellCosts(classtable.UnholyAssault, 'UnholyAssault')) and (( st_planning or adds_remain ) and ( cooldown[classtable.Apocalypse].remains <gcd * 2 or not talents[classtable.Apocalypse] or targets >= 2 and buff[classtable.DarkTransformationBuff].up )) and cooldown[classtable.UnholyAssault].ready then
         return classtable.UnholyAssault
     end
     if (MaxDps:FindSpell(classtable.Apocalypse) and CheckSpellCosts(classtable.Apocalypse, 'Apocalypse')) and (( st_planning or adds_remain )) and cooldown[classtable.Apocalypse].ready then
-        MaxDps:GlowCooldown(classtable.Apocalypse, cooldown[classtable.Apocalypse].ready)
-    else
-        MaxDps:GlowCooldown(classtable.Apocalypse, false)
+        return classtable.Apocalypse
     end
-    if (MaxDps:FindSpell(classtable.Outbreak) and CheckSpellCosts(classtable.Outbreak, 'Outbreak')) and (( debuff[classtable.VirulentPlagueDeBuff].refreshable or talents[classtable.Superstrain] and ( debuff[classtable.FrostFeverDeBuff].refreshable or debuff[classtable.BloodPlagueDeBuff].refreshable ) ) and ( not talents[classtable.UnholyBlight] or talents[classtable.UnholyBlight] and cooldown[classtable.DarkTransformation].duration >15 % ( ( 3 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) ) and ( not talents[classtable.RaiseAbomination] or talents[classtable.RaiseAbomination] and cooldown[classtable.RaiseAbomination].duration >15 % ( ( 3 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) )) and cooldown[classtable.Outbreak].ready then
+    if (MaxDps:FindSpell(classtable.Outbreak) and CheckSpellCosts(classtable.Outbreak, 'Outbreak')) and (( debuff[classtable.VirulentPlagueDeBuff].refreshable or talents[classtable.Superstrain] and ( debuff[classtable.FrostFeverDeBuff].refreshable or debuff[classtable.BloodPlagueDeBuff].refreshable ) ) and ( not talents[classtable.UnholyBlight] or talents[classtable.UnholyBlight] and cooldown[classtable.DarkTransformation].remains >15 % ( ( 3 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) ) and ( not talents[classtable.RaiseAbomination] or talents[classtable.RaiseAbomination] and cooldown[classtable.RaiseAbomination].remains >15 % ( ( 3 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) )) and cooldown[classtable.Outbreak].ready then
         return classtable.Outbreak
     end
     if (MaxDps:FindSpell(classtable.AbominationLimb) and CheckSpellCosts(classtable.AbominationLimb, 'AbominationLimb')) and (( st_planning or adds_remain ) and ( targets >= 2 or not buff[classtable.SuddenDoomBuff].up and buff[classtable.FestermightBuff].up and debuff[classtable.FesteringWoundDeBuff].count <= 2 )) and cooldown[classtable.AbominationLimb].ready then
@@ -348,11 +346,9 @@ function Unholy:cds_san()
         return classtable.UnholyAssault
     end
     if (MaxDps:FindSpell(classtable.Apocalypse) and CheckSpellCosts(classtable.Apocalypse, 'Apocalypse')) and (( st_planning or adds_remain ) and ( debuff[classtable.FesteringWoundDeBuff].count >= 3 or targets >= 2 )) and cooldown[classtable.Apocalypse].ready then
-        MaxDps:GlowCooldown(classtable.Apocalypse, cooldown[classtable.Apocalypse].ready)
-    else
-        MaxDps:GlowCooldown(classtable.Apocalypse, false)
+        return classtable.Apocalypse
     end
-    if (MaxDps:FindSpell(classtable.Outbreak) and CheckSpellCosts(classtable.Outbreak, 'Outbreak')) and (( GetTotemDuration('abomination') <15 and debuff[classtable.VirulentPlagueDeBuff].refreshable or talents[classtable.Morbidity] and buff[classtable.InflictionofSorrowBuff].up and talents[classtable.Superstrain] and debuff[classtable.FrostFeverDeBuff].refreshable and debuff[classtable.BloodPlagueDeBuff].refreshable ) and ( not talents[classtable.UnholyBlight] or talents[classtable.UnholyBlight] and cooldown[classtable.DarkTransformation].duration >15 % ( ( 3 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) ) and ( not talents[classtable.RaiseAbomination] or talents[classtable.RaiseAbomination] and cooldown[classtable.RaiseAbomination].duration >15 % ( ( 3 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) )) and cooldown[classtable.Outbreak].ready then
+    if (MaxDps:FindSpell(classtable.Outbreak) and CheckSpellCosts(classtable.Outbreak, 'Outbreak')) and (( GetTotemDuration('abomination') <15 and debuff[classtable.VirulentPlagueDeBuff].refreshable or talents[classtable.Morbidity] and buff[classtable.InflictionofSorrowBuff].up and talents[classtable.Superstrain] and debuff[classtable.FrostFeverDeBuff].refreshable and debuff[classtable.BloodPlagueDeBuff].refreshable ) and ( not talents[classtable.UnholyBlight] or talents[classtable.UnholyBlight] and cooldown[classtable.DarkTransformation].remains >15 % ( ( 3 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) ) and ( not talents[classtable.RaiseAbomination] or talents[classtable.RaiseAbomination] and cooldown[classtable.RaiseAbomination].remains >15 % ( ( 3 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) )) and cooldown[classtable.Outbreak].ready then
         return classtable.Outbreak
     end
     if (MaxDps:FindSpell(classtable.AbominationLimb) and CheckSpellCosts(classtable.AbominationLimb, 'AbominationLimb')) and (targets >= 1 and ( st_planning or adds_remain ) and ( targets >= 2 or not buff[classtable.DarkTransformationBuff].up and not buff[classtable.SuddenDoomBuff].up and buff[classtable.FestermightBuff].up and debuff[classtable.FesteringWoundDeBuff].count <= 2 )) and cooldown[classtable.AbominationLimb].ready then
@@ -362,12 +358,12 @@ function Unholy:cds_san()
     end
 end
 function Unholy:cds_shared()
-    if (MaxDps:FindSpell(classtable.ArmyoftheDead) and CheckSpellCosts(classtable.ArmyoftheDead, 'ArmyoftheDead')) and (( st_planning or adds_remain ) and ( talents[classtable.CommanderoftheDead] and cooldown[classtable.DarkTransformation].duration <5 or not talents[classtable.CommanderoftheDead] and targets >= 1 ) or ttd <35) and cooldown[classtable.ArmyoftheDead].ready then
+    if (MaxDps:FindSpell(classtable.ArmyoftheDead) and CheckSpellCosts(classtable.ArmyoftheDead, 'ArmyoftheDead')) and (( st_planning or adds_remain ) and ( talents[classtable.CommanderoftheDead] and cooldown[classtable.DarkTransformation].remains <5 or not talents[classtable.CommanderoftheDead] and targets >= 1 ) or ttd <35) and cooldown[classtable.ArmyoftheDead].ready then
         MaxDps:GlowCooldown(classtable.ArmyoftheDead, cooldown[classtable.ArmyoftheDead].ready)
     else
         MaxDps:GlowCooldown(classtable.ArmyoftheDead, false)
     end
-    if (MaxDps:FindSpell(classtable.RaiseAbomination) and CheckSpellCosts(classtable.RaiseAbomination, 'RaiseAbomination')) and (( st_planning or adds_remain ) and ( talents[classtable.CommanderoftheDead] and cooldown[classtable.DarkTransformation].duration <gcd * 2 or not talents[classtable.CommanderoftheDead] and targets >= 1 ) or ttd <30) and cooldown[classtable.RaiseAbomination].ready then
+    if (MaxDps:FindSpell(classtable.RaiseAbomination) and CheckSpellCosts(classtable.RaiseAbomination, 'RaiseAbomination')) and (( st_planning or adds_remain ) and ( talents[classtable.CommanderoftheDead] and cooldown[classtable.DarkTransformation].remains <gcd * 2 or not talents[classtable.CommanderoftheDead] and targets >= 1 ) or ttd <30) and cooldown[classtable.RaiseAbomination].ready then
         MaxDps:GlowCooldown(classtable.RaiseAbomination, cooldown[classtable.RaiseAbomination].ready)
     else
         MaxDps:GlowCooldown(classtable.RaiseAbomination, false)
@@ -377,7 +373,7 @@ function Unholy:cds_shared()
     else
         MaxDps:GlowCooldown(classtable.SummonGargoyle, false)
     end
-    if (MaxDps:FindSpell(classtable.VileContagion) and CheckSpellCosts(classtable.VileContagion, 'VileContagion')) and (adds_remain and ( debuff[classtable.FesteringWoundDeBuff].count == 6 and ( debuff[classtable.Defile].up or debuff[classtable.DeathandDecayDebuff].up or cooldown[classtable.AnyDnd].duration <3 ) or (targets >1) and targets <= 11 and targets >5 or buff[classtable.DeathandDecayBuff].up and debuff[classtable.FesteringWoundDeBuff].count >= 4 or cooldown[classtable.AnyDnd].duration <3 and debuff[classtable.FesteringWoundDeBuff].count >= 4 )) and cooldown[classtable.VileContagion].ready then
+    if (MaxDps:FindSpell(classtable.VileContagion) and CheckSpellCosts(classtable.VileContagion, 'VileContagion')) and (adds_remain and ( debuff[classtable.FesteringWoundDeBuff].count == 6 and ( debuff[classtable.Defile].up or debuff[classtable.DeathandDecayDebuff].up or cooldown[classtable.AnyDnd].remains <3 ) or (targets >1) and targets <= 11 and targets >5 or buff[classtable.DeathandDecayBuff].up and debuff[classtable.FesteringWoundDeBuff].count >= 4 or cooldown[classtable.AnyDnd].remains <3 and debuff[classtable.FesteringWoundDeBuff].count >= 4 )) and cooldown[classtable.VileContagion].ready then
         return classtable.VileContagion
     end
 end
@@ -413,7 +409,7 @@ function Unholy:san_fishing()
     if (MaxDps:FindSpell(classtable.DeathCoil) and CheckSpellCosts(classtable.DeathCoil, 'DeathCoil')) and (not buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.DeathCoil].ready then
         return classtable.DeathCoil
     end
-    if (MaxDps:FindSpell(classtable.WoundSpender) and CheckSpellCosts(classtable.WoundSpender, 'WoundSpender')) and (( debuff[classtable.FesteringWoundDeBuff].count >= 3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) and cooldown[classtable.Apocalypse].duration >apoc_timing ) or buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.WoundSpender].ready then
+    if (MaxDps:FindSpell(classtable.WoundSpender) and CheckSpellCosts(classtable.WoundSpender, 'WoundSpender')) and (( debuff[classtable.FesteringWoundDeBuff].count >= 3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) and cooldown[classtable.Apocalypse].remains >apoc_timing ) or buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.WoundSpender].ready then
         return classtable.WoundSpender
     end
     if (MaxDps:FindSpell(classtable.FesteringStrike) and CheckSpellCosts(classtable.FesteringStrike, 'FesteringStrike')) and (debuff[classtable.FesteringWoundDeBuff].count <3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' )) and cooldown[classtable.FesteringStrike].ready then
@@ -430,10 +426,10 @@ function Unholy:san_st()
     if (MaxDps:FindSpell(classtable.SoulReaper) and CheckSpellCosts(classtable.SoulReaper, 'SoulReaper')) and (targetHP <= 35 and not buff[classtable.GiftoftheSanlaynBuff].up and ttd >5) and cooldown[classtable.SoulReaper].ready then
         return classtable.SoulReaper
     end
-    if (MaxDps:FindSpell(classtable.FesteringStrike) and CheckSpellCosts(classtable.FesteringStrike, 'FesteringStrike')) and (( debuff[classtable.FesteringWoundDeBuff].count <4 and cooldown[classtable.Apocalypse].duration <apoc_timing ) or ( talents[classtable.GiftoftheSanlayn] and not buff[classtable.GiftoftheSanlaynBuff].up or not talents[classtable.GiftoftheSanlayn] ) and ( buff[classtable.FesteringScytheBuff].up or debuff[classtable.FesteringWoundDeBuff].count <= 1 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) )) and cooldown[classtable.FesteringStrike].ready then
+    if (MaxDps:FindSpell(classtable.FesteringStrike) and CheckSpellCosts(classtable.FesteringStrike, 'FesteringStrike')) and (( debuff[classtable.FesteringWoundDeBuff].count <4 and cooldown[classtable.Apocalypse].remains <apoc_timing ) or ( talents[classtable.GiftoftheSanlayn] and not buff[classtable.GiftoftheSanlaynBuff].up or not talents[classtable.GiftoftheSanlayn] ) and ( buff[classtable.FesteringScytheBuff].up or debuff[classtable.FesteringWoundDeBuff].count <= 1 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) )) and cooldown[classtable.FesteringStrike].ready then
         return classtable.FesteringStrike
     end
-    if (MaxDps:FindSpell(classtable.WoundSpender) and CheckSpellCosts(classtable.WoundSpender, 'WoundSpender')) and (( debuff[classtable.FesteringWoundDeBuff].count >= 3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) and cooldown[classtable.Apocalypse].duration >apoc_timing ) or buff[classtable.VampiricStrikeBuff].up and cooldown[classtable.Apocalypse].duration >apoc_timing) and cooldown[classtable.WoundSpender].ready then
+    if (MaxDps:FindSpell(classtable.WoundSpender) and CheckSpellCosts(classtable.WoundSpender, 'WoundSpender')) and (( debuff[classtable.FesteringWoundDeBuff].count >= 3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) and cooldown[classtable.Apocalypse].remains >apoc_timing ) or buff[classtable.VampiricStrikeBuff].up and cooldown[classtable.Apocalypse].remains >apoc_timing) and cooldown[classtable.WoundSpender].ready then
         return classtable.WoundSpender
     end
     if (MaxDps:FindSpell(classtable.DeathCoil) and CheckSpellCosts(classtable.DeathCoil, 'DeathCoil')) and (not pooling_runic_power and debuff[classtable.DeathRotDeBuff].remains <gcd or ( buff[classtable.SuddenDoomBuff].up and debuff[classtable.FesteringWoundDeBuff].count >= 1 or Runes <2 )) and cooldown[classtable.DeathCoil].ready then
@@ -471,27 +467,27 @@ end
 local function trinkets()
 end
 function Unholy:variables()
-    if targets == 1 and ( (targets <2) or math.huge >15 ) then
+    if targets == 1 then
         st_planning = true
     else
         st_planning = false
     end
-    if targets >= 2 and ( (targets <2) or (targets >1) and targets >6 ) then
+    if targets >= 2 then
         adds_remain = true
     else
         adds_remain = false
     end
-    if cooldown[classtable.Apocalypse].duration <10 and debuff[classtable.FesteringWoundDeBuff].count <= 4 and cooldown[classtable.UnholyAssault].duration >10 then
+    if cooldown[classtable.Apocalypse].remains <10 and debuff[classtable.FesteringWoundDeBuff].count <= 4 and cooldown[classtable.UnholyAssault].remains >10 then
         apoc_timing = 7
     else
         apoc_timing = 3
     end
-    if ( cooldown[classtable.Apocalypse].duration >apoc_timing or not talents[classtable.Apocalypse] ) and ( debuff[classtable.FesteringWoundDeBuff].count >= 1 and cooldown[classtable.UnholyAssault].duration <20 and talents[classtable.UnholyAssault] and st_planning or debuff[classtable.RottenTouchDeBuff].up and debuff[classtable.FesteringWoundDeBuff].count >= 1 or debuff[classtable.FesteringWoundDeBuff].count >= 4 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' and 1 or 0) ) or ttd <5 and debuff[classtable.FesteringWoundDeBuff].count >= 1 then
+    if ( cooldown[classtable.Apocalypse].remains >apoc_timing or not talents[classtable.Apocalypse] ) and ( debuff[classtable.FesteringWoundDeBuff].count >= 1 and cooldown[classtable.UnholyAssault].remains <20 and talents[classtable.UnholyAssault] and st_planning or debuff[classtable.RottenTouchDeBuff].up and debuff[classtable.FesteringWoundDeBuff].count >= 1 or debuff[classtable.FesteringWoundDeBuff].count >= 4 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' and 1 or 0) ) or ttd <5 and debuff[classtable.FesteringWoundDeBuff].count >= 1 then
         pop_wounds = true
     else
         pop_wounds = false
     end
-    if talents[classtable.VileContagion] and cooldown[classtable.VileContagion].duration <3 and RunicPower <60 and not st_planning then
+    if talents[classtable.VileContagion] and cooldown[classtable.VileContagion].remains <3 and RunicPower <60 and not st_planning then
         pooling_runic_power = true
     else
         pooling_runic_power = false
@@ -533,6 +529,15 @@ function DeathKnight:Unholy()
     RunicPower = UnitPower('player', RunicPowerPT)
     RunicPowerMax = UnitPowerMax('player', RunicPowerPT)
     RunicPowerDeficit = RunicPowerMax - RunicPower
+    classtable.WoundSpender = ((talents[classtable.ClawingShadows] and classtable.ClawingShadows) or classtable.ScourgeStrike)
+    classtable.FesteringScythe = 458128
+    if buff[classtable.FesteringScytheBuff].up then
+        classtable.FesteringStrike = classtable.FesteringScythe
+    else
+        classtable.FesteringStrike = 85948
+    end
+    classtable.DeathandDecayBuff = not talents[classtable.Defile] and 188290 or 152280
+    classtable.DeathandDecayBuff = not talents[classtable.Defile] and 188290 or 152280
     classtable.DeathandDecayBuff = not talents[classtable.Defile] and 188290 or 152280
     classtable.FesteringWoundDeBuff = 194310
     classtable.FesteringScytheBuff = 458123
@@ -551,15 +556,9 @@ function DeathKnight:Unholy()
     classtable.RunicCorruptionBuff = 51460
     classtable.DeathRotDeBuff = 377540
     classtable.RottenTouchDeBuff = 390276
-	classtable.WoundSpender = st_planning and classtable.ClawingShadows or classtable.Epidemic
-	classtable.FesteringScythe = 458128
-	if buff[classtable.FesteringScytheBuff].up then
-		classtable.FesteringStrike = classtable.FesteringScythe
-	else
-		classtable.FesteringStrike = 85948
-	end
 
     Unholy:variables()
+
     --if (talents[classtable.VampiricStrike]) then
     --    local san_trinketsCheck = Unholy:san_trinkets()
     --    if san_trinketsCheck then
@@ -610,7 +609,7 @@ function DeathKnight:Unholy()
             return Unholy:aoe()
         end
     end
-    if (talents[classtable.GiftoftheSanlayn] and not buff[classtable.GiftoftheSanlaynBuff].up and buff[classtable.EssenceoftheBloodQueenBuff].remains <cooldown[classtable.DarkTransformation].duration + 2) then
+    if (talents[classtable.GiftoftheSanlayn] and not buff[classtable.GiftoftheSanlaynBuff].up and buff[classtable.EssenceoftheBloodQueenBuff].remains <cooldown[classtable.DarkTransformation].remains + 2) then
         local san_fishingCheck = Unholy:san_fishing()
         if san_fishingCheck then
             return Unholy:san_fishing()
@@ -628,4 +627,5 @@ function DeathKnight:Unholy()
             return Unholy:st()
         end
     end
+
 end

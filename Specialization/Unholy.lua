@@ -269,13 +269,9 @@ end
 function Unholy:precombat()
     if (MaxDps:FindSpell(classtable.RaiseDead) and CheckSpellCosts(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
         MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
-    else
-        MaxDps:GlowCooldown(classtable.RaiseDead, false)
     end
     if (MaxDps:FindSpell(classtable.ArmyoftheDead) and CheckSpellCosts(classtable.ArmyoftheDead, 'ArmyoftheDead')) and cooldown[classtable.ArmyoftheDead].ready then
         MaxDps:GlowCooldown(classtable.ArmyoftheDead, cooldown[classtable.ArmyoftheDead].ready)
-    else
-        MaxDps:GlowCooldown(classtable.ArmyoftheDead, false)
     end
 end
 function Unholy:aoe()
@@ -318,8 +314,6 @@ end
 function Unholy:cds()
     if (MaxDps:FindSpell(classtable.DarkTransformation) and CheckSpellCosts(classtable.DarkTransformation, 'DarkTransformation')) and (( st_planning or adds_remain ) and ( cooldown[classtable.Apocalypse].remains <8 or not talents[classtable.Apocalypse] or targets >= 1 )) and cooldown[classtable.DarkTransformation].ready then
         MaxDps:GlowCooldown(classtable.DarkTransformation, cooldown[classtable.DarkTransformation].ready)
-    else
-        MaxDps:GlowCooldown(classtable.DarkTransformation, false)
     end
     if (MaxDps:FindSpell(classtable.UnholyAssault) and CheckSpellCosts(classtable.UnholyAssault, 'UnholyAssault')) and (( st_planning or adds_remain ) and ( cooldown[classtable.Apocalypse].remains <gcd * 2 or not talents[classtable.Apocalypse] or targets >= 2 and buff[classtable.DarkTransformationBuff].up )) and cooldown[classtable.UnholyAssault].ready then
         return classtable.UnholyAssault
@@ -332,15 +326,11 @@ function Unholy:cds()
     end
     if (MaxDps:FindSpell(classtable.AbominationLimb) and CheckSpellCosts(classtable.AbominationLimb, 'AbominationLimb')) and (( st_planning or adds_remain ) and ( targets >= 2 or not buff[classtable.SuddenDoomBuff].up and buff[classtable.FestermightBuff].up and debuff[classtable.FesteringWoundDeBuff].count <= 2 )) and cooldown[classtable.AbominationLimb].ready then
         MaxDps:GlowCooldown(classtable.AbominationLimb, cooldown[classtable.AbominationLimb].ready)
-    else
-        MaxDps:GlowCooldown(classtable.AbominationLimb, false)
     end
 end
 function Unholy:cds_san()
     if (MaxDps:FindSpell(classtable.DarkTransformation) and CheckSpellCosts(classtable.DarkTransformation, 'DarkTransformation')) and (targets >= 1 and ( st_planning or adds_remain ) and ( talents[classtable.Apocalypse] and ( ( UnitExists('pet') and UnitName('pet')  == 'apoc_ghoul' ) or targets >= 2 ) or not talents[classtable.Apocalypse] )) and cooldown[classtable.DarkTransformation].ready then
         MaxDps:GlowCooldown(classtable.DarkTransformation, cooldown[classtable.DarkTransformation].ready)
-    else
-        MaxDps:GlowCooldown(classtable.DarkTransformation, false)
     end
     if (MaxDps:FindSpell(classtable.UnholyAssault) and CheckSpellCosts(classtable.UnholyAssault, 'UnholyAssault')) and (( st_planning or adds_remain ) and ( buff[classtable.DarkTransformationBuff].up and buff[classtable.DarkTransformationBuff].remains <12 )) and cooldown[classtable.UnholyAssault].ready then
         return classtable.UnholyAssault
@@ -353,25 +343,17 @@ function Unholy:cds_san()
     end
     if (MaxDps:FindSpell(classtable.AbominationLimb) and CheckSpellCosts(classtable.AbominationLimb, 'AbominationLimb')) and (targets >= 1 and ( st_planning or adds_remain ) and ( targets >= 2 or not buff[classtable.DarkTransformationBuff].up and not buff[classtable.SuddenDoomBuff].up and buff[classtable.FestermightBuff].up and debuff[classtable.FesteringWoundDeBuff].count <= 2 )) and cooldown[classtable.AbominationLimb].ready then
         MaxDps:GlowCooldown(classtable.AbominationLimb, cooldown[classtable.AbominationLimb].ready)
-    else
-        MaxDps:GlowCooldown(classtable.AbominationLimb, false)
     end
 end
 function Unholy:cds_shared()
     if (MaxDps:FindSpell(classtable.ArmyoftheDead) and CheckSpellCosts(classtable.ArmyoftheDead, 'ArmyoftheDead')) and (( st_planning or adds_remain ) and ( talents[classtable.CommanderoftheDead] and cooldown[classtable.DarkTransformation].remains <5 or not talents[classtable.CommanderoftheDead] and targets >= 1 ) or ttd <35) and cooldown[classtable.ArmyoftheDead].ready then
         MaxDps:GlowCooldown(classtable.ArmyoftheDead, cooldown[classtable.ArmyoftheDead].ready)
-    else
-        MaxDps:GlowCooldown(classtable.ArmyoftheDead, false)
     end
     if (MaxDps:FindSpell(classtable.RaiseAbomination) and CheckSpellCosts(classtable.RaiseAbomination, 'RaiseAbomination')) and (( st_planning or adds_remain ) and ( talents[classtable.CommanderoftheDead] and cooldown[classtable.DarkTransformation].remains <gcd * 2 or not talents[classtable.CommanderoftheDead] and targets >= 1 ) or ttd <30) and cooldown[classtable.RaiseAbomination].ready then
         MaxDps:GlowCooldown(classtable.RaiseAbomination, cooldown[classtable.RaiseAbomination].ready)
-    else
-        MaxDps:GlowCooldown(classtable.RaiseAbomination, false)
     end
     if (MaxDps:FindSpell(classtable.SummonGargoyle) and CheckSpellCosts(classtable.SummonGargoyle, 'SummonGargoyle')) and (( st_planning or adds_remain ) and ( buff[classtable.CommanderoftheDeadBuff].up or not talents[classtable.CommanderoftheDead] and targets >= 1 )) and cooldown[classtable.SummonGargoyle].ready then
         MaxDps:GlowCooldown(classtable.SummonGargoyle, cooldown[classtable.SummonGargoyle].ready)
-    else
-        MaxDps:GlowCooldown(classtable.SummonGargoyle, false)
     end
     if (MaxDps:FindSpell(classtable.VileContagion) and CheckSpellCosts(classtable.VileContagion, 'VileContagion')) and (adds_remain and ( debuff[classtable.FesteringWoundDeBuff].count == 6 and ( debuff[classtable.Defile].up or debuff[classtable.DeathandDecayDebuff].up or cooldown[classtable.AnyDnd].remains <3 ) or (targets >1) and targets <= 11 and targets >5 or buff[classtable.DeathandDecayBuff].up and debuff[classtable.FesteringWoundDeBuff].count >= 4 or cooldown[classtable.AnyDnd].remains <3 and debuff[classtable.FesteringWoundDeBuff].count >= 4 )) and cooldown[classtable.VileContagion].ready then
         return classtable.VileContagion
@@ -556,6 +538,11 @@ function DeathKnight:Unholy()
     classtable.RunicCorruptionBuff = 51460
     classtable.DeathRotDeBuff = 377540
     classtable.RottenTouchDeBuff = 390276
+
+    for spellId in pairs(MaxDps.Flags) do
+        self.Flags[spellId] = false
+        self:ClearGlowIndependent(spellId, spellId)
+    end
 
     Unholy:variables()
 

@@ -68,10 +68,10 @@ local RunicPowerDeficit
 
 local Blood = {}
 
-local trinket_1_buffs
-local trinket_2_buffs
-local trinket_1_exclude
-local trinket_2_exclude
+local trinket_one_buffs
+local trinket_two_buffs
+local trinket_one_exclude
+local trinket_two_exclude
 local damage_trinket_priority
 local death_strike_dump_amount
 local bone_shield_refresh_value
@@ -80,13 +80,14 @@ local heart_strike_rp
 
 local function CheckSpellCosts(spell,spellstring)
     if not IsSpellKnownOrOverridesKnown(spell) then return false end
+    if not C_Spell.IsSpellUsable(spell) then return false end
     if spellstring == 'TouchofDeath' then
         if targethealthPerc > 15 then
             return false
         end
     end
     if spellstring == 'KillShot' then
-        if (classtable.SicEmBuff and not buff[classtable.SicEmBuff].up) and targethealthPerc > 15 then
+        if (classtable.SicEmBuff and not buff[classtable.SicEmBuff].up) or (classtable.HuntersPreyBuff and not buff[classtable.HuntersPreyBuff].up) and targethealthPerc > 15 then
             return false
         end
     end
@@ -109,6 +110,147 @@ local function CheckSpellCosts(spell,spellstring)
     end
     return true
 end
+local function MaxGetSpellCost(spell,power)
+    local costs = C_Spell.GetSpellPowerCost(spell)
+    if type(costs) ~= 'table' then return 0 end
+    for i,costtable in pairs(costs) do
+        if costtable.name == power then
+            return costtable.cost
+        end
+    end
+    return 0
+end
+
+
+
+local function CheckEquipped(checkName)
+    for i=1,14 do
+        local itemID = GetInventoryItemID('player', i)
+        local itemName = itemID and C_Item.GetItemInfo(itemID) or ''
+        if checkName == itemName then
+            return true
+        end
+    end
+    return false
+end
+
+
+
+
+local function CheckTrinketNames(checkName)
+    --if slot == 1 then
+    --    slot = 13
+    --end
+    --if slot == 2 then
+    --    slot = 14
+    --end
+    for i=13,14 do
+        local itemID = GetInventoryItemID('player', i)
+        local itemName = C_Item.GetItemInfo(itemID)
+        if checkName == itemName then
+            return true
+        end
+    end
+    return false
+end
+
+
+local function CheckTrinketCooldown(slot)
+    if slot == 1 then
+        slot = 13
+    end
+    if slot == 2 then
+        slot = 14
+    end
+    if slot == 13 or slot == 14 then
+        local itemID = GetInventoryItemID('player', slot)
+        local _, duration, _ = C_Item.GetItemCooldown(itemID)
+        if duration == 0 then return true else return false end
+    else
+        local tOneitemID = GetInventoryItemID('player', 13)
+        local tTwoitemID = GetInventoryItemID('player', 14)
+        local tOneitemName = C_Item.GetItemInfo(tOneitemID)
+        local tTwoitemName = C_Item.GetItemInfo(tTwoitemID)
+        if tOneitemName == slot then
+            local _, duration, _ = C_Item.GetItemCooldown(tOneitemID)
+            if duration == 0 then return true else return false end
+        end
+        if tTwoitemName == slot then
+            local _, duration, _ = C_Item.GetItemCooldown(tTwoitemID)
+            if duration == 0 then return true else return false end
+        end
+    end
+end
+
+
+
+
+local function twoh_check()
+   local leftwep = GetInventoryItemLink('player',16)
+   local leftwepSubType = leftwep and select(13, C_Item.GetItemInfo(leftwep))
+   local rightwep = GetInventoryItemLink('player',17)
+   local rightwepSubType = rightwep and select(13, C_Item.GetItemInfo(rightwep))
+   if leftwepSubType == (1 or 5 or 6 or 8) then
+      return true
+   end
+end
+
+
+local function wep_rune_check(type)
+    local MHitemLink=GetInventoryItemLink('player',16)
+    local OHitemLink=GetInventoryItemLink('player',17)
+    if MHitemLink ~= nil then
+        local _,_,enchant=strsplit(':',MHitemLink)
+        if enchant ~= nil and enchant ~= '' then
+            if enchant == '3368' then
+                MHenchant = 'Rune of the Fallen Crusader'
+            elseif enchant == '6243' then
+                MHenchant = 'Rune of Hysteria'
+            elseif enchant == '3370' then
+                MHenchant = 'Rune of Razorice'
+            elseif enchant == '6241' then
+                MHenchant = 'Rune of Sanguination'
+            elseif enchant == '6242' then
+                MHenchant = 'Rune of Spellwarding'
+            elseif enchant == '6245' then
+                MHenchant = 'Rune of the Apocalypse'
+            elseif enchant == '3847' then
+                MHenchant = 'Rune of the Stoneskin Gargoyle'
+            elseif enchant == '6244' then
+                MHenchant = 'Rune of Unending Thirst'
+            else
+                MHenchant = 'Unknown Enchant - ' .. enchant
+            end
+        end
+    end
+    if OHitemLink ~= nil then
+        local _,_,enchant=strsplit(':',OHitemLink)
+        if enchant ~= nil and enchant ~= '' then
+            if enchant == '3368' then
+                OHenchant = 'Rune of the Fallen Crusader'
+            elseif enchant == '6243' then
+                OHenchant = 'Rune of Hysteria'
+            elseif enchant == '3370' then
+                OHenchant = 'Rune of Razorice'
+            elseif enchant == '6241' then
+                OHenchant = 'Rune of Sanguination'
+            elseif enchant == '6242' then
+                OHenchant = 'Rune of Spellwarding'
+            elseif enchant == '6245' then
+                OHenchant = 'Rune of the Apocalypse'
+            elseif enchant == '3847' then
+                OHenchant = 'Rune of the Stoneskin Gargoyle'
+            elseif enchant == '6244' then
+                OHenchant = 'Rune of Unending Thirst'
+            else
+                OHenchant = 'Unknown Enchant - ' .. enchant
+            end
+        end
+    end
+    if (MHenchant or OHenchant) == type then return true end
+    return false
+end
+
 
 local function GetTotemDuration(name)
     for index=1,MAX_TOTEMS do
@@ -117,6 +259,22 @@ local function GetTotemDuration(name)
         if (totemName == name and est_dur and est_dur > 0) then return est_dur else return 0 end
     end
 end
+
+
+local function CheckPrevSpell(spell)
+    if MaxDps and MaxDps.spellHistory then
+        if MaxDps.spellHistory[1] then
+            if MaxDps.spellHistory[1] == spell then
+                return true
+            end
+            if MaxDps.spellHistory[1] ~= spell then
+                return false
+            end
+        end
+    end
+    return true
+end
+
 
 function Blood:precombat()
 end
@@ -159,7 +317,7 @@ function Blood:drw_up()
         return classtable.HeartStrike
     end
 end
-local function racials()
+function Blood:racials()
 end
 function Blood:standard()
     if (MaxDps:FindSpell(classtable.Tombstone) and CheckSpellCosts(classtable.Tombstone, 'Tombstone')) and (buff[classtable.BoneShieldBuff].count >5 and Runes >= 2 and RunicPowerDeficit >= 30 and not talents[classtable.ShatteringBone] or ( talents[classtable.ShatteringBone] and debuff[classtable.DeathandDecayDebuff].up ) and cooldown[classtable.DancingRuneWeapon].remains >= 25) and cooldown[classtable.Tombstone].ready then
@@ -200,7 +358,83 @@ function Blood:standard()
         return classtable.HeartStrike
     end
 end
+function Blood:trinkets()
+end
 
+function Blood:callaction()
+    death_strike_dump_amount = 65
+    if talents[classtable.Consumption] or talents[classtable.Blooddrinker] then
+        bone_shield_refresh_value = 4
+    else
+        bone_shield_refresh_value = 5
+    end
+    if (MaxDps:FindSpell(classtable.MindFreeze) and CheckSpellCosts(classtable.MindFreeze, 'MindFreeze')) and (UnitCastingInfo('target') and select(8,UnitCastingInfo('target')) == false) and cooldown[classtable.MindFreeze].ready then
+        MaxDps:GlowCooldown(classtable.MindFreeze, select(8,UnitCastingInfo('target') == false) and cooldown[classtable.MindFreeze].ready)
+    end
+    local trinketsCheck = Blood:trinkets()
+    if trinketsCheck then
+        return trinketsCheck
+    end
+    if (MaxDps:FindSpell(classtable.RaiseDead) and CheckSpellCosts(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
+        MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
+    end
+    if (MaxDps:FindSpell(classtable.ReapersMark) and CheckSpellCosts(classtable.ReapersMark, 'ReapersMark')) and cooldown[classtable.ReapersMark].ready then
+        MaxDps:GlowCooldown(classtable.ReapersMark, cooldown[classtable.ReapersMark].ready)
+    end
+    if (MaxDps:FindSpell(classtable.IceboundFortitude) and CheckSpellCosts(classtable.IceboundFortitude, 'IceboundFortitude')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up )) and cooldown[classtable.IceboundFortitude].ready then
+        MaxDps:GlowCooldown(classtable.IceboundFortitude, cooldown[classtable.IceboundFortitude].ready)
+    end
+    if (MaxDps:FindSpell(classtable.RuneTap) and CheckSpellCosts(classtable.RuneTap, 'RuneTap')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3)  and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.RuneTap].ready then
+        return classtable.RuneTap
+    end
+    if (MaxDps:FindSpell(classtable.DeathStrike) and CheckSpellCosts(classtable.DeathStrike, 'DeathStrike')) and (buff[classtable.BloodShieldBuff].up and buff[classtable.BloodShieldBuff].remains <= gcd) and cooldown[classtable.DeathStrike].ready then
+        return classtable.DeathStrike
+    end
+    if (MaxDps:FindSpell(classtable.DeathsCaress) and CheckSpellCosts(classtable.DeathsCaress, 'DeathsCaress')) and (not buff[classtable.BoneShieldBuff].up) and cooldown[classtable.DeathsCaress].ready then
+        return classtable.DeathsCaress
+    end
+    if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( talents[classtable.UnholyGround] or talents[classtable.SanguineGround] or targets >3 or buff[classtable.CrimsonScourgeBuff].up )) and cooldown[classtable.DeathandDecay].ready then
+        return classtable.DeathandDecay
+    end
+    if (MaxDps:FindSpell(classtable.DeathStrike) and CheckSpellCosts(classtable.DeathStrike, 'DeathStrike')) and (buff[classtable.CoagulopathyBuff].remains <= gcd or buff[classtable.IcyTalonsBuff].remains <= gcd or RunicPower >= death_strike_dump_amount or RunicPowerDeficit <= heart_strike_rp or ttd <10) and cooldown[classtable.DeathStrike].ready then
+        return classtable.DeathStrike
+    end
+    if (MaxDps:FindSpell(classtable.Blooddrinker) and CheckSpellCosts(classtable.Blooddrinker, 'Blooddrinker')) and (not buff[classtable.DancingRuneWeaponBuff].up) and cooldown[classtable.Blooddrinker].ready then
+        MaxDps:GlowCooldown(classtable.Blooddrinker, cooldown[classtable.Blooddrinker].ready)
+    end
+    local racialsCheck = Blood:racials()
+    if racialsCheck then
+        return racialsCheck
+    end
+    if (MaxDps:FindSpell(classtable.SacrificialPact) and CheckSpellCosts(classtable.SacrificialPact, 'SacrificialPact')) and (not buff[classtable.DancingRuneWeaponBuff].up and ( GetTotemDuration('Risen Ghoul') <2 or ttd <gcd )) and cooldown[classtable.SacrificialPact].ready then
+        MaxDps:GlowCooldown(classtable.SacrificialPact, cooldown[classtable.SacrificialPact].ready)
+    end
+    if (MaxDps:FindSpell(classtable.BloodTap) and CheckSpellCosts(classtable.BloodTap, 'BloodTap')) and (( Runes <= 2 and DeathKnight:TimeToRunes(4) >gcd and cooldown[classtable.BloodTap].charges >= 1.8 ) or DeathKnight:TimeToRunes(3) >gcd) and cooldown[classtable.BloodTap].ready then
+        MaxDps:GlowCooldown(classtable.BloodTap, cooldown[classtable.BloodTap].ready)
+    end
+    if (MaxDps:FindSpell(classtable.GorefiendsGrasp) and CheckSpellCosts(classtable.GorefiendsGrasp, 'GorefiendsGrasp')) and (talents[classtable.TighteningGrasp]) and cooldown[classtable.GorefiendsGrasp].ready then
+        MaxDps:GlowCooldown(classtable.GorefiendsGrasp, cooldown[classtable.GorefiendsGrasp].ready)
+    end
+    if (MaxDps:FindSpell(classtable.EmpowerRuneWeapon) and CheckSpellCosts(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (Runes <6 and RunicPowerDeficit >5) and cooldown[classtable.EmpowerRuneWeapon].ready then
+        MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
+    end
+    if (MaxDps:FindSpell(classtable.AbominationLimb) and CheckSpellCosts(classtable.AbominationLimb, 'AbominationLimb')) and cooldown[classtable.AbominationLimb].ready then
+        MaxDps:GlowCooldown(classtable.AbominationLimb, cooldown[classtable.AbominationLimb].ready)
+    end
+    if (MaxDps:FindSpell(classtable.DancingRuneWeapon) and CheckSpellCosts(classtable.DancingRuneWeapon, 'DancingRuneWeapon')) and (not buff[classtable.DancingRuneWeaponBuff].up) and cooldown[classtable.DancingRuneWeapon].ready then
+        MaxDps:GlowCooldown(classtable.DancingRuneWeapon, cooldown[classtable.DancingRuneWeapon].ready)
+    end
+    if (buff[classtable.DancingRuneWeaponBuff].up) then
+        local drw_upCheck = Blood:drw_up()
+        if drw_upCheck then
+            return Blood:drw_up()
+        end
+    end
+    local standardCheck = Blood:standard()
+    if standardCheck then
+        return standardCheck
+    end
+end
 function DeathKnight:Blood()
     fd = MaxDps.FrameData
     ttd = (fd.timeToDie and fd.timeToDie) or 500
@@ -231,6 +465,10 @@ function DeathKnight:Blood()
     RunicPower = UnitPower('player', RunicPowerPT)
     RunicPowerMax = UnitPowerMax('player', RunicPowerPT)
     RunicPowerDeficit = RunicPowerMax - RunicPower
+    for spellId in pairs(MaxDps.Flags) do
+        self.Flags[spellId] = false
+        self:ClearGlowIndependent(spellId, spellId)
+    end
     classtable.BloodPlagueDeBuff = 55078
     classtable.BoneShieldBuff = 195181
     classtable.DeathandDecayDebuff = 52212
@@ -238,72 +476,19 @@ function DeathKnight:Blood()
     classtable.IcyTalonsBuff = 194879
     classtable.SoulReaperDeBuff = 343294
     classtable.HemostasisBuff = 273947
+    classtable.DancingRuneWeaponBuff = 81256
+    classtable.VampiricBloodBuff = 55233
+    classtable.IceboundFortitudeBuff = 48792
+    classtable.BloodShieldBuff = 77535
+    classtable.CrimsonScourgeBuff = 81141
 
-    for spellId in pairs(MaxDps.Flags) do
-        self.Flags[spellId] = false
-        self:ClearGlowIndependent(spellId, spellId)
-    end
-
-    death_strike_dump_amount = 65
-    if talents[classtable.Consumption] or talents[classtable.Blooddrinker] then
-        bone_shield_refresh_value = 4
-    else
-        bone_shield_refresh_value = 5
-    end
-    if (MaxDps:FindSpell(classtable.MindFreeze) and CheckSpellCosts(classtable.MindFreeze, 'MindFreeze')) and (UnitCastingInfo('target') and select(8,UnitCastingInfo('target')) == false) and cooldown[classtable.MindFreeze].ready then
-        MaxDps:GlowCooldown(classtable.MindFreeze, select(8,UnitCastingInfo('target') == false) and cooldown[classtable.MindFreeze].ready)
-    end
-    if (MaxDps:FindSpell(classtable.RaiseDead) and CheckSpellCosts(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
-        MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
-    end
-    if (MaxDps:FindSpell(classtable.ReapersMark) and CheckSpellCosts(classtable.ReapersMark, 'ReapersMark')) and cooldown[classtable.ReapersMark].ready then
-        MaxDps:GlowCooldown(classtable.ReapersMark, cooldown[classtable.ReapersMark].ready)
-    end
-    if (MaxDps:FindSpell(classtable.IceboundFortitude) and CheckSpellCosts(classtable.IceboundFortitude, 'IceboundFortitude')) and (not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up )) and cooldown[classtable.IceboundFortitude].ready then
-        MaxDps:GlowCooldown(classtable.IceboundFortitude, cooldown[classtable.IceboundFortitude].ready)
-    end
-    if (MaxDps:FindSpell(classtable.VampiricBlood) and CheckSpellCosts(classtable.VampiricBlood, 'VampiricBlood')) and (not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.IceboundFortitudeBuff].up or buff[classtable.VampiricBloodBuff].up )) and cooldown[classtable.VampiricBlood].ready then
-        MaxDps:GlowCooldown(classtable.VampiricBlood, cooldown[classtable.VampiricBlood].ready)
-    end
-    if (MaxDps:FindSpell(classtable.DeathsCaress) and CheckSpellCosts(classtable.DeathsCaress, 'DeathsCaress')) and (not buff[classtable.BoneShieldBuff].up) and cooldown[classtable.DeathsCaress].ready then
-        return classtable.DeathsCaress
-    end
-    if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( talents[classtable.UnholyGround] or talents[classtable.SanguineGround] or targets >3 or buff[classtable.CrimsonScourgeBuff].up )) and cooldown[classtable.DeathandDecay].charges >= cooldown[classtable.DeathandDecay].maxCharges and cooldown[classtable.DeathandDecay].ready then
-        return classtable.DeathandDecay
-    end
-    if (MaxDps:FindSpell(classtable.DeathStrike) and CheckSpellCosts(classtable.DeathStrike, 'DeathStrike')) and (buff[classtable.CoagulopathyBuff].remains <= gcd or buff[classtable.IcyTalonsBuff].remains <= gcd or RunicPower >= death_strike_dump_amount or RunicPowerDeficit <= heart_strike_rp or ttd <10) and cooldown[classtable.DeathStrike].ready then
-        return classtable.DeathStrike
-    end
-    if (MaxDps:FindSpell(classtable.Blooddrinker) and CheckSpellCosts(classtable.Blooddrinker, 'Blooddrinker')) and (not buff[classtable.DancingRuneWeaponBuff].up) and cooldown[classtable.Blooddrinker].ready then
-        MaxDps:GlowCooldown(classtable.Blooddrinker, cooldown[classtable.Blooddrinker].ready)
-    end
-    if (MaxDps:FindSpell(classtable.SacrificialPact) and CheckSpellCosts(classtable.SacrificialPact, 'SacrificialPact')) and (not buff[classtable.DancingRuneWeaponBuff].up and ( GetTotemDuration('Risen Ghoul') <2 or ttd <gcd )) and cooldown[classtable.SacrificialPact].ready then
-        MaxDps:GlowCooldown(classtable.SacrificialPact, cooldown[classtable.SacrificialPact].ready)
-    end
-    if (MaxDps:FindSpell(classtable.BloodTap) and CheckSpellCosts(classtable.BloodTap, 'BloodTap')) and (( Runes <= 2 and DeathKnight:TimeToRunes(4) >gcd and cooldown[classtable.BloodTap].charges >= 1.8 ) or DeathKnight:TimeToRunes(3) >gcd) and cooldown[classtable.BloodTap].ready then
-        MaxDps:GlowCooldown(classtable.BloodTap, cooldown[classtable.BloodTap].ready)
-    end
-    if (MaxDps:FindSpell(classtable.GorefiendsGrasp) and CheckSpellCosts(classtable.GorefiendsGrasp, 'GorefiendsGrasp')) and (talents[classtable.TighteningGrasp]) and cooldown[classtable.GorefiendsGrasp].ready then
-        MaxDps:GlowCooldown(classtable.GorefiendsGrasp, cooldown[classtable.GorefiendsGrasp].ready)
-    end
-    if (MaxDps:FindSpell(classtable.EmpowerRuneWeapon) and CheckSpellCosts(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (Runes <6 and RunicPowerDeficit >5) and cooldown[classtable.EmpowerRuneWeapon].ready then
-        MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
-    end
-    if (MaxDps:FindSpell(classtable.AbominationLimb) and CheckSpellCosts(classtable.AbominationLimb, 'AbominationLimb')) and cooldown[classtable.AbominationLimb].ready then
-        MaxDps:GlowCooldown(classtable.AbominationLimb, cooldown[classtable.AbominationLimb].ready)
-    end
-    if (MaxDps:FindSpell(classtable.DancingRuneWeapon) and CheckSpellCosts(classtable.DancingRuneWeapon, 'DancingRuneWeapon')) and (not buff[classtable.DancingRuneWeaponBuff].up) and cooldown[classtable.DancingRuneWeapon].ready then
-        MaxDps:GlowCooldown(classtable.DancingRuneWeapon, cooldown[classtable.DancingRuneWeapon].ready)
-    end
-    if (buff[classtable.DancingRuneWeaponBuff].up) then
-        local drw_upCheck = Blood:drw_up()
-        if drw_upCheck then
-            return Blood:drw_up()
-        end
-    end
-    local standardCheck = Blood:standard()
-    if standardCheck then
-        return standardCheck
+    local precombatCheck = Blood:precombat()
+    if precombatCheck then
+        return Blood:precombat()
     end
 
+    local callactionCheck = Blood:callaction()
+    if callactionCheck then
+        return Blood:callaction()
+    end
 end

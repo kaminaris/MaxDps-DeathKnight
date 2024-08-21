@@ -459,7 +459,7 @@ function Frost:cooldowns()
 end
 function Frost:high_prio()
     if (MaxDps:FindSpell(classtable.MindFreeze) and CheckSpellCosts(classtable.MindFreeze, 'MindFreeze')) and (UnitCastingInfo('target') and select(8,UnitCastingInfo('target')) == false) and cooldown[classtable.MindFreeze].ready then
-        MaxDps:GlowCooldown(classtable.MindFreeze, select(8,UnitCastingInfo('target') == false) and cooldown[classtable.MindFreeze].ready)
+        MaxDps:GlowCooldown(classtable.MindFreeze, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
     end
     if (MaxDps:FindSpell(classtable.HowlingBlast) and CheckSpellCosts(classtable.HowlingBlast, 'HowlingBlast')) and (not debuff[classtable.FrostFeverDeBuff].up and targets >= 2 and ( ( not talents[classtable.Obliteration] or talents[classtable.Obliteration] and ( not cooldown[classtable.PillarofFrost].ready or buff[classtable.PillarofFrostBuff].up and not buff[classtable.KillingMachineBuff].up ) ) or ( CheckEquipped('FyralaththeDreamrender') and not debuff[classtable.MarkofFyralathDeBuff].up ) )) and cooldown[classtable.HowlingBlast].ready then
         return classtable.HowlingBlast
@@ -566,7 +566,7 @@ function Frost:single_target()
     if (MaxDps:FindSpell(classtable.HowlingBlast) and CheckSpellCosts(classtable.HowlingBlast, 'HowlingBlast')) and (not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.HowlingBlast].ready then
         return classtable.HowlingBlast
     end
-    if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (talents[classtable.BreathofSindragosa] and not buff[classtable.BreathofSindragosaBuff].up and not true_breath_cooldown >= 0 and Runes <2 and not buff[classtable.DeathandDecayBuff].up) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:FindSpell(classtable.DeathandDecay) and CheckSpellCosts(classtable.DeathandDecay, 'DeathandDecay')) and (talents[classtable.BreathofSindragosa] and not buff[classtable.BreathofSindragosaBuff].up and not (true_breath_cooldown >= 0) and Runes <2 and not buff[classtable.DeathandDecayBuff].up) and cooldown[classtable.DeathandDecay].ready then
         return classtable.DeathandDecay
     end
     if (MaxDps:FindSpell(classtable.HornofWinter) and CheckSpellCosts(classtable.HornofWinter, 'HornofWinter')) and (Runes <2 and RunicPowerDeficit >25 and ( not talents[classtable.BreathofSindragosa] or true_breath_cooldown >cooldown[classtable.HornofWinter].duration - 15 )) and cooldown[classtable.HornofWinter].ready then

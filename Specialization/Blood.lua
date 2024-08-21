@@ -279,6 +279,9 @@ end
 function Blood:precombat()
 end
 function Blood:drw_up()
+    if (MaxDps:FindSpell(classtable.Marrowrend) and CheckSpellCosts(classtable.Marrowrend, 'Marrowrend')) and ( buff[classtable.BoneShieldBuff].remains <= 4 and buff[classtable.DancingRuneWeaponBuff].remains <= gcd*3 and not buff[classtable.BonestormBuff].up ) and cooldown[classtable.Marrowrend].ready then
+        return classtable.Marrowrend
+    end
     if (MaxDps:FindSpell(classtable.BloodBoil) and CheckSpellCosts(classtable.BloodBoil, 'BloodBoil')) and (not debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.BloodBoil].ready then
         return classtable.BloodBoil
     end
@@ -320,6 +323,9 @@ end
 function Blood:racials()
 end
 function Blood:standard()
+    if (MaxDps:FindSpell(classtable.Marrowrend) and CheckSpellCosts(classtable.Marrowrend, 'Marrowrend')) and ( buff[classtable.BoneShieldBuff].remains <= 3 ) and cooldown[classtable.Marrowrend].ready then
+        return classtable.Marrowrend
+    end
     if (MaxDps:FindSpell(classtable.Tombstone) and CheckSpellCosts(classtable.Tombstone, 'Tombstone')) and (buff[classtable.BoneShieldBuff].count >5 and Runes >= 2 and RunicPowerDeficit >= 30 and not talents[classtable.ShatteringBone] or ( talents[classtable.ShatteringBone] and debuff[classtable.DeathandDecayDebuff].up ) and cooldown[classtable.DancingRuneWeapon].remains >= 25) and cooldown[classtable.Tombstone].ready then
         MaxDps:GlowCooldown(classtable.Tombstone, cooldown[classtable.Tombstone].ready)
     end
@@ -481,6 +487,7 @@ function DeathKnight:Blood()
     classtable.IceboundFortitudeBuff = 48792
     classtable.BloodShieldBuff = 77535
     classtable.CrimsonScourgeBuff = 81141
+    classtable.BonestormBuff = 194844
 
     local precombatCheck = Blood:precombat()
     if precombatCheck then

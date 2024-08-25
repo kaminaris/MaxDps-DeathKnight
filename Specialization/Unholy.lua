@@ -285,12 +285,12 @@ end
 
 
 function Unholy:precombat()
-    if (CheckSpellCosts(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
+    if (CheckSpellCosts(classtable.RaiseDead, 'RaiseDead')) and not UnitExists("pet") and cooldown[classtable.RaiseDead].ready then
         MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
     end
-    if (CheckSpellCosts(classtable.ArmyoftheDead, 'ArmyoftheDead')) and cooldown[classtable.ArmyoftheDead].ready then
-        MaxDps:GlowCooldown(classtable.ArmyoftheDead, cooldown[classtable.ArmyoftheDead].ready)
-    end
+    --if (CheckSpellCosts(classtable.ArmyoftheDead, 'ArmyoftheDead')) and cooldown[classtable.ArmyoftheDead].ready then
+    --    MaxDps:GlowCooldown(classtable.ArmyoftheDead, cooldown[classtable.ArmyoftheDead].ready)
+    --end
 end
 function Unholy:aoe()
     if (CheckSpellCosts(classtable.WoundSpender, 'WoundSpender')) and (debuff[classtable.FesteringWoundDeBuff].count >= 1 and buff[classtable.DeathandDecayBuff].up and talents[classtable.BurstingSores] and cooldown[classtable.Apocalypse].remains >apoc_timing) and cooldown[classtable.WoundSpender].ready then

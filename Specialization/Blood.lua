@@ -79,7 +79,7 @@ local heart_strike_rp_drw
 local heart_strike_rp
 
 local function CheckSpellCosts(spell,spellstring)
-    if not IsSpellKnown(spell) then return false end
+    if not IsSpellKnownOrOverridesKnown(spell) then return false end
     if not C_Spell.IsSpellUsable(spell) then return false end
     if spellstring == 'TouchofDeath' then
         if targethealthPerc > 15 then

@@ -292,7 +292,7 @@ function Frost:cooldowns()
     if (MaxDps:CheckSpellUsable(classtable.BreathofSindragosa, 'BreathofSindragosa')) and (not buff[classtable.BreathofSindragosaBuff].up and RunicPower >breath_rp_threshold and ( cooldown[classtable.PillarofFrost].ready and sending_cds or MaxDps:boss() and ttd <30 ) or ( timeInCombat <10 and Runes <1 )) and cooldown[classtable.BreathofSindragosa].ready then
         MaxDps:GlowCooldown(classtable.BreathofSindragosa, cooldown[classtable.BreathofSindragosa].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and (talents[classtable.RideroftheApocalypse] and talents[classtable.ApocalypseNow] and sending_cds and ( not talents[classtable.BreathofSindragosa] and buff[classtable.PillarofFrostBuff].up or buff[classtable.BreathofSindragosaBuff].up ) or MaxDps:boss() and ttd <30) and cooldown[classtable.FrostwyrmsFury].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and ((MaxDps.ActiveHeroTree == 'rideroftheapocalypse') and talents[classtable.ApocalypseNow] and sending_cds and ( not talents[classtable.BreathofSindragosa] and buff[classtable.PillarofFrostBuff].up or buff[classtable.BreathofSindragosaBuff].up ) or MaxDps:boss() and ttd <20) and cooldown[classtable.FrostwyrmsFury].ready then
         MaxDps:GlowCooldown(classtable.FrostwyrmsFury, cooldown[classtable.FrostwyrmsFury].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and (not talents[classtable.ApocalypseNow] and targets == 1 and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up and not talents[classtable.Obliteration] or not talents[classtable.PillarofFrost] ) and ( (targets <2) or ( math.huge >15 + (targets>1 and MaxDps:MaxAddDuration() or 0) or talents[classtable.AbsoluteZero] and math.huge >15 + (targets>1 and MaxDps:MaxAddDuration() or 0) ) ) or MaxDps:boss() and ttd <3) and cooldown[classtable.FrostwyrmsFury].ready then
@@ -365,7 +365,7 @@ function Frost:obliteration()
     if (MaxDps:CheckSpellUsable(classtable.GlacialAdvance, 'GlacialAdvance')) and (( ga_priority or debuff[classtable.RazoriceDeBuff].count <5 ) and ( not wep_rune_check('Rune of Razorice') and ( debuff[classtable.RazoriceDeBuff].count <5 or debuff[classtable.RazoriceDeBuff].remains <gcd * 3 ) or ( ( rp_buffs or Runes <2 ) and targets >1 ) )) and cooldown[classtable.GlacialAdvance].ready then
         return classtable.GlacialAdvance
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (( Runes <2 or rp_buffs or debuff[classtable.RazoriceDeBuff].count == 5 and talents[classtable.ShatteringBlade] or talents[classtable.RideroftheApocalypse] ) and not pooling_runic_power and ( not talents[classtable.GlacialAdvance] or targets == 1 or talents[classtable.ShatteredFrost] )) and cooldown[classtable.FrostStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (( Runes <2 or rp_buffs or debuff[classtable.RazoriceDeBuff].count == 5 and talents[classtable.ShatteringBlade] or (MaxDps.ActiveHeroTree == 'rideroftheapocalypse') ) and not pooling_runic_power and ( not talents[classtable.GlacialAdvance] or targets == 1 or talents[classtable.ShatteredFrost] )) and cooldown[classtable.FrostStrike].ready then
         return classtable.FrostStrike
     end
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up) and cooldown[classtable.HowlingBlast].ready then

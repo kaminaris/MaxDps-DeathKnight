@@ -244,6 +244,7 @@ end
 
 function Blood:callaction()
     death_strike_dump_amount = 65
+    heart_strike_rp = ( 10 + targets * (talents[classtable.Heartbreaker] and talents[classtable.Heartbreaker] or 0) * 2 )
     if talents[classtable.Consumption] or talents[classtable.Blooddrinker] then
         bone_shield_refresh_value = 4
     else

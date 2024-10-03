@@ -1,7 +1,7 @@
 ## Title: MaxDps_DeathKnight
 ## Version: @project-version@
 ## Author: Kaminaris
-## Interface: 110002
+## Interface: 40400, 40401
 ## Dependencies: MaxDps
 ## LoadOnDemand: 1
 ## SavedVariables: MaxDpsDeathKnightOptions
@@ -10,7 +10,5 @@
 ## X-Wago-ID: QNlqwY6e
 
 Main.lua
-Config.lua
-Specialization/Blood.lua
-Specialization/Frost.lua
-Specialization/Unholy.lua
+Specialization/Cata/Frost.lua
+Specialization/Cata/Unholy.lua

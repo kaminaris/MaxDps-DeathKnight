@@ -53,9 +53,6 @@ local curentHP
 local maxHP
 local healthPerc
 local timeInCombat
-local className, classFilename, classId = UnitClass('player')
-local currentSpec = GetSpecialization()
-local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or 'None'
 local classtable
 local LibRangeCheck = LibStub('LibRangeCheck-3.0', true)
 
@@ -168,6 +165,9 @@ function Unholy:callaction()
     end
     if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
         MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
+    end
+    if (MaxDps:CheckSpellUsable(classtable.GolembloodPotion, 'GolembloodPotion')) and (not in_combat or MaxDps:Bloodlust() or ttd <= 60) and cooldown[classtable.GolembloodPotion].ready then
+        if not setSpell then setSpell = classtable.GolembloodPotion end
     end
     if (MaxDps:CheckSpellUsable(classtable.UnholyFrenzy, 'UnholyFrenzy')) and (not MaxDps:Bloodlust() or ttd <= 45) and cooldown[classtable.UnholyFrenzy].ready then
         if not setSpell then setSpell = classtable.UnholyFrenzy end

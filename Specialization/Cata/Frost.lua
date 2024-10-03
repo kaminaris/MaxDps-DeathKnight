@@ -53,9 +53,6 @@ local curentHP
 local maxHP
 local healthPerc
 local timeInCombat
-local className, classFilename, classId = UnitClass('player')
-local currentSpec = GetSpecialization()
-local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or 'None'
 local classtable
 local LibRangeCheck = LibStub('LibRangeCheck-3.0', true)
 
@@ -165,6 +162,9 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.ArmyoftheDead, 'ArmyoftheDead')) and cooldown[classtable.ArmyoftheDead].ready then
         MaxDps:GlowCooldown(classtable.ArmyoftheDead, cooldown[classtable.ArmyoftheDead].ready)
     end
+    if (MaxDps:CheckSpellUsable(classtable.GolembloodPotion, 'GolembloodPotion')) and (not in_combat or MaxDps:Bloodlust() or ttd <= 60) and cooldown[classtable.GolembloodPotion].ready then
+        if not setSpell then setSpell = classtable.GolembloodPotion end
+    end
     if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost')) and cooldown[classtable.PillarofFrost].ready then
         MaxDps:GlowCooldown(classtable.PillarofFrost, cooldown[classtable.PillarofFrost].ready)
     end
@@ -218,6 +218,9 @@ function Frost:callaction()
     end
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready then
         MaxDps:GlowCooldown(classtable.HornofWinter, cooldown[classtable.HornofWinter].ready)
+    end
+    if (MaxDps:CheckSpellUsable(classtable.RocketBarrage, 'RocketBarrage')) and cooldown[classtable.RocketBarrage].ready then
+        if not setSpell then setSpell = classtable.RocketBarrage end
     end
 end
 function DeathKnight:Frost()

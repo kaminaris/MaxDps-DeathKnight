@@ -46,8 +46,10 @@ DeathKnight.weaponRunes = {
 DeathKnight.hasEnchant = {}
 
 function DeathKnight:Enable()
-	DeathKnight:InitializeDatabase()
-	DeathKnight:CreateConfig()
+	if MaxDps:IsRetailWow() then
+	    DeathKnight:InitializeDatabase()
+	    DeathKnight:CreateConfig()
+	end
 	DeathKnight:InitializeWeaponRunes()
 
 	if MaxDps.Spec == 1 then

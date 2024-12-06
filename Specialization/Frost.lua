@@ -451,7 +451,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and (not talents[classtable.ApocalypseNow] and targets >= 2 and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up or (targets >1) and (targets >1) and math.huge <cooldown[classtable.PillarofFrost].remains - math.huge - (targets>1 and MaxDps:MaxAddDuration() or 0) ) and fwf_buffs) and cooldown[classtable.FrostwyrmsFury].ready then
         MaxDps:GlowCooldown(classtable.FrostwyrmsFury, cooldown[classtable.FrostwyrmsFury].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and (not talents[classtable.ApocalypseNow] and talents[classtable.Obliteration] and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up and not main_hand.two_hand or not buff[classtable.PillarofFrostBuff].up and (twoh_check() == true and 2 or 1) and cooldown[classtable.PillarofFrost].ready==false or not talents[classtable.PillarofFrost] ) and fwf_buffs and ( (targets <2) or math.huge >cooldown[classtable.FrostwyrmsFury].duration + (targets>1 and MaxDps:MaxAddDuration() or 0) )) and cooldown[classtable.FrostwyrmsFury].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and (not talents[classtable.ApocalypseNow] and talents[classtable.Obliteration] and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up and not twoh_check() or not buff[classtable.PillarofFrostBuff].up and (twoh_check() == true and 2 or 1) and cooldown[classtable.PillarofFrost].ready==false or not talents[classtable.PillarofFrost] ) and fwf_buffs and ( (targets <2) or math.huge >cooldown[classtable.FrostwyrmsFury].duration + (targets>1 and MaxDps:MaxAddDuration() or 0) )) and cooldown[classtable.FrostwyrmsFury].ready then
         MaxDps:GlowCooldown(classtable.FrostwyrmsFury, cooldown[classtable.FrostwyrmsFury].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (buff[classtable.PillarofFrostBuff].up) and cooldown[classtable.RaiseDead].ready then
@@ -472,7 +472,7 @@ function Frost:callaction()
     if (talents[classtable.ColdHeart] and ( not buff[classtable.KillingMachineBuff].up or talents[classtable.BreathofSindragosa] ) and ( ( debuff[classtable.RazoriceDeBuff].count == 5 or not wep_rune_check('Rune of Razorice') and not talents[classtable.GlacialAdvance] and not talents[classtable.Avalanche] and not talents[classtable.ArcticAssault] ) or MaxDps:boss() and ttd <= gcd )) then
         Frost:cold_heart()
     end
-    if (buff[classtable.BreathofSindragosaBuff].up or breath_ticks_left >0) then
+    if (buff[classtable.BreathofSindragosaBuff].up or buff[classtable.BreathofSindragosaBuff].duration >0) then
         Frost:breath()
     end
     if (talents[classtable.Obliteration] and buff[classtable.PillarofFrostBuff].up and not buff[classtable.BreathofSindragosaBuff].up) then

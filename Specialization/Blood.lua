@@ -363,13 +363,13 @@ function Blood:callaction()
     if (MaxDps:CheckSpellUsable(classtable.MindFreeze, 'MindFreeze')) and cooldown[classtable.MindFreeze].ready then
         MaxDps:GlowCooldown(classtable.MindFreeze, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
     end
-    if (MaxDps:CheckSpellUsable(classtable.IceboundFortitude, 'IceboundFortitude')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and incoming_damage_5s >= ibf_damage and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up )) and cooldown[classtable.IceboundFortitude].ready then
+    if (MaxDps:CheckSpellUsable(classtable.IceboundFortitude, 'IceboundFortitude')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up )) and cooldown[classtable.IceboundFortitude].ready then
         MaxDps:GlowCooldown(classtable.IceboundFortitude, cooldown[classtable.IceboundFortitude].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.VampiricBlood, 'VampiricBlood')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and incoming_damage_5s >= vb_damage and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.VampiricBlood].ready then
+    if (MaxDps:CheckSpellUsable(classtable.VampiricBlood, 'VampiricBlood')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.VampiricBlood].ready then
         MaxDps:GlowCooldown(classtable.VampiricBlood, cooldown[classtable.VampiricBlood].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.RuneTap, 'RuneTap')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and incoming_damage_5s >= rt_damage and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.RuneTap].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RuneTap, 'RuneTap')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.RuneTap].ready then
         if not setSpell then setSpell = classtable.RuneTap end
     end
     if ((MaxDps.ActiveHeroTree == 'deathbringer')) then

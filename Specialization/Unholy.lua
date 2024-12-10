@@ -366,7 +366,7 @@ function Unholy:san_fishing()
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (buff[classtable.SuddenDoomBuff].up and talents[classtable.DoomedBidding]) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targetHP <= 35) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targetHP <= 35 and ttd >5) and cooldown[classtable.SoulReaper].ready then
         if not setSpell then setSpell = classtable.SoulReaper end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.DeathCoil].ready then

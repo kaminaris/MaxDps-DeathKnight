@@ -240,7 +240,7 @@ function Unholy:aoe_setup()
     if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (buff[classtable.FesteringScytheBuff].up) and cooldown[classtable.FesteringStrike].ready then
         if not setSpell then setSpell = classtable.FesteringStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( not talents[classtable.BurstingSores] and not talents[classtable.VileContagion] or debuff[classtable.FesteringWoundDebuff].count >= 1 or debuff[classtable.FesteringWoundDebuff].count >= 8 or (targets >1) and targets <= 11 and targets >5 or not buff[classtable.DeathandDecayBuff].up and talents[classtable.Defile] )) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (MaxDps:CooldownConsolidated(classtable.DeathandDecay).charges >= MaxDps:CooldownConsolidated(classtable.DeathandDecay).maxCharges) and (not debuff[classtable.DeathandDecayDebuff].up and ( not talents[classtable.BurstingSores] and not talents[classtable.VileContagion] or debuff[classtable.FesteringWoundDebuff].count >= 1 or debuff[classtable.FesteringWoundDebuff].count >= 8 or (targets >1) and targets <= 11 and targets >5 or not buff[classtable.DeathandDecayBuff].up and talents[classtable.Defile] )) and cooldown[classtable.DeathandDecay].ready then
         if not setSpell then setSpell = classtable.DeathandDecay end
     end
     if (MaxDps:CheckSpellUsable(classtable.WoundSpender, 'WoundSpender')) and (debuff[classtable.ChainsofIceTrollbaneSlowDeBuff].up) and cooldown[classtable.WoundSpender].ready then
@@ -343,7 +343,7 @@ function Unholy:cds_san()
     end
 end
 function Unholy:cleave()
-    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (MaxDps:CooldownConsolidated(classtable.DeathandDecay).charges >= MaxDps:CooldownConsolidated(classtable.DeathandDecay).maxCharges) and (not debuff[classtable.DeathandDecayDebuff].up) and cooldown[classtable.DeathandDecay].ready then
         if not setSpell then setSpell = classtable.DeathandDecay end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not pooling_runic_power) and cooldown[classtable.DeathCoil].ready then
@@ -360,13 +360,13 @@ function Unholy:cleave()
     end
 end
 function Unholy:san_fishing()
-    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (not buff[classtable.DeathandDecayBuff].up and not buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (MaxDps:CooldownConsolidated(classtable.DeathandDecay).charges >= MaxDps:CooldownConsolidated(classtable.DeathandDecay).maxCharges) and (not buff[classtable.DeathandDecayBuff].up and not buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.DeathandDecay].ready then
         if not setSpell then setSpell = classtable.DeathandDecay end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (buff[classtable.SuddenDoomBuff].up and talents[classtable.DoomedBidding]) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targetHP <= 35 and ttd >5) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targetHP <= 35) and cooldown[classtable.SoulReaper].ready then
         if not setSpell then setSpell = classtable.SoulReaper end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.DeathCoil].ready then
@@ -380,7 +380,7 @@ function Unholy:san_fishing()
     end
 end
 function Unholy:san_st()
-    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and talents[classtable.UnholyGround] and cooldown[classtable.DarkTransformation].remains <5) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (MaxDps:CooldownConsolidated(classtable.DeathandDecay).charges >= MaxDps:CooldownConsolidated(classtable.DeathandDecay).maxCharges) and (not debuff[classtable.DeathandDecayDebuff].up and talents[classtable.UnholyGround] and cooldown[classtable.DarkTransformation].remains <5) and cooldown[classtable.DeathandDecay].ready then
         if not setSpell then setSpell = classtable.DeathandDecay end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (buff[classtable.SuddenDoomBuff].up and buff[classtable.GiftoftheSanlaynBuff].remains and ( talents[classtable.DoomedBidding] or talents[classtable.RottenTouch] ) or Runes <3 and not buff[classtable.RunicCorruptionBuff].up) and cooldown[classtable.DeathCoil].ready then
@@ -420,7 +420,7 @@ function Unholy:st()
     if (MaxDps:CheckSpellUsable(classtable.WoundSpender, 'WoundSpender')) and (debuff[classtable.ChainsofIceTrollbaneSlowDeBuff].up) and cooldown[classtable.WoundSpender].ready then
         if not setSpell then setSpell = classtable.WoundSpender end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (talents[classtable.UnholyGround] and not buff[classtable.DeathandDecayBuff].up and ( ( UnitExists('pet') and UnitName('pet')  == 'apoc_ghoul' ) or ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) or ( UnitExists('pet') and UnitName('pet')  == 'gargoyle' ) )) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (MaxDps:CooldownConsolidated(classtable.DeathandDecay).charges >= MaxDps:CooldownConsolidated(classtable.DeathandDecay).maxCharges) and (talents[classtable.UnholyGround] and not buff[classtable.DeathandDecayBuff].up and ( ( UnitExists('pet') and UnitName('pet')  == 'apoc_ghoul' ) or ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) or ( UnitExists('pet') and UnitName('pet')  == 'gargoyle' ) )) and cooldown[classtable.DeathandDecay].ready then
         if not setSpell then setSpell = classtable.DeathandDecay end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not pooling_runic_power and spend_rp or MaxDps:boss() and ttd <10) and cooldown[classtable.DeathCoil].ready then

@@ -398,7 +398,7 @@ function Unholy:san_st()
     if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (( debuff[classtable.FesteringWoundDeBuff].count == 0 and cooldown[classtable.Apocalypse].remains <apoc_timing ) or ( talents[classtable.GiftoftheSanlayn] and not buff[classtable.GiftoftheSanlaynBuff].up or not talents[classtable.GiftoftheSanlayn] ) and ( buff[classtable.FesteringScytheBuff].up or debuff[classtable.FesteringWoundDeBuff].count <= 1 )) and cooldown[classtable.FesteringStrike].ready then
         if not setSpell then setSpell = classtable.FesteringStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.WoundSpender, 'WoundSpender')) and (( not talents[classtable.Apocalypse] or cooldown[classtable.Apocalypse].remains >apoc_timing ) and ( debuff[classtable.FesteringWoundDeBuff].count >= 3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) or buff[classtable.VampiricStrikeBuff].up )) and cooldown[classtable.WoundSpender].ready then
+    if (MaxDps:CheckSpellUsable(classtable.WoundSpender, 'WoundSpender')) and (( not talents[classtable.Apocalypse] or cooldown[classtable.Apocalypse].remains >apoc_timing ) and ( debuff[classtable.FesteringWoundDeBuff].count >= 3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' and 1 or 0) or buff[classtable.VampiricStrikeBuff].up )) and cooldown[classtable.WoundSpender].ready then
         if not setSpell then setSpell = classtable.WoundSpender end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not pooling_runic_power and debuff[classtable.DeathRotDeBuff].remains <gcd or ( buff[classtable.SuddenDoomBuff].up and debuff[classtable.FesteringWoundDeBuff].count >= 1 or Runes <2 )) and cooldown[classtable.DeathCoil].ready then
@@ -548,7 +548,9 @@ function DeathKnight:Unholy()
     RunicPower = UnitPower('player', RunicPowerPT)
     RunicPowerMax = UnitPowerMax('player', RunicPowerPT)
     RunicPowerDeficit = RunicPowerMax - RunicPower
-    classtable.WoundSpender = ((talents[classtable.ClawingShadows] and classtable.ClawingShadows) or classtable.ScourgeStrike)
+    classtable.VampiricStrike = 433895
+    --classtable.WoundSpender = ((MaxDps:FindSpell(classtable.VampiricStrike) and classtable.VampiricStrike) or (MaxDps:FindSpell(classtable.ClawingShadows) and classtable.ClawingShadows) or classtable.ScourgeStrike)
+    classtable.WoundSpender = C_Spell.GetSpellInfo(classtable.ScourgeStrike) and ( C_Spell.GetSpellInfo(C_Spell.GetSpellInfo(classtable.ScourgeStrike).name).spellID )
     classtable.FesteringScythe = 458128
     classtable.DnD = talents[classtable.Defile] and classtable.Defile or not talents[classtable.Defile] and classtable.DeathandDecay
     if buff[classtable.FesteringScytheBuff].up then

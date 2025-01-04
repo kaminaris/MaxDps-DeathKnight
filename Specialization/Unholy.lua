@@ -174,7 +174,7 @@ end
 
 
 function Unholy:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and not UnitExists('pet') and cooldown[classtable.RaiseDead].ready then
         MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.ArmyoftheDead, 'ArmyoftheDead') and talents[classtable.ArmyoftheDead]) and cooldown[classtable.ArmyoftheDead].ready and not UnitAffectingCombat('player') then
@@ -269,7 +269,7 @@ function Unholy:aoe_setup()
     end
 end
 function Unholy:cds()
-    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and (targets == 1 and ( cooldown[classtable.Apocalypse].remains <8 or not talents[classtable.Apocalypse] or targets >= 1 ) or MaxDps:boss() and ttd <20) and cooldown[classtable.DarkTransformation].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and (UnitExists('pet') and targets == 1 and ( cooldown[classtable.Apocalypse].remains <8 or not talents[classtable.Apocalypse] or targets >= 1 ) or MaxDps:boss() and ttd <20) and cooldown[classtable.DarkTransformation].ready then
         MaxDps:GlowCooldown(classtable.DarkTransformation, cooldown[classtable.DarkTransformation].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.UnholyAssault, 'UnholyAssault')) and (targets == 1 and ( cooldown[classtable.Apocalypse].remains <gcd * 2 or not talents[classtable.Apocalypse] or targets >= 2 and buff[classtable.DarkTransformationBuff].up ) or MaxDps:boss() and ttd <20) and cooldown[classtable.UnholyAssault].ready then
@@ -292,7 +292,7 @@ function Unholy:cds_aoe()
     if (MaxDps:CheckSpellUsable(classtable.VileContagion, 'VileContagion') and talents[classtable.VileContagion]) and (debuff[classtable.FesteringWoundDeBuff].count >= 4 and ( targets >4 or (targets <2) and ttd >4 ) and ( (targets >1) and targets <= 11 or cooldown[classtable.DeathandDecay].remains <3 or buff[classtable.DeathandDecayBuff].up and debuff[classtable.FesteringWoundDeBuff].count >= 4 ) or targets >1 and debuff[classtable.FesteringWoundDeBuff].count == 6) and cooldown[classtable.VileContagion].ready then
         if not setSpell then setSpell = classtable.VileContagion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and (targets >1 and ( cooldown[classtable.VileContagion].remains >5 or not talents[classtable.VileContagion] or debuff[classtable.DeathandDecayDebuff].up or cooldown[classtable.DeathandDecay].remains <3 )) and cooldown[classtable.DarkTransformation].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and (UnitExists('pet') and targets >1 and ( cooldown[classtable.VileContagion].remains >5 or not talents[classtable.VileContagion] or debuff[classtable.DeathandDecayDebuff].up or cooldown[classtable.DeathandDecay].remains <3 )) and cooldown[classtable.DarkTransformation].ready then
         MaxDps:GlowCooldown(classtable.DarkTransformation, cooldown[classtable.DarkTransformation].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (debuff[classtable.VirulentPlagueDeBuff].remains <5 and ( debuff[classtable.VirulentPlagueDeBuff].refreshable or talents[classtable.Morbidity] and not buff[classtable.GiftoftheSanlaynBuff].up and talents[classtable.Superstrain] and debuff[classtable.FrostFeverDeBuff].refreshable and debuff[classtable.BloodPlagueDeBuff].refreshable ) and ( not talents[classtable.UnholyBlight] or talents[classtable.UnholyBlight] and cooldown[classtable.DarkTransformation].ready==false ) and ( not talents[classtable.RaiseAbomination] or talents[classtable.RaiseAbomination] and cooldown[classtable.RaiseAbomination].ready==false )) and cooldown[classtable.Outbreak].ready then
@@ -306,7 +306,7 @@ function Unholy:cds_aoe()
     end
 end
 function Unholy:cds_aoe_san()
-    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and (targets >1 and buff[classtable.DeathandDecayBuff].up) and cooldown[classtable.DarkTransformation].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and (UnitExists('pet') and targets >1 and buff[classtable.DeathandDecayBuff].up) and cooldown[classtable.DarkTransformation].ready then
         MaxDps:GlowCooldown(classtable.DarkTransformation, cooldown[classtable.DarkTransformation].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.UnholyAssault, 'UnholyAssault')) and (targets >1 and ( cooldown[classtable.VileContagion].remains <6 or cooldown[classtable.VileContagion].remains >40 or not talents[classtable.VileContagion] ) or MaxDps:boss() and ttd <20) and cooldown[classtable.UnholyAssault].ready then
@@ -326,7 +326,7 @@ function Unholy:cds_aoe_san()
     end
 end
 function Unholy:cds_san()
-    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and (targets >= 1 and targets == 1 and ( talents[classtable.Apocalypse] and ( UnitExists('pet') and UnitName('pet')  == 'apoc_ghoul' ) or not talents[classtable.Apocalypse] ) or MaxDps:boss() and ttd <20) and cooldown[classtable.DarkTransformation].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and (targets >= 1 and targets == 1 and ( talents[classtable.Apocalypse] and UnitExists('pet') or not talents[classtable.Apocalypse] ) or MaxDps:boss() and ttd <20) and cooldown[classtable.DarkTransformation].ready then
         MaxDps:GlowCooldown(classtable.DarkTransformation, cooldown[classtable.DarkTransformation].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.UnholyAssault, 'UnholyAssault')) and (targets == 1 and ( buff[classtable.DarkTransformationBuff].up and buff[classtable.DarkTransformationBuff].remains <12 ) or MaxDps:boss() and ttd <20) and cooldown[classtable.UnholyAssault].ready then

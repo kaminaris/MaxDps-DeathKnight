@@ -191,7 +191,7 @@ function Unholy:aoe()
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not pooling_runic_power and targets <epidemic_targets) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and (not pooling_runic_power) and cooldown[classtable.Epidemic].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and (not pooling_runic_power and debuff[classtable.VirulentPlagueDeBuff].up) and cooldown[classtable.Epidemic].ready then
         if not setSpell then setSpell = classtable.Epidemic end
     end
     if (MaxDps:CheckSpellUsable(classtable.WoundSpender, 'WoundSpender')) and (debuff[classtable.ChainsofIceTrollbaneSlowDeBuff].up) and cooldown[classtable.WoundSpender].ready then
@@ -214,7 +214,7 @@ function Unholy:aoe_burst()
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not buff[classtable.VampiricStrikeBuff].up and targets <epidemic_targets and ( not talents[classtable.BurstingSores] or talents[classtable.BurstingSores] and MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) <targets and MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) <targets * 0.4 and buff[classtable.SuddenDoomBuff].up or buff[classtable.SuddenDoomBuff].up and ( talents[classtable.DoomedBidding] and talents[classtable.MenacingMagus] or talents[classtable.RottenTouch] or debuff[classtable.DeathRotDeBuff].remains <gcd ) )) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and (not buff[classtable.VampiricStrikeBuff].up and ( not talents[classtable.BurstingSores] or talents[classtable.BurstingSores] and MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) <1 and MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) <targets * 0.4 and buff[classtable.SuddenDoomBuff].up or buff[classtable.SuddenDoomBuff].up and ( buff[classtable.AFeastofSoulsBuff].up or debuff[classtable.DeathRotDeBuff].remains <gcd or debuff[classtable.DeathRotDeBuff].count <10 ) )) and cooldown[classtable.Epidemic].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic'))  and debuff[classtable.VirulentPlagueDeBuff].up and (not buff[classtable.VampiricStrikeBuff].up and ( not talents[classtable.BurstingSores] or talents[classtable.BurstingSores] and MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) <1 and MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) <targets * 0.4 and buff[classtable.SuddenDoomBuff].up or buff[classtable.SuddenDoomBuff].up and ( buff[classtable.AFeastofSoulsBuff].up or debuff[classtable.DeathRotDeBuff].remains <gcd or debuff[classtable.DeathRotDeBuff].count <10 ) )) and cooldown[classtable.Epidemic].ready then
         if not setSpell then setSpell = classtable.Epidemic end
     end
     if (MaxDps:CheckSpellUsable(classtable.WoundSpender, 'WoundSpender')) and (debuff[classtable.ChainsofIceTrollbaneSlowDeBuff].up) and cooldown[classtable.WoundSpender].ready then
@@ -226,7 +226,7 @@ function Unholy:aoe_burst()
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (targets <epidemic_targets) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and cooldown[classtable.Epidemic].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and debuff[classtable.VirulentPlagueDeBuff].up and cooldown[classtable.Epidemic].ready then
         if not setSpell then setSpell = classtable.Epidemic end
     end
     if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (debuff[classtable.FesteringWoundDeBuff].count <= 2) and cooldown[classtable.FesteringStrike].ready then
@@ -255,7 +255,7 @@ function Unholy:aoe_setup()
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not pooling_runic_power and buff[classtable.SuddenDoomBuff].up and targets <epidemic_targets) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and (not pooling_runic_power and buff[classtable.SuddenDoomBuff].up) and cooldown[classtable.Epidemic].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and debuff[classtable.VirulentPlagueDeBuff].up and (not pooling_runic_power and buff[classtable.SuddenDoomBuff].up) and cooldown[classtable.Epidemic].ready then
         if not setSpell then setSpell = classtable.Epidemic end
     end
     if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (cooldown[classtable.Apocalypse].remains <gcd and debuff[classtable.FesteringWoundDeBuff].count == 0 or MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) <1) and cooldown[classtable.FesteringStrike].ready then
@@ -264,7 +264,7 @@ function Unholy:aoe_setup()
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not pooling_runic_power and targets <epidemic_targets) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and (not pooling_runic_power) and cooldown[classtable.Epidemic].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and debuff[classtable.VirulentPlagueDeBuff].up and (not pooling_runic_power) and cooldown[classtable.Epidemic].ready then
         if not setSpell then setSpell = classtable.Epidemic end
     end
 end

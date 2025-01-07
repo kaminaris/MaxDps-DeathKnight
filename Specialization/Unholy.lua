@@ -372,10 +372,10 @@ function Unholy:san_fishing()
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.WoundSpender, 'WoundSpender')) and (( debuff[classtable.FesteringWoundDeBuff].count >= 3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' ) and cooldown[classtable.Apocalypse].remains >apoc_timing ) or buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.WoundSpender].ready then
+    if (MaxDps:CheckSpellUsable(classtable.WoundSpender, 'WoundSpender')) and (( debuff[classtable.FesteringWoundDeBuff].count >= 3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' and 1 or 0) and cooldown[classtable.Apocalypse].remains >apoc_timing ) or buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.WoundSpender].ready then
         if not setSpell then setSpell = classtable.WoundSpender end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (debuff[classtable.FesteringWoundDeBuff].count <3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' )) and cooldown[classtable.FesteringStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (debuff[classtable.FesteringWoundDeBuff].count <3 - ( UnitExists('pet') and UnitName('pet')  == 'abomination' and 1 or 0)) and cooldown[classtable.FesteringStrike].ready then
         if not setSpell then setSpell = classtable.FesteringStrike end
     end
 end

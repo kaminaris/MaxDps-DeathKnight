@@ -144,87 +144,110 @@ local function GetTotemDuration(name)
 end
 
 
+function Unholy:precombat()
+    if (MaxDps:CheckSpellUsable(classtable.UnholyPresence, 'UnholyPresence')) and (not buff[classtable.PresenceBuff].up) and cooldown[classtable.UnholyPresence].ready and not UnitAffectingCombat('player') then
+        if not setSpell then setSpell = classtable.UnholyPresence end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (talents[classtable.MasterofGhouls]) and cooldown[classtable.RaiseDead].ready and not UnitAffectingCombat('player') then
+        if not setSpell then setSpell = classtable.RaiseDead end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.ArmyoftheDead, 'ArmyoftheDead')) and cooldown[classtable.ArmyoftheDead].ready and not UnitAffectingCombat('player') then
+        if not setSpell then setSpell = classtable.ArmyoftheDead end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready and not UnitAffectingCombat('player') then
+        if not setSpell then setSpell = classtable.HornofWinter end
+    end
+end
 
 
 local function ClearCDs()
-    MaxDps:GlowCooldown(classtable.ArmyoftheDead, false)
-    MaxDps:GlowCooldown(classtable.RaiseDead, false)
-    MaxDps:GlowCooldown(classtable.DarkTransformation, false)
-    MaxDps:GlowCooldown(classtable.SummonGargoyle, false)
-    MaxDps:GlowCooldown(classtable.BloodTap, false)
-    MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, false)
-    MaxDps:GlowCooldown(classtable.HornofWinter, false)
+    MaxDps:GlowCooldown(classtable.MindFreeze, false)
 end
 
 function Unholy:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and cooldown[classtable.Presence].ready then
-        if not setSpell then setSpell = classtable.Presence end
+    if (MaxDps:CheckSpellUsable(classtable.MindFreeze, 'MindFreeze')) and cooldown[classtable.MindFreeze].ready then
+        MaxDps:GlowCooldown(classtable.MindFreeze, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArmyoftheDead, 'ArmyoftheDead')) and cooldown[classtable.ArmyoftheDead].ready then
-        MaxDps:GlowCooldown(classtable.ArmyoftheDead, cooldown[classtable.ArmyoftheDead].ready)
+    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and (ttd >= 15 or targets >1) and cooldown[classtable.DarkTransformation].ready then
+        if not setSpell then setSpell = classtable.DarkTransformation end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
-        MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
-    end
-    if (MaxDps:CheckSpellUsable(classtable.GolembloodPotion, 'GolembloodPotion')) and (not in_combat or MaxDps:Bloodlust() or ttd <= 60) and cooldown[classtable.GolembloodPotion].ready then
-        if not setSpell then setSpell = classtable.GolembloodPotion end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.UnholyFrenzy, 'UnholyFrenzy')) and (not MaxDps:Bloodlust() or ttd <= 45) and cooldown[classtable.UnholyFrenzy].ready then
-        if not setSpell then setSpell = classtable.UnholyFrenzy end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (debuff[classtable.FrostFeverDeBuff].remains <= 2 or debuff[classtable.BloodPlagueDeBuff].remains <= 2) and cooldown[classtable.Outbreak].ready then
-        if not setSpell then setSpell = classtable.Outbreak end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.IcyTouch, 'IcyTouch')) and (debuff[classtable.FrostFeverDeBuff].remains <2 and cooldown[classtable.Outbreak].remains >2) and cooldown[classtable.IcyTouch].ready then
-        if not setSpell then setSpell = classtable.IcyTouch end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (debuff[classtable.BloodPlagueDeBuff].remains <2 and cooldown[classtable.Outbreak].remains >2) and cooldown[classtable.PlagueStrike].ready then
-        if not setSpell then setSpell = classtable.PlagueStrike end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation')) and cooldown[classtable.DarkTransformation].ready then
-        MaxDps:GlowCooldown(classtable.DarkTransformation, cooldown[classtable.DarkTransformation].ready)
-    end
-    if (MaxDps:CheckSpellUsable(classtable.SummonGargoyle, 'SummonGargoyle')) and cooldown[classtable.SummonGargoyle].ready then
-        MaxDps:GlowCooldown(classtable.SummonGargoyle, cooldown[classtable.SummonGargoyle].ready)
-    end
-    if (MaxDps:CheckSpellUsable(classtable.SummonGargoyle, 'SummonGargoyle')) and (MaxDps:Bloodlust() or buff[classtable.UnholyFrenzyBuff].up) and cooldown[classtable.SummonGargoyle].ready then
-        MaxDps:GlowCooldown(classtable.SummonGargoyle, cooldown[classtable.SummonGargoyle].ready)
-    end
-    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (unholy == 2 and RunicPower <110) and cooldown[classtable.DeathandDecay].ready then
-        if not setSpell then setSpell = classtable.DeathandDecay end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')) and (unholy == 2 and RunicPower <110) and cooldown[classtable.ScourgeStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')) and (ttd <3 and targets <2) and cooldown[classtable.ScourgeStrike].ready then
         if not setSpell then setSpell = classtable.ScourgeStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (blood == 2 and frost == 2 and RunicPower <110) and cooldown[classtable.FesteringStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (ttd <3 and targets <2) and cooldown[classtable.FesteringStrike].ready then
         if not setSpell then setSpell = classtable.FesteringStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (RunicPower >90) and cooldown[classtable.DeathCoil].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (ttd <3 and targets <2) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (buff[classtable.SuddenDoomBuff].up) and cooldown[classtable.DeathCoil].ready then
-        if not setSpell then setSpell = classtable.DeathCoil end
+    if (MaxDps:CheckSpellUsable(classtable.UnholyFrenzy, 'UnholyFrenzy')) and (buff[classtable.UnholyStrengthBuff].up) and cooldown[classtable.UnholyFrenzy].ready then
+        if not setSpell then setSpell = classtable.UnholyFrenzy end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:CheckSpellUsable(classtable.SynapseSprings, 'SynapseSprings')) and (buff[classtable.UnholyStrengthBuff].up or ttd <= 13) and cooldown[classtable.SynapseSprings].ready then
+        if not setSpell then setSpell = classtable.SynapseSprings end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (buff[classtable.UnholyStrengthBuff].up and buff[classtable.SynapseSpringsBuff].up) and cooldown[classtable.Outbreak].ready then
+        if not setSpell then setSpell = classtable.Outbreak end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.SummonGargoyle, 'SummonGargoyle')) and (buff[classtable.UnholyStrengthBuff].up and ( cooldown[classtable.UnholyFrenzy].ready or buff[classtable.UnholyFrenzyBuff].up or MaxDps:Bloodlust() )) and cooldown[classtable.SummonGargoyle].ready then
+        if not setSpell then setSpell = classtable.SummonGargoyle end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (timeInCombat >15 and ( not debuff[classtable.FrostFeverDeBuff].up or not debuff[classtable.BloodPlagueDeBuff].up )) and cooldown[classtable.Outbreak].ready then
+        if not setSpell then setSpell = classtable.Outbreak end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.IcyTouch, 'IcyTouch')) and (not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.IcyTouch].ready then
+        if not setSpell then setSpell = classtable.IcyTouch end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (not debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.PlagueStrike].ready then
+        if not setSpell then setSpell = classtable.PlagueStrike end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.Pestilence, 'Pestilence')) and (debuff[classtable.FrostFeverDeBuff].up and debuff[classtable.BloodPlagueDeBuff].up and ( debuff[classtable.FrostFeverDeBuff].count  + debuff[classtable.BloodPlagueDeBuff].count  <targets * 2 )) and cooldown[classtable.Pestilence].ready then
+        if not setSpell then setSpell = classtable.Pestilence end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (not (GetUnitSpeed('player') >0) and ttd >5 or targets >1) and cooldown[classtable.DeathandDecay].ready then
         if not setSpell then setSpell = classtable.DeathandDecay end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (targets >2) and cooldown[classtable.BloodBoil].ready then
+        if not setSpell then setSpell = classtable.BloodBoil end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (blood_runes.time_to_2 <= 1 and frost_runes.time_to_2 <= 1) and cooldown[classtable.FesteringStrike].ready then
+        if not setSpell then setSpell = classtable.FesteringStrike end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')) and (unholy_runes.time_to_2 <= 1) and cooldown[classtable.ScourgeStrike].ready then
+        if not setSpell then setSpell = classtable.ScourgeStrike end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.BloodStrike, 'BloodStrike')) and (blood_runes.time_to_2 <= 1 and not action.festering_strike.known) and cooldown[classtable.BloodStrike].ready then
+        if not setSpell then setSpell = classtable.BloodStrike end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not cooldown[classtable.SummonGargoyle].ready and not buff[classtable.RunicCorruptionBuff].up and not MaxDps:Bloodlust()) and cooldown[classtable.DeathCoil].ready then
+        if not setSpell then setSpell = classtable.DeathCoil end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.IcyTouch, 'IcyTouch')) and (frost_runes.time_to_2 <= 1 and ( not action.festering_strike.known or targets >2 )) and cooldown[classtable.IcyTouch].ready then
+        if not setSpell then setSpell = classtable.IcyTouch end
     end
     if (MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')) and cooldown[classtable.ScourgeStrike].ready then
         if not setSpell then setSpell = classtable.ScourgeStrike end
     end
+    if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (runic_power.current >= 44 and ( not buff[classtable.DarkTransformationBuff].up and buff[classtable.ShadowInfusionBuff].count <5 ) or ( buff[classtable.SuddenDoomBuff].up and buff[classtable.SuddenDoomBuff].remains <buff[classtable.DarkTransformationBuff].remains )) and cooldown[classtable.DeathCoil].ready then
+        if not setSpell then setSpell = classtable.DeathCoil end
+    end
     if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and cooldown[classtable.FesteringStrike].ready then
         if not setSpell then setSpell = classtable.FesteringStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and cooldown[classtable.DeathCoil].ready then
+    if (MaxDps:CheckSpellUsable(classtable.BloodStrike, 'BloodStrike')) and (not action.festering_strike.known) and cooldown[classtable.BloodStrike].ready then
+        if not setSpell then setSpell = classtable.BloodStrike end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (not cooldown[classtable.SummonGargoyle].ready or buff[classtable.SuddenDoomBuff].up or runic_power.current >= 100) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap')) and cooldown[classtable.BloodTap].ready then
-        MaxDps:GlowCooldown(classtable.BloodTap, cooldown[classtable.BloodTap].ready)
+    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap')) and (blood_runes.current == 0 and blood_runes.time_to_1 >2) and cooldown[classtable.BloodTap].ready then
+        if not setSpell then setSpell = classtable.BloodTap end
     end
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and cooldown[classtable.EmpowerRuneWeapon].ready then
-        MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
+    if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and (not buff[classtable.HornofWinterBuff].up) and cooldown[classtable.HornofWinter].ready then
+        if not setSpell then setSpell = classtable.HornofWinter end
     end
-    if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready then
-        MaxDps:GlowCooldown(classtable.HornofWinter, cooldown[classtable.HornofWinter].ready)
+    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (blood_runes.current == 0 and frost_runes.current == 0 and unholy_runes.current == 0) and cooldown[classtable.EmpowerRuneWeapon].ready then
+        if not setSpell then setSpell = classtable.EmpowerRuneWeapon end
     end
 end
 function DeathKnight:Unholy()
@@ -268,13 +291,49 @@ function DeathKnight:Unholy()
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
+    classtable.PresenceBuff = 0
+    classtable.UnholyStrengthBuff = 53365
+    classtable.SynapseSpringsBuff = 0
+    classtable.UnholyFrenzyBuff = 49016
     classtable.bloodlust = 0
     classtable.FrostFeverDeBuff = 55095
     classtable.BloodPlagueDeBuff = 55078
-    classtable.UnholyFrenzyBuff = 0
+    classtable.RunicCorruptionBuff = 51460
+    classtable.DarkTransformationBuff = 63560
+    classtable.ShadowInfusionBuff = 91342
     classtable.SuddenDoomBuff = 81340
+    classtable.HornofWinterBuff = 0
+    classtable.UnholyPresence = 48265
+    classtable.RaiseDead = 46584
+    classtable.MindFreeze = 47528
+    classtable.DarkTransformation = 63560
+    classtable.ScourgeStrike = 55090
+    classtable.FesteringStrike = 85948
+    classtable.DeathCoil = 47541
+    classtable.UnholyFrenzy = 49016
+    classtable.Outbreak = 77575
+    classtable.SummonGargoyle = 49206
+    classtable.IcyTouch = 45477
+    classtable.PlagueStrike = 45462
+    classtable.Pestilence = 50842
+    classtable.BloodBoil = 48721
+    classtable.BloodStrike = 45902
+    classtable.BloodTap = 45529
+    classtable.EmpowerRuneWeapon = 47568
+
+    local function debugg()
+        talents[classtable.MasterofGhouls] = 1
+    end
+
+
+    if MaxDps.db.global.debugMode then
+        debugg()
+    end
+
     setSpell = nil
     ClearCDs()
+
+    Unholy:precombat()
 
     Unholy:callaction()
     if setSpell then return setSpell end

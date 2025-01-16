@@ -69,24 +69,24 @@ local RunicPowerDeficit
 
 local Frost = {}
 
-local trinket_one_sync
-local trinket_two_sync
-local trinket_one_buffs
-local trinket_two_buffs
-local trinket_one_duration
-local trinket_two_duration
+local trinket_1_sync
+local trinket_2_sync
+local trinket_1_buffs
+local trinket_2_buffs
+local trinket_1_duration
+local trinket_2_duration
 local trinket_priority
 local damage_trinket_priority
-local trinket_one_manual
-local trinket_two_manual
+local trinket_1_manual
+local trinket_2_manual
 local rw_buffs
 local breath_rp_cost
 local static_rime_buffs
-local breath_rp_threshold
-local erw_breath_rp_trigger
-local erw_breath_rune_trigger
-local oblit_rune_pooling
-local breath_rime_rp_threshold
+local breath_rp_threshold = 60
+local erw_breath_rp_trigger = 70
+local erw_breath_rune_trigger = 3
+local oblit_rune_pooling = 4
+local breath_rime_rp_threshold = 60
 local st_planning
 local adds_remain
 local sending_cds
@@ -190,10 +190,10 @@ function Frost:precombat()
     breath_rime_rp_threshold = 60
 end
 function Frost:cold_heart()
-    if (MaxDps:CheckSpellUsable(classtable.ChainsofIce, 'ChainsofIce')) and (ttd <gcd and ( Runes <2 or not buff[classtable.KillingMachineBuff].up and ( not (twoh_check() == true and 2 or 1) and buff[classtable.ColdHeartBuff].count >= 4 or (twoh_check() == true and 2 or 1) and buff[classtable.ColdHeartBuff].count >8 ) or buff[classtable.KillingMachineBuff].up and ( not (twoh_check() == true and 2 or 1) and buff[classtable.ColdHeartBuff].count >8 or (twoh_check() == true and 2 or 1) and buff[classtable.ColdHeartBuff].count >10 ) )) and cooldown[classtable.ChainsofIce].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ChainsofIce, 'ChainsofIce')) and (ttd <gcd and ( Runes <2 or not buff[classtable.KillingMachineBuff].up and ( not twoh_check() and buff[classtable.ColdHeartBuff].count >= 4 or twoh_check() and buff[classtable.ColdHeartBuff].count >8 ) or buff[classtable.KillingMachineBuff].up and ( not twoh_check() and buff[classtable.ColdHeartBuff].count >8 or twoh_check() and buff[classtable.ColdHeartBuff].count >10 ) )) and cooldown[classtable.ChainsofIce].ready then
         if not setSpell then setSpell = classtable.ChainsofIce end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ChainsofIce, 'ChainsofIce')) and (not talents[classtable.Obliteration] and buff[classtable.PillarofFrostBuff].up and buff[classtable.ColdHeartBuff].count >= 10 and ( buff[classtable.PillarofFrostBuff].remains <gcd * ( 1 + ( talents[classtable.FrostwyrmsFury] and cooldown[classtable.FrostwyrmsFury].ready and 1 or 0 ) ) or buff[classtable.UnholyStrengthBuff].up and buff[classtable.UnholyStrengthBuff].remains <gcd )) and cooldown[classtable.ChainsofIce].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ChainsofIce, 'ChainsofIce')) and (not talents[classtable.Obliteration] and buff[classtable.PillarofFrostBuff].up and buff[classtable.ColdHeartBuff].count >= 10 and ( buff[classtable.PillarofFrostBuff].remains <gcd * ( 1 + ( ( talents[classtable.FrostwyrmsFury] and cooldown[classtable.FrostwyrmsFury].ready ) and 1 or 0 ) ) or buff[classtable.UnholyStrengthBuff].up and buff[classtable.UnholyStrengthBuff].remains <gcd )) and cooldown[classtable.ChainsofIce].ready then
         if not setSpell then setSpell = classtable.ChainsofIce end
     end
     if (MaxDps:CheckSpellUsable(classtable.ChainsofIce, 'ChainsofIce')) and (not talents[classtable.Obliteration] and wep_rune_check('Rune of fallen_crusader') and not buff[classtable.PillarofFrostBuff].up and cooldown[classtable.PillarofFrost].remains >15 and ( buff[classtable.ColdHeartBuff].count >= 10 and buff[classtable.UnholyStrengthBuff].up or buff[classtable.ColdHeartBuff].count >= 13 )) and cooldown[classtable.ChainsofIce].ready then
@@ -242,7 +242,7 @@ function Frost:obliteration()
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.KillingMachineBuff].count <2 and buff[classtable.PillarofFrostBuff].remains <gcd and rime_buffs) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.GlacialAdvance, 'GlacialAdvance')) and (buff[classtable.KillingMachineBuff].count <2 and buff[classtable.PillarofFrostBuff].remains <gcd and not buff[classtable.DeathandDecayBuff].up and ga_priority) and cooldown[classtable.GlacialAdvance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.GlacialAdvance, 'GlacialAdvance') and talents[classtable.GlacialAdvance]) and (buff[classtable.KillingMachineBuff].count <2 and buff[classtable.PillarofFrostBuff].remains <gcd and not buff[classtable.DeathandDecayBuff].up and ga_priority) and cooldown[classtable.GlacialAdvance].ready then
         if not setSpell then setSpell = classtable.GlacialAdvance end
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (buff[classtable.KillingMachineBuff].count <2 and buff[classtable.PillarofFrostBuff].remains <gcd and not buff[classtable.DeathandDecayBuff].up) and cooldown[classtable.FrostStrike].ready then
@@ -260,7 +260,7 @@ function Frost:obliteration()
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (not buff[classtable.KillingMachineBuff].up and ( not debuff[classtable.FrostFeverDeBuff].up )) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.GlacialAdvance, 'GlacialAdvance')) and (( ga_priority or debuff[classtable.RazoriceDeBuff].count <5 ) and ( not wep_rune_check('Rune of Razorice') and ( debuff[classtable.RazoriceDeBuff].count <5 or debuff[classtable.RazoriceDeBuff].remains <gcd * 3 ) or ( ( rp_buffs or Runes <2 ) and targets >1 ) )) and cooldown[classtable.GlacialAdvance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.GlacialAdvance, 'GlacialAdvance') and talents[classtable.GlacialAdvance]) and (( ga_priority or debuff[classtable.RazoriceDeBuff].count <5 ) and ( not wep_rune_check('Rune of Razorice') and ( debuff[classtable.RazoriceDeBuff].count <5 or debuff[classtable.RazoriceDeBuff].remains <gcd * 3 ) or ( ( rp_buffs or Runes <2 ) and targets >1 ) )) and cooldown[classtable.GlacialAdvance].ready then
         if not setSpell then setSpell = classtable.GlacialAdvance end
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (( Runes <2 or rp_buffs or debuff[classtable.RazoriceDeBuff].count == 5 and talents[classtable.ShatteringBlade] ) and not pooling_runic_power and ( not talents[classtable.GlacialAdvance] or targets == 1 or talents[classtable.ShatteredFrost] )) and cooldown[classtable.FrostStrike].ready then
@@ -272,7 +272,7 @@ function Frost:obliteration()
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (not pooling_runic_power and ( not talents[classtable.GlacialAdvance] or targets == 1 or talents[classtable.ShatteredFrost] )) and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.GlacialAdvance, 'GlacialAdvance')) and (not pooling_runic_power and ga_priority) and cooldown[classtable.GlacialAdvance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.GlacialAdvance, 'GlacialAdvance') and talents[classtable.GlacialAdvance]) and (not pooling_runic_power and ga_priority) and cooldown[classtable.GlacialAdvance].ready then
         if not setSpell then setSpell = classtable.GlacialAdvance end
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (not pooling_runic_power) and cooldown[classtable.FrostStrike].ready then
@@ -301,7 +301,7 @@ function Frost:aoe()
     if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (buff[classtable.KillingMachineBuff].count >0) and cooldown[classtable.Obliterate].ready then
         if not setSpell then setSpell = classtable.Obliterate end
     end
-    if (MaxDps:CheckSpellUsable(classtable.GlacialAdvance, 'GlacialAdvance')) and (not pooling_runic_power and ( ga_priority or debuff[classtable.RazoriceDeBuff].count <5 )) and cooldown[classtable.GlacialAdvance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.GlacialAdvance, 'GlacialAdvance') and talents[classtable.GlacialAdvance]) and (not pooling_runic_power and ( ga_priority or debuff[classtable.RazoriceDeBuff].count <5 )) and cooldown[classtable.GlacialAdvance].ready then
         if not setSpell then setSpell = classtable.GlacialAdvance end
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (not pooling_runic_power) and cooldown[classtable.FrostStrike].ready then
@@ -336,13 +336,13 @@ function Frost:single_target()
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (not pooling_runic_power and ( rp_buffs or ( not talents[classtable.ShatteringBlade] and RunicPowerDeficit <20 ) )) and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up and ( not talents[classtable.BreathofSindragosa] or talents[classtable.RageoftheFrozenChampion] or cooldown[classtable.BreathofSindragosa].ready==false )) and cooldown[classtable.HowlingBlast].ready then
+    if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up and ( not talents[classtable.BreathofSindragosa] or talents[classtable.RageoftheFrozenChampion] or not cooldown[classtable.BreathofSindragosa].ready )) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (not pooling_runic_power and not ( (twoh_check() == true and 2 or 1) or talents[classtable.ShatteringBlade] )) and cooldown[classtable.FrostStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (not pooling_runic_power and not ( twoh_check() or talents[classtable.ShatteringBlade] )) and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (not pooling_runes and (twoh_check() == true and 2 or 1)) and cooldown[classtable.Obliterate].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (not pooling_runes and twoh_check()) and cooldown[classtable.Obliterate].ready then
         if not setSpell then setSpell = classtable.Obliterate end
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (not pooling_runic_power) and cooldown[classtable.FrostStrike].ready then
@@ -381,7 +381,7 @@ function Frost:callaction()
     adds_remain = targets >1
     sending_cds = ( st_planning or adds_remain )
     rime_buffs = buff[classtable.RimeBuff].up and ( static_rime_buffs or talents[classtable.Avalanche] and not talents[classtable.ArcticAssault] and debuff[classtable.RazoriceDeBuff].count <5 )
-    rp_buffs = talents[classtable.UnleashedFrenzy] and ( buff[classtable.UnleashedFrenzyBuff].remains <gcd * 3 or buff[classtable.UnleashedFrenzyBuff].count <3 ) or talents[classtable.IcyTalons] and ( buff[classtable.IcyTalonsBuff].remains <gcd * 3 or buff[classtable.IcyTalonsBuff].count <( 3 + ( 2 * (talents[classtable.Smotheringoffense] and talents[classtable.Smotheringoffense] or 0) ) + ( 2 * (talents[classtable.DarkTalons] and talents[classtable.DarkTalons] or 0) ) ) )
+    rp_buffs = talents[classtable.UnleashedFrenzy] and ( buff[classtable.UnleashedFrenzyBuff].remains <gcd * 3 or buff[classtable.UnleashedFrenzyBuff].count <3 ) or talents[classtable.IcyTalons] and ( buff[classtable.IcyTalonsBuff].remains <gcd * 3 or buff[classtable.IcyTalonsBuff].count <( 3 + ( 2 * (talents[classtable.SmotheringOffense] and talents[classtable.SmotheringOffense] or 0) ) + ( 2 * (talents[classtable.DarkTalons] and talents[classtable.DarkTalons] or 0) ) ) )
     cooldown_check = talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up and ( talents[classtable.Obliteration] and buff[classtable.PillarofFrostBuff].remains >10 or not talents[classtable.Obliteration] ) or not talents[classtable.PillarofFrost] and buff[classtable.EmpowerRuneWeaponBuff].up or not talents[classtable.PillarofFrost] and not talents[classtable.EmpowerRuneWeapon] or targets >= 2 and buff[classtable.PillarofFrostBuff].up
     if cooldown[classtable.BreathofSindragosa].remains >cooldown[classtable.PillarofFrost].remains then
         true_breath_cooldown = cooldown[classtable.BreathofSindragosa].remains
@@ -399,11 +399,11 @@ function Frost:callaction()
         breath_pooling_time = 2
     end
     pooling_runes = Runes <oblit_rune_pooling and talents[classtable.Obliteration] and ( not talents[classtable.BreathofSindragosa] or true_breath_cooldown >0 ) and cooldown[classtable.PillarofFrost].remains <oblit_pooling_time
-    pooling_runic_power = talents[classtable.BreathofSindragosa] and ( true_breath_cooldown <breath_pooling_time or ttd <30 and not cooldown[classtable.BreathofSindragosa].ready==false ) or talents[classtable.Obliteration] and ( not talents[classtable.BreathofSindragosa] or cooldown[classtable.BreathofSindragosa].remains >30 ) and RunicPower <35 and cooldown[classtable.PillarofFrost].remains <oblit_pooling_time
+    pooling_runic_power = talents[classtable.BreathofSindragosa] and ( true_breath_cooldown <breath_pooling_time or ttd <30 and cooldown[classtable.BreathofSindragosa].ready ) or talents[classtable.Obliteration] and ( not talents[classtable.BreathofSindragosa] or cooldown[classtable.BreathofSindragosa].remains >30 ) and RunicPower <35 and cooldown[classtable.PillarofFrost].remains <oblit_pooling_time
     ga_priority = ( not talents[classtable.ShatteredFrost] and talents[classtable.ShatteringBlade] and targets >= 4 ) or ( not talents[classtable.ShatteredFrost] and not talents[classtable.ShatteringBlade] and targets >= 2 )
     breath_dying = RunicPower <breath_rp_cost * 2 * gcd and DeathKnight:TimeToRunes(2) >RunicPower % breath_rp_cost
     fwf_buffs = ( buff[classtable.PillarofFrostBuff].remains <gcd or ( buff[classtable.UnholyStrengthBuff].up and buff[classtable.UnholyStrengthBuff].remains <gcd ) or ( (talents[classtable.Bonegrinder] and talents[classtable.Bonegrinder] or 0) == 2 and buff[classtable.BonegrinderFrostBuff].up and buff[classtable.BonegrinderFrostBuff].remains <gcd ) ) and ( targets >1 or debuff[classtable.RazoriceDeBuff].count == 5 or not wep_rune_check('Rune of Razorice') and ( not talents[classtable.GlacialAdvance] or not talents[classtable.Avalanche] or not talents[classtable.ArcticAssault] ) or talents[classtable.ShatteringBlade] )
-    if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (not debuff[classtable.FrostFeverDeBuff].up and targets >= 2 and ( not talents[classtable.Obliteration] or talents[classtable.WitherAway] or talents[classtable.Obliteration] and ( not cooldown[classtable.PillarofFrost].ready or buff[classtable.PillarofFrostBuff].up and not buff[classtable.KillingMachineBuff].up ) )) and cooldown[classtable.HowlingBlast].ready then
+    if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (not debuff[classtable.FrostFeverDeBuff].up and targets >= 2 and ( not talents[classtable.BreathofSindragosa] or not buff[classtable.BreathofSindragosaBuff].up ) and ( not talents[classtable.Obliteration] or talents[classtable.WitherAway] or talents[classtable.Obliteration] and ( not cooldown[classtable.PillarofFrost].ready or buff[classtable.PillarofFrostBuff].up and not buff[classtable.KillingMachineBuff].up ) )) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
     end
     if (MaxDps:CheckSpellUsable(classtable.AbominationLimb, 'AbominationLimb')) and (talents[classtable.Obliteration] and not buff[classtable.PillarofFrostBuff].up and sending_cds and ( not (MaxDps.ActiveHeroTree == 'deathbringer') or cooldown[classtable.ReapersMark].remains <5 ) or MaxDps:boss() and ttd <15) and cooldown[classtable.AbominationLimb].ready then
@@ -418,40 +418,40 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.ChillStreak, 'ChillStreak')) and (sending_cds and ( not talents[classtable.ArcticAssault] or not buff[classtable.PillarofFrostBuff].up )) and cooldown[classtable.ChillStreak].ready then
         MaxDps:GlowCooldown(classtable.ChillStreak, cooldown[classtable.ChillStreak].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (talents[classtable.Obliteration] and not talents[classtable.BreathofSindragosa] and buff[classtable.PillarofFrostBuff].up or MaxDps:boss() and ttd <20) and cooldown[classtable.EmpowerRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon') and talents[classtable.EmpowerRuneWeapon]) and (talents[classtable.Obliteration] and not talents[classtable.BreathofSindragosa] and buff[classtable.PillarofFrostBuff].up or MaxDps:boss() and ttd <20) and cooldown[classtable.EmpowerRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (buff[classtable.BreathofSindragosaBuff].up and ( RunicPower <40 or RunicPower <erw_breath_rp_trigger and Runes <erw_breath_rune_trigger )) and cooldown[classtable.EmpowerRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon') and talents[classtable.EmpowerRuneWeapon]) and (buff[classtable.BreathofSindragosaBuff].up and ( RunicPower <40 or RunicPower <erw_breath_rp_trigger and Runes <erw_breath_rune_trigger )) and cooldown[classtable.EmpowerRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (not talents[classtable.BreathofSindragosa] and not talents[classtable.Obliteration] and not buff[classtable.EmpowerRuneWeaponBuff].up and Runes <5 and ( cooldown[classtable.PillarofFrost].remains <7 or buff[classtable.PillarofFrostBuff].up or not talents[classtable.PillarofFrost] )) and cooldown[classtable.EmpowerRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon') and talents[classtable.EmpowerRuneWeapon]) and (not talents[classtable.BreathofSindragosa] and not talents[classtable.Obliteration] and not buff[classtable.EmpowerRuneWeaponBuff].up and Runes <5 and ( cooldown[classtable.PillarofFrost].remains <7 or buff[classtable.PillarofFrostBuff].up or not talents[classtable.PillarofFrost] )) and cooldown[classtable.EmpowerRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost')) and (talents[classtable.Obliteration] and not talents[classtable.BreathofSindragosa] and sending_cds or MaxDps:boss() and ttd <20) and cooldown[classtable.PillarofFrost].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost') and talents[classtable.PillarofFrost]) and (talents[classtable.Obliteration] and not talents[classtable.BreathofSindragosa] and sending_cds or MaxDps:boss() and ttd <20) and cooldown[classtable.PillarofFrost].ready then
         MaxDps:GlowCooldown(classtable.PillarofFrost, cooldown[classtable.PillarofFrost].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost')) and (talents[classtable.BreathofSindragosa] and sending_cds and cooldown[classtable.BreathofSindragosa].ready==false and buff[classtable.UnleashedFrenzyBuff].up and ( not (MaxDps.ActiveHeroTree == 'deathbringer') or Runes >1 )) and cooldown[classtable.PillarofFrost].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost') and talents[classtable.PillarofFrost]) and (talents[classtable.BreathofSindragosa] and sending_cds and not cooldown[classtable.BreathofSindragosa].ready and buff[classtable.UnleashedFrenzyBuff].up and ( not (MaxDps.ActiveHeroTree == 'deathbringer') or Runes >1 )) and cooldown[classtable.PillarofFrost].ready then
         MaxDps:GlowCooldown(classtable.PillarofFrost, cooldown[classtable.PillarofFrost].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost')) and (not talents[classtable.Obliteration] and not talents[classtable.BreathofSindragosa] and sending_cds) and cooldown[classtable.PillarofFrost].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost') and talents[classtable.PillarofFrost]) and (not talents[classtable.Obliteration] and not talents[classtable.BreathofSindragosa] and sending_cds) and cooldown[classtable.PillarofFrost].ready then
         MaxDps:GlowCooldown(classtable.PillarofFrost, cooldown[classtable.PillarofFrost].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.BreathofSindragosa, 'BreathofSindragosa')) and (not buff[classtable.BreathofSindragosaBuff].up and RunicPower >breath_rp_threshold and ( Runes <2 or RunicPower >80 ) and ( ( buff[classtable.PillarofFrostBuff].up or cooldown[classtable.PillarofFrost].remains >30 or cooldown[classtable.PillarofFrost].ready ) and sending_cds or ttd <30 ) or ( timeInCombat <10 and Runes <1 )) and cooldown[classtable.BreathofSindragosa].ready then
+    if (MaxDps:CheckSpellUsable(classtable.BreathofSindragosa, 'BreathofSindragosa') and talents[classtable.BreathofSindragosa]) and (not buff[classtable.BreathofSindragosaBuff].up and RunicPower >breath_rp_threshold and ( Runes <2 or RunicPower >80 ) and ( ( buff[classtable.PillarofFrostBuff].up or cooldown[classtable.PillarofFrost].remains >30 or cooldown[classtable.PillarofFrost].ready ) and sending_cds or ttd <30 ) or ( timeInCombat <10 and Runes <1 )) and cooldown[classtable.BreathofSindragosa].ready then
         MaxDps:GlowCooldown(classtable.BreathofSindragosa, cooldown[classtable.BreathofSindragosa].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.ReapersMark, 'ReapersMark')) and (( MaxDps:boss() or ttd >13 ) and not debuff[classtable.ReapersMarkDebuffDeBuff].up and ( buff[classtable.PillarofFrostBuff].up or cooldown[classtable.PillarofFrost].remains >5 )) and cooldown[classtable.ReapersMark].ready then
         MaxDps:GlowCooldown(classtable.ReapersMark, cooldown[classtable.ReapersMark].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and ((MaxDps.ActiveHeroTree == 'rideroftheapocalypse') and talents[classtable.ApocalypseNow] and sending_cds and ( not talents[classtable.BreathofSindragosa] and buff[classtable.PillarofFrostBuff].up or buff[classtable.BreathofSindragosaBuff].up ) or MaxDps:boss() and ttd <20) and cooldown[classtable.FrostwyrmsFury].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury') and talents[classtable.FrostwyrmsFury]) and ((MaxDps.ActiveHeroTree == 'rideroftheapocalypse') and talents[classtable.ApocalypseNow] and sending_cds and ( not talents[classtable.BreathofSindragosa] and buff[classtable.PillarofFrostBuff].up or buff[classtable.BreathofSindragosaBuff].up ) or MaxDps:boss() and ttd <20) and cooldown[classtable.FrostwyrmsFury].ready then
         MaxDps:GlowCooldown(classtable.FrostwyrmsFury, cooldown[classtable.FrostwyrmsFury].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and (not talents[classtable.ApocalypseNow] and targets == 1 and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up and not talents[classtable.Obliteration] or not talents[classtable.PillarofFrost] ) and ( (targets <2) or math.huge >cooldown[classtable.FrostwyrmsFury].duration + (targets>1 and MaxDps:MaxAddDuration() or 0) ) and fwf_buffs or ttd <3) and cooldown[classtable.FrostwyrmsFury].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury') and talents[classtable.FrostwyrmsFury]) and (not talents[classtable.ApocalypseNow] and targets == 1 and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up and not talents[classtable.Obliteration] or not talents[classtable.PillarofFrost] ) and ( (targets <2) or math.huge >cooldown[classtable.FrostwyrmsFury].duration + (targets>1 and MaxDps:MaxAddDuration() or 0) ) and fwf_buffs or ttd <3) and cooldown[classtable.FrostwyrmsFury].ready then
         MaxDps:GlowCooldown(classtable.FrostwyrmsFury, cooldown[classtable.FrostwyrmsFury].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and (not talents[classtable.ApocalypseNow] and targets >= 2 and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up or (targets >1) and (targets >1) and math.huge <cooldown[classtable.PillarofFrost].remains - math.huge - (targets>1 and MaxDps:MaxAddDuration() or 0) ) and fwf_buffs) and cooldown[classtable.FrostwyrmsFury].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury') and talents[classtable.FrostwyrmsFury]) and (not talents[classtable.ApocalypseNow] and targets >= 2 and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up or (targets >1) and (targets >1) and math.huge <cooldown[classtable.PillarofFrost].remains - math.huge - (targets>1 and MaxDps:MaxAddDuration() or 0) ) and fwf_buffs) and cooldown[classtable.FrostwyrmsFury].ready then
         MaxDps:GlowCooldown(classtable.FrostwyrmsFury, cooldown[classtable.FrostwyrmsFury].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury')) and (not talents[classtable.ApocalypseNow] and talents[classtable.Obliteration] and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up and not twoh_check() or not buff[classtable.PillarofFrostBuff].up and (twoh_check() == true and 2 or 1) and cooldown[classtable.PillarofFrost].ready==false or not talents[classtable.PillarofFrost] ) and fwf_buffs and ( (targets <2) or math.huge >cooldown[classtable.FrostwyrmsFury].duration + (targets>1 and MaxDps:MaxAddDuration() or 0) )) and cooldown[classtable.FrostwyrmsFury].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury') and talents[classtable.FrostwyrmsFury]) and (not talents[classtable.ApocalypseNow] and talents[classtable.Obliteration] and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up and not twoh_check() or not buff[classtable.PillarofFrostBuff].up and twoh_check() and not cooldown[classtable.PillarofFrost].ready or not talents[classtable.PillarofFrost] ) and fwf_buffs and ( (targets <2) or math.huge >cooldown[classtable.FrostwyrmsFury].duration + (targets>1 and MaxDps:MaxAddDuration() or 0) )) and cooldown[classtable.FrostwyrmsFury].ready then
         MaxDps:GlowCooldown(classtable.FrostwyrmsFury, cooldown[classtable.FrostwyrmsFury].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (buff[classtable.PillarofFrostBuff].up) and cooldown[classtable.RaiseDead].ready then
@@ -472,7 +472,7 @@ function Frost:callaction()
     if (talents[classtable.ColdHeart] and ( not buff[classtable.KillingMachineBuff].up or talents[classtable.BreathofSindragosa] ) and ( ( debuff[classtable.RazoriceDeBuff].count == 5 or not wep_rune_check('Rune of Razorice') and not talents[classtable.GlacialAdvance] and not talents[classtable.Avalanche] and not talents[classtable.ArcticAssault] ) or MaxDps:boss() and ttd <= gcd )) then
         Frost:cold_heart()
     end
-    if (buff[classtable.BreathofSindragosaBuff].up or buff[classtable.BreathofSindragosaBuff].duration >0) then
+    if (buff[classtable.BreathofSindragosaBuff].up or buff[classtable.BreathofSindragosaBuff].remaining >0) then
         Frost:breath()
     end
     if (talents[classtable.Obliteration] and buff[classtable.PillarofFrostBuff].up and not buff[classtable.BreathofSindragosaBuff].up) then
@@ -534,10 +534,39 @@ function DeathKnight:Frost()
     classtable.AFeastofSoulsBuff = 440861
     classtable.UnleashedFrenzyBuff = 376907
     classtable.IcyTalonsBuff = 194879
+    classtable.BreathofSindragosaBuff = 152279
     classtable.GatheringStormBuff = 194912
     classtable.RemorselessWinterBuff = 196770
-    classtable.BreathofSindragosaBuff = 152279
     classtable.ReapersMarkDebuffDeBuff = 439594
+
+    local function debugg()
+        talents[classtable.PillarofFrost] = 1
+        talents[classtable.Obliteration] = 1
+        talents[classtable.BreathofSindragosa] = 1
+        talents[classtable.WitherAway] = 1
+        talents[classtable.EmpowerRuneWeapon] = 1
+        talents[classtable.ArcticAssault] = 1
+        talents[classtable.ApocalypseNow] = 1
+        talents[classtable.EnduringStrength] = 1
+        talents[classtable.TheLongWinter] = 1
+        talents[classtable.CleavingStrikes] = 1
+        talents[classtable.ColdHeart] = 1
+        talents[classtable.GlacialAdvance] = 1
+        talents[classtable.Avalanche] = 1
+        talents[classtable.FrostwyrmsFury] = 1
+        talents[classtable.UnholyGround] = 1
+        talents[classtable.ShatteringBlade] = 1
+        talents[classtable.AFeastofSouls] = 1
+        talents[classtable.ShatteredFrost] = 1
+        talents[classtable.Icebreaker] = 1
+        talents[classtable.RageoftheFrozenChampion] = 1
+    end
+
+
+    --if MaxDps.db.global.debugMode then
+    --   debugg()
+    --end
+
     setSpell = nil
     ClearCDs()
 

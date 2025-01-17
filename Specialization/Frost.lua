@@ -472,7 +472,7 @@ function Frost:callaction()
     if (talents[classtable.ColdHeart] and ( not buff[classtable.KillingMachineBuff].up or talents[classtable.BreathofSindragosa] ) and ( ( debuff[classtable.RazoriceDeBuff].count == 5 or not wep_rune_check('Rune of Razorice') and not talents[classtable.GlacialAdvance] and not talents[classtable.Avalanche] and not talents[classtable.ArcticAssault] ) or MaxDps:boss() and ttd <= gcd )) then
         Frost:cold_heart()
     end
-    if (buff[classtable.BreathofSindragosaBuff].up or buff[classtable.BreathofSindragosaBuff].remaining >0) then
+    if (buff[classtable.BreathofSindragosaBuff].up or buff[classtable.BreathofSindragosaBuff].remains >0) then
         Frost:breath()
     end
     if (talents[classtable.Obliteration] and buff[classtable.PillarofFrostBuff].up and not buff[classtable.BreathofSindragosaBuff].up) then

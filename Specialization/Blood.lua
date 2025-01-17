@@ -202,7 +202,7 @@ function Blood:deathbringer()
     if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (( debuff[classtable.ReapersMarkDeBuff].up and ( ( UnitExists('pet') and UnitName('pet')  == 'dancing_rune_weapon' ) and debuff[classtable.BloodPlagueDeBuff].count <2 ) ) or not debuff[classtable.BloodPlagueDeBuff].up or ( cooldown[classtable.BloodBoil].charges >= 1 and debuff[classtable.ReapersMarkDeBuff].up and buff[classtable.CoagulopathyBuff].remains >2 * gcd )) and cooldown[classtable.BloodBoil].ready then
         if not setSpell then setSpell = classtable.BloodBoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (( ( debuff[classtable.ReapersMarkDeBuff].up ) and not debuff[classtable.DeathandDecayDebuff].up ) or not buff[classtable.DeathandDecayBuff].up) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (( ( debuff[classtable.ReapersMarkDeBuff].up ) and not buff[classtable.DeathandDecayBuff].up ) or not buff[classtable.DeathandDecayBuff].up) and cooldown[classtable.DeathandDecay].ready then
         if not setSpell then setSpell = classtable.DeathandDecay end
     end
     if (MaxDps:CheckSpellUsable(classtable.Marrowrend, 'Marrowrend')) and (buff[classtable.ExterminateBuff].up and ( RunicPowerDeficit >20 and buff[classtable.CoagulopathyBuff].remains >2 * gcd )) and cooldown[classtable.Marrowrend].ready then
@@ -422,7 +422,6 @@ function DeathKnight:Blood()
     classtable.BloodPlagueDeBuff = 55078
     classtable.ReaperofSoulsBuff = 440002
     classtable.SoulReaperDeBuff = 343294
-    classtable.DeathandDecayDebuff = 52212
     classtable.DeathandDecayBuff = 188290
     classtable.ExterminateBuff = 441378
     classtable.DancingRuneWeaponBuff = 81256

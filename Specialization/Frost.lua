@@ -225,7 +225,7 @@ function Frost:breath()
     if (MaxDps:CheckSpellUsable(classtable.RemorselessWinter, 'RemorselessWinter')) and (breath_dying) and cooldown[classtable.RemorselessWinter].ready then
         if not setSpell then setSpell = classtable.RemorselessWinter end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (not debuff[classtable.DeathandDecayDebuff].up and ( st_planning and talents[classtable.UnholyGround] and RunicPowerDeficit >= 10 and not talents[classtable.Obliteration] or breath_dying )) and cooldown[classtable.DeathandDecay].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (not buff[classtable.DeathandDecayBuff].up and ( st_planning and talents[classtable.UnholyGround] and RunicPowerDeficit >= 10 and not talents[classtable.Obliteration] or breath_dying )) and cooldown[classtable.DeathandDecay].ready then
         if not setSpell then setSpell = classtable.DeathandDecay end
     end
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (breath_dying) and cooldown[classtable.HowlingBlast].ready then
@@ -526,10 +526,9 @@ function DeathKnight:Frost()
     classtable.BonegrinderFrostBuff = 377098
     classtable.FrostFeverDeBuff = 55095
     classtable.EmpowerRuneWeaponBuff = 47568
-    classtable.DeathandDecayDebuff = 52212
+    classtable.DeathandDecayBuff = 188290
     classtable.RimeBuff = 59052
     classtable.ExterminateBuff = 441378
-    classtable.DeathandDecayBuff = 188290
     classtable.RazoriceDeBuff = 51714
     classtable.AFeastofSoulsBuff = 440861
     classtable.UnleashedFrenzyBuff = 376907

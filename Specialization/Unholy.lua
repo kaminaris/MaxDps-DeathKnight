@@ -564,7 +564,7 @@ function DeathKnight:Unholy()
     --end
     classtable.FesteringScytheBuff = 458123
     classtable.FesteringWoundDeBuff = 194310
-    classtable.DeathandDecayBuff = not talents[classtable.Defile] and 188290 or 152280
+    classtable.DeathandDecayBuff = 188290
     classtable.ChainsofIceTrollbaneSlowDeBuff = 444826
     classtable.VampiricStrikeBuff = 433901
     classtable.VirulentPlagueDeBuff = 191587

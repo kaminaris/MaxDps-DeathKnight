@@ -69,8 +69,8 @@ local RunicPowerDeficit
 
 local Blood = {}
 
-local trinket_one_buffs
-local trinket_two_buffs
+local trinket_1_buffs
+local trinket_2_buffs
 local damage_trinket_priority
 local death_strike_dump_amount
 local bone_shield_refresh_value
@@ -190,8 +190,8 @@ function Blood:deathbringer()
     if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (debuff[classtable.ReapersMarkDeBuff].up and cooldown[classtable.BloodBoil].charges >= 1.5) and cooldown[classtable.BloodBoil].ready then
         if not setSpell then setSpell = classtable.BloodBoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Consumption, 'Consumption')) and (debuff[classtable.ReapersMarkDeBuff].up and debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.Consumption].ready then
-        if not setSpell then setSpell = classtable.Consumption end
+    if (MaxDps:CheckSpellUsable(classtable.Consumption, 'Consumption') and talents[classtable.Consumption]) and (debuff[classtable.ReapersMarkDeBuff].up and debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.Consumption].ready then
+        MaxDps:GlowCooldown(classtable.Consumption, cooldown[classtable.Consumption].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (buff[classtable.ReaperofSoulsBuff].up and buff[classtable.CoagulopathyBuff].remains >1 * gcd) and cooldown[classtable.SoulReaper].ready then
         if not setSpell then setSpell = classtable.SoulReaper end
@@ -226,7 +226,7 @@ function Blood:deathbringer()
     if (MaxDps:CheckSpellUsable(classtable.Blooddrinker, 'Blooddrinker')) and (buff[classtable.CoagulopathyBuff].remains >3 * gcd and not buff[classtable.DancingRuneWeaponBuff].up) and cooldown[classtable.Blooddrinker].ready then
         MaxDps:GlowCooldown(classtable.Blooddrinker, cooldown[classtable.Blooddrinker].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.DancingRuneWeapon, 'DancingRuneWeapon')) and (buff[classtable.CoagulopathyBuff].remains >2 * gcd) and cooldown[classtable.DancingRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DancingRuneWeapon, 'DancingRuneWeapon') and talents[classtable.DancingRuneWeapon]) and (buff[classtable.CoagulopathyBuff].remains >2 * gcd) and cooldown[classtable.DancingRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.DancingRuneWeapon, cooldown[classtable.DancingRuneWeapon].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.Bonestorm, 'Bonestorm')) and (buff[classtable.DeathandDecayBuff].up and buff[classtable.BoneShieldBuff].count >5 and cooldown[classtable.DancingRuneWeapon].remains >= 10) and cooldown[classtable.Bonestorm].ready then
@@ -241,8 +241,8 @@ function Blood:deathbringer()
     if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (cooldown[classtable.BloodBoil].charges >= 1.5 or ( DeathKnight:TimeToRunes(5) <= gcd )) and cooldown[classtable.BloodBoil].ready then
         if not setSpell then setSpell = classtable.BloodBoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Consumption, 'Consumption')) and cooldown[classtable.Consumption].ready then
-        if not setSpell then setSpell = classtable.Consumption end
+    if (MaxDps:CheckSpellUsable(classtable.Consumption, 'Consumption') and talents[classtable.Consumption]) and cooldown[classtable.Consumption].ready then
+        MaxDps:GlowCooldown(classtable.Consumption, cooldown[classtable.Consumption].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (RunicPowerDeficit <= heart_strike_rp_drw or RunicPower >= death_strike_dump_amount) and cooldown[classtable.DeathStrike].ready then
         if not setSpell then setSpell = classtable.DeathStrike end
@@ -274,8 +274,8 @@ function Blood:sanlayn()
     if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (not debuff[classtable.BloodPlagueDeBuff].up or ( debuff[classtable.BloodPlagueDeBuff].remains <10 and buff[classtable.DancingRuneWeaponBuff].up )) and cooldown[classtable.BloodBoil].ready then
         if not setSpell then setSpell = classtable.BloodBoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Consumption, 'Consumption')) and (( UnitExists('pet') and UnitName('pet')  == 'dancing_rune_weapon' ) and GetTotemDuration('dancing_rune_weapon') <= 3) and cooldown[classtable.Consumption].ready then
-        if not setSpell then setSpell = classtable.Consumption end
+    if (MaxDps:CheckSpellUsable(classtable.Consumption, 'Consumption') and talents[classtable.Consumption]) and (( UnitExists('pet') and UnitName('pet')  == 'dancing_rune_weapon' ) and GetTotemDuration('dancing_rune_weapon') <= 3) and cooldown[classtable.Consumption].ready then
+        MaxDps:GlowCooldown(classtable.Consumption, cooldown[classtable.Consumption].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.Bonestorm, 'Bonestorm')) and (( buff[classtable.DeathandDecayBuff].up ) and buff[classtable.BoneShieldBuff].count >5 and cooldown[classtable.DancingRuneWeapon].remains >= 25) and cooldown[classtable.Bonestorm].ready then
         if not setSpell then setSpell = classtable.Bonestorm end
@@ -301,7 +301,7 @@ function Blood:sanlayn()
     if (MaxDps:CheckSpellUsable(classtable.Tombstone, 'Tombstone')) and (( not buff[classtable.DancingRuneWeaponBuff].up and buff[classtable.DeathandDecayBuff].up ) and buff[classtable.BoneShieldBuff].count >5 and RunicPowerDeficit >= 30 and cooldown[classtable.DancingRuneWeapon].remains >= 25 and buff[classtable.CoagulopathyBuff].remains >2 * gcd) and cooldown[classtable.Tombstone].ready then
         MaxDps:GlowCooldown(classtable.Tombstone, cooldown[classtable.Tombstone].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.DancingRuneWeapon, 'DancingRuneWeapon')) and (buff[classtable.CoagulopathyBuff].remains >= 2 * gcd and ( not buff[classtable.EssenceoftheBloodQueenBuff].up or buff[classtable.EssenceoftheBloodQueenBuff].remains >= 3 * gcd ) and ( not buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.DancingRuneWeaponBuff].remains >= 6 * gcd )) and cooldown[classtable.DancingRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DancingRuneWeapon, 'DancingRuneWeapon') and talents[classtable.DancingRuneWeapon]) and (buff[classtable.CoagulopathyBuff].remains >= 2 * gcd and ( not buff[classtable.EssenceoftheBloodQueenBuff].up or buff[classtable.EssenceoftheBloodQueenBuff].remains >= 3 * gcd ) and ( not buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.DancingRuneWeaponBuff].remains >= 6 * gcd )) and cooldown[classtable.DancingRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.DancingRuneWeapon, cooldown[classtable.DancingRuneWeapon].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (not buff[classtable.VampiricStrikeBuff].up and cooldown[classtable.DancingRuneWeapon].remains <= 30 and RunicPower >death_strike_pre_essence_dump_amount and buff[classtable.EssenceoftheBloodQueenBuff].count >= 3) and cooldown[classtable.DeathStrike].ready then
@@ -319,10 +319,10 @@ function Blood:sanlayn()
     if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (buff[classtable.DancingRuneWeaponBuff].up and ( buff[classtable.CoagulopathyBuff].remains <2 * gcd or ( RunicPowerDeficit <= heart_strike_rp_drw and buff[classtable.InciteTerrorBuff].count >= 3 ) )) and cooldown[classtable.DeathStrike].ready then
         if not setSpell then setSpell = classtable.DeathStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.HeartStrike, 'HeartStrike')) and (buff[classtable.VampiricStrikeBuff].up or buff[classtable.InflictionofSorrowBuff].up and ( ( talents[classtable.Consumption] and buff[classtable.ConsumptionBuff].up ) or not talents[classtable.Consumption] ) and debuff[classtable.BloodPlagueDeBuff].up and debuff[classtable.BloodPlagueDeBuff].remains >20) and cooldown[classtable.HeartStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.HeartStrike, 'HeartStrike')) and (buff[classtable.VampiricStrikeBuff].up or buff[classtable.InflictionofSorrowBuff].up and ( ( (talents[classtable.Consumption] and true or false) and buff[classtable.ConsumptionBuff].up ) or not (talents[classtable.Consumption] and true or false) ) and debuff[classtable.BloodPlagueDeBuff].up and debuff[classtable.BloodPlagueDeBuff].remains >20) and cooldown[classtable.HeartStrike].ready then
         if not setSpell then setSpell = classtable.HeartStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DancingRuneWeapon, 'DancingRuneWeapon')) and (buff[classtable.CoagulopathyBuff].up) and cooldown[classtable.DancingRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DancingRuneWeapon, 'DancingRuneWeapon') and talents[classtable.DancingRuneWeapon]) and (buff[classtable.CoagulopathyBuff].up) and cooldown[classtable.DancingRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.DancingRuneWeapon, cooldown[classtable.DancingRuneWeapon].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (RunicPowerDeficit <= heart_strike_rp_drw or RunicPower >= death_strike_dump_amount) and cooldown[classtable.DeathStrike].ready then
@@ -331,8 +331,8 @@ function Blood:sanlayn()
     if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (cooldown[classtable.BloodBoil].charges >= 2 or ( DeathKnight:TimeToRunes(5) <= gcd )) and cooldown[classtable.BloodBoil].ready then
         if not setSpell then setSpell = classtable.BloodBoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Consumption, 'Consumption')) and (cooldown[classtable.DancingRuneWeapon].remains >20) and cooldown[classtable.Consumption].ready then
-        if not setSpell then setSpell = classtable.Consumption end
+    if (MaxDps:CheckSpellUsable(classtable.Consumption, 'Consumption') and talents[classtable.Consumption]) and (cooldown[classtable.DancingRuneWeapon].remains >20) and cooldown[classtable.Consumption].ready then
+        MaxDps:GlowCooldown(classtable.Consumption, cooldown[classtable.Consumption].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.HeartStrike, 'HeartStrike')) and (Runes >1) and cooldown[classtable.HeartStrike].ready then
         if not setSpell then setSpell = classtable.HeartStrike end
@@ -350,8 +350,10 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.MindFreeze, false)
     MaxDps:GlowCooldown(classtable.IceboundFortitude, false)
     MaxDps:GlowCooldown(classtable.VampiricBlood, false)
+    MaxDps:GlowCooldown(classtable.RuneTap, false)
     MaxDps:GlowCooldown(classtable.RaiseDead, false)
     MaxDps:GlowCooldown(classtable.BloodTap, false)
+    MaxDps:GlowCooldown(classtable.Consumption, false)
     MaxDps:GlowCooldown(classtable.AbominationLimb, false)
     MaxDps:GlowCooldown(classtable.ReapersMark, false)
     MaxDps:GlowCooldown(classtable.Blooddrinker, false)
@@ -370,7 +372,7 @@ function Blood:callaction()
         MaxDps:GlowCooldown(classtable.VampiricBlood, cooldown[classtable.VampiricBlood].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.RuneTap, 'RuneTap')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.RuneTap].ready then
-        if not setSpell then setSpell = classtable.RuneTap end
+        MaxDps:GlowCooldown(classtable.RuneTap, cooldown[classtable.RuneTap].ready)
     end
     if ((MaxDps.ActiveHeroTree == 'deathbringer')) then
         Blood:deathbringer()
@@ -433,6 +435,17 @@ function DeathKnight:Blood()
     classtable.ConsumptionBuff = 274156
     classtable.VampiricBloodBuff = 55233
     classtable.IceboundFortitudeBuff = 48792
+
+    local function debugg()
+        talents[classtable.DancingRuneWeapon] = 1
+        talents[classtable.Consumption] = 1
+    end
+
+
+    --if MaxDps.db.global.debugMode then
+    --   debugg()
+    --end
+
     setSpell = nil
     ClearCDs()
 

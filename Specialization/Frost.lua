@@ -454,7 +454,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury') and talents[classtable.FrostwyrmsFury]) and (not talents[classtable.ApocalypseNow] and talents[classtable.Obliteration] and ( talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up and not twoh_check() or not buff[classtable.PillarofFrostBuff].up and twoh_check() and not cooldown[classtable.PillarofFrost].ready or not talents[classtable.PillarofFrost] ) and fwf_buffs and ( (targets <2) or math.huge >cooldown[classtable.FrostwyrmsFury].duration + (targets>1 and MaxDps:MaxAddDuration() or 0) )) and cooldown[classtable.FrostwyrmsFury].ready then
         MaxDps:GlowCooldown(classtable.FrostwyrmsFury, cooldown[classtable.FrostwyrmsFury].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (buff[classtable.PillarofFrostBuff].up) and cooldown[classtable.RaiseDead].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' ) and buff[classtable.PillarofFrostBuff].up) and cooldown[classtable.RaiseDead].ready then
         MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.Frostscythe, 'Frostscythe')) and (not buff[classtable.KillingMachineBuff].up and not buff[classtable.PillarofFrostBuff].up) and cooldown[classtable.Frostscythe].ready then

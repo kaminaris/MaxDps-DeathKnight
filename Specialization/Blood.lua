@@ -169,7 +169,7 @@ function Blood:deathbringer()
     death_strike_dump_amount = 65
     bone_shield_refresh_value = 6
     heart_strike_rp_drw = ( 25 + targets * (talents[classtable.Heartbreaker] and talents[classtable.Heartbreaker] or 0) * 2 )
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' )) and cooldown[classtable.RaiseDead].ready then
         MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap')) and (Runes <= 1) and cooldown[classtable.BloodTap].ready then
@@ -292,7 +292,7 @@ function Blood:sanlayn()
     if (MaxDps:CheckSpellUsable(classtable.HeartStrike, 'HeartStrike')) and (buff[classtable.InflictionofSorrowBuff].up and buff[classtable.DeathandDecayBuff].up) and cooldown[classtable.HeartStrike].ready then
         if not setSpell then setSpell = classtable.HeartStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' )) and cooldown[classtable.RaiseDead].ready then
         MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.AbominationLimb, 'AbominationLimb')) and cooldown[classtable.AbominationLimb].ready then

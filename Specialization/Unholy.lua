@@ -550,7 +550,7 @@ function DeathKnight:Unholy()
     RunicPowerDeficit = RunicPowerMax - RunicPower
     classtable.VampiricStrike = 433895
     --classtable.WoundSpender = ((MaxDps:FindSpell(classtable.VampiricStrike) and classtable.VampiricStrike) or (MaxDps:FindSpell(classtable.ClawingShadows) and classtable.ClawingShadows) or classtable.ScourgeStrike)
-    classtable.WoundSpender = C_Spell.GetSpellInfo(classtable.ScourgeStrike) and ( C_Spell.GetSpellInfo(C_Spell.GetSpellInfo(classtable.ScourgeStrike).name).spellID )
+    classtable.WoundSpender = IsSpellKnownOrOverridesKnown(classtable.ScourgeStrike) and C_Spell.GetSpellInfo(classtable.ScourgeStrike) and ( C_Spell.GetSpellInfo(C_Spell.GetSpellInfo(classtable.ScourgeStrike).name).spellID ) --55090
     classtable.FesteringScythe = 458128
     classtable.DnD = talents[classtable.Defile] and classtable.Defile or not talents[classtable.Defile] and classtable.DeathandDecay
     if buff[classtable.FesteringScytheBuff].up then

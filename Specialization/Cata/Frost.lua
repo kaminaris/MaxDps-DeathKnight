@@ -161,14 +161,11 @@ local function ClearCDs()
 end
 
 function Frost:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (blood_runes.current == 0 and frost_runes.current == 0 and unholy_runes.current == 0) and cooldown[classtable.EmpowerRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (DeathKnight:RuneTypeCount('Blood') == 0 and DeathKnight:RuneTypeCount('Frost') == 0 and DeathKnight:RuneTypeCount('Unholy') == 0) and cooldown[classtable.EmpowerRuneWeapon].ready then
         if not setSpell then setSpell = classtable.EmpowerRuneWeapon end
     end
     if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost')) and (buff[classtable.UnholyStrengthBuff].up) and cooldown[classtable.PillarofFrost].ready then
         if not setSpell then setSpell = classtable.PillarofFrost end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.SynapseSprings, 'SynapseSprings')) and (buff[classtable.UnholyStrengthBuff].up) and cooldown[classtable.SynapseSprings].ready then
-        if not setSpell then setSpell = classtable.SynapseSprings end
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (ttd <= 3) and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
@@ -179,13 +176,13 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (ttd <= 3) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (buff[classtable.PillarofFrostBuff].up and buff[classtable.UnholyStrengthBuff].up and buff[classtable.SynapseSpringsBuff].up) and cooldown[classtable.RaiseDead].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' ) and buff[classtable.PillarofFrostBuff].up and buff[classtable.UnholyStrengthBuff].up and buff[classtable.SynapseSpringsBuff].up) and cooldown[classtable.RaiseDead].ready then
         if not setSpell then setSpell = classtable.RaiseDead end
     end
-    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap')) and (death_runes.current <= 1 and blood_runes.time_to_1 >5.5) and cooldown[classtable.BloodTap].ready then
+    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap')) and (DeathKnight:RuneTypeCount('Death') <= 1 and DeathKnight:TimeToRunesCata('Blood',1) >5.5) and cooldown[classtable.BloodTap].ready then
         if not setSpell then setSpell = classtable.BloodTap end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (runic_power.current >= 105) and cooldown[classtable.FrostStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (RunicPower >= 105) and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
     end
     if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (not debuff[classtable.FrostFeverDeBuff].up or not debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.Outbreak].ready then
@@ -200,13 +197,13 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (not (GetUnitSpeed('player') >0) and ttd >5 and targets >1) and cooldown[classtable.DeathandDecay].ready then
         if not setSpell then setSpell = classtable.DeathandDecay end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (not debuff[classtable.BloodPlagueDeBuff].up and unholy_runes.current == 2) and cooldown[classtable.PlagueStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (not debuff[classtable.BloodPlagueDeBuff].up and DeathKnight:RuneTypeCount('Unholy') == 2) and cooldown[classtable.PlagueStrike].ready then
         if not setSpell then setSpell = classtable.PlagueStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (RunicPower >100 and frost_runes.current == 0 and death_runes.current == 0 and unholy_runes.current >= 1) and cooldown[classtable.FrostStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (RunicPower >100 and DeathKnight:RuneTypeCount('Frost') == 0 and DeathKnight:RuneTypeCount('Death') == 0 and DeathKnight:RuneTypeCount('Unholy') >= 1) and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (debuff[classtable.BloodPlagueDeBuff].up and unholy_runes.current == 2) and cooldown[classtable.Obliterate].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (debuff[classtable.BloodPlagueDeBuff].up and DeathKnight:RuneTypeCount('Unholy') == 2) and cooldown[classtable.Obliterate].ready then
         if not setSpell then setSpell = classtable.Obliterate end
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (buff[classtable.KillingMachineBuff].up) and cooldown[classtable.FrostStrike].ready then
@@ -218,7 +215,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (buff[classtable.PillarofFrostBuff].up and buff[classtable.UnholyStrengthBuff].up) and cooldown[classtable.RaiseDead].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' ) and buff[classtable.PillarofFrostBuff].up and buff[classtable.UnholyStrengthBuff].up) and cooldown[classtable.RaiseDead].ready then
         if not setSpell then setSpell = classtable.RaiseDead end
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and cooldown[classtable.FrostStrike].ready then
@@ -227,7 +224,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready then
         if not setSpell then setSpell = classtable.HornofWinter end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (frost_runes.current == 0 and death_runes.current == 0 and unholy_runes.current >= 1 and frost_runes.time_to_1 >2.5 and blood_runes.time_to_1 >2.5) and cooldown[classtable.PlagueStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (DeathKnight:RuneTypeCount('Frost') == 0 and DeathKnight:RuneTypeCount('Death') == 0 and DeathKnight:RuneTypeCount('Unholy') >= 1 and DeathKnight:TimeToRunesCata('Frost',1) >2.5 and DeathKnight:TimeToRunesCata('Blood',1) >2.5) and cooldown[classtable.PlagueStrike].ready then
         if not setSpell then setSpell = classtable.PlagueStrike end
     end
 end
@@ -265,24 +262,20 @@ function DeathKnight:Frost()
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
-    classtable.UnholyPresenceBuff = 48265
-    classtable.UnholyStrengthBuff = 53365
-    classtable.PillarofFrostBuff = 0
-    classtable.SynapseSpringsBuff = 0
     classtable.FrostFeverDeBuff = 55095
     classtable.BloodPlagueDeBuff = 55078
-    classtable.FreezingFogBuff = 59052
-    classtable.KillingMachineBuff = 51124
-    classtable.HornofWinterBuff = 0
     classtable.UnholyPresence = 48265
     classtable.SummonGargoyle = 49206
+    classtable.HornofWinter = 57330
     classtable.EmpowerRuneWeapon = 47568
+    classtable.PillarofFrost = 51271
     classtable.FrostStrike = 49143
     classtable.Obliterate = 49020
     classtable.HowlingBlast = 49184
     classtable.RaiseDead = 46584
     classtable.BloodTap = 45529
     classtable.Outbreak = 77575
+    classtable.DeathandDecay = 43265
     classtable.PlagueStrike = 45462
 
     local function debugg()

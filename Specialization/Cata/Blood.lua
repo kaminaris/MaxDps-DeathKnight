@@ -63,6 +63,9 @@ local RuneUnholy
 local RunicPower
 local RunicPowerMax
 local RunicPowerDeficit
+local ibf_damage
+local rt_damage
+local vb_damage
 
 local Blood = {}
 
@@ -154,7 +157,7 @@ function Blood:precombat()
     if (MaxDps:CheckSpellUsable(classtable.ArmyoftheDead, 'ArmyoftheDead')) and cooldown[classtable.ArmyoftheDead].ready and not UnitAffectingCombat('player') then
         if not setSpell then setSpell = classtable.ArmyoftheDead end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' )) and cooldown[classtable.RaiseDead].ready and not UnitAffectingCombat('player') then
         if not setSpell then setSpell = classtable.RaiseDead end
     end
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready and not UnitAffectingCombat('player') then
@@ -168,7 +171,7 @@ function Blood:aoe()
     if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (debuff[classtable.BloodPlagueDeBuff].remains <= 1 or debuff[classtable.FrostFeverDeBuff].remains <= 1) and cooldown[classtable.Outbreak].ready then
         if not setSpell then setSpell = classtable.Outbreak end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Pestilence, 'Pestilence')) and (debuff[classtable.FrostFeverDeBuff].up and debuff[classtable.BloodPlagueDeBuff].up and ( debuff[classtable.FrostFeverDeBuff].count  + debuff[classtable.BloodPlagueDeBuff].count  <targets * 2 )) and cooldown[classtable.Pestilence].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Pestilence, 'Pestilence')) and (debuff[classtable.FrostFeverDeBuff].up and debuff[classtable.BloodPlagueDeBuff].up and ( MaxDps:DebuffCounter(classtable.FrostFeverDeBuff) + MaxDps:DebuffCounter(classtable.BloodPlagueDeBuff) <targets * 2 )) and cooldown[classtable.Pestilence].ready then
         if not setSpell then setSpell = classtable.Pestilence end
     end
     if (MaxDps:CheckSpellUsable(classtable.HeartStrike, 'HeartStrike')) and (targets <= 5) and cooldown[classtable.HeartStrike].ready then
@@ -177,7 +180,7 @@ function Blood:aoe()
     if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (targets >5 or buff[classtable.CrimsonScourgeBuff].up) and cooldown[classtable.BloodBoil].ready then
         if not setSpell then setSpell = classtable.BloodBoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (curentHP <= 50 or not buff[classtable.BloodShieldBuff].up) and cooldown[classtable.DeathStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (healthPerc <= 50 or not buff[classtable.BloodShieldBuff].up) and cooldown[classtable.DeathStrike].ready then
         if not setSpell then setSpell = classtable.DeathStrike end
     end
     if (MaxDps:CheckSpellUsable(classtable.IcyTouch, 'IcyTouch')) and (not debuff[classtable.FrostFeverDeBuff].up and ttd >10) and cooldown[classtable.IcyTouch].ready then
@@ -195,7 +198,7 @@ function Blood:aoe()
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready then
         if not setSpell then setSpell = classtable.HornofWinter end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' )) and cooldown[classtable.RaiseDead].ready then
         if not setSpell then setSpell = classtable.RaiseDead end
     end
 end
@@ -209,13 +212,10 @@ function Blood:callaction()
     if (MaxDps:CheckSpellUsable(classtable.MindFreeze, 'MindFreeze')) and cooldown[classtable.MindFreeze].ready then
         MaxDps:GlowCooldown(classtable.MindFreeze, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
     end
-    if (MaxDps:CheckSpellUsable(classtable.SynapseSprings, 'SynapseSprings')) and cooldown[classtable.SynapseSprings].ready then
-        if not setSpell then setSpell = classtable.SynapseSprings end
-    end
     if (MaxDps:CheckSpellUsable(classtable.DancingRuneWeapon, 'DancingRuneWeapon')) and cooldown[classtable.DancingRuneWeapon].ready then
         if not setSpell then setSpell = classtable.DancingRuneWeapon end
     end
-    if (MaxDps:CheckSpellUsable(classtable.IceboundFortitude, 'IceboundFortitude')) and (curentHP <= 30) and cooldown[classtable.IceboundFortitude].ready then
+    if (MaxDps:CheckSpellUsable(classtable.IceboundFortitude, 'IceboundFortitude')) and (healthPerc <= 30) and cooldown[classtable.IceboundFortitude].ready then
         if not setSpell then setSpell = classtable.IceboundFortitude end
     end
     if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (debuff[classtable.BloodPlagueDeBuff].remains <= 1 or debuff[classtable.FrostFeverDeBuff].remains <= 1) and cooldown[classtable.Outbreak].ready then
@@ -224,40 +224,40 @@ function Blood:callaction()
     if (MaxDps:CheckSpellUsable(classtable.BoneShield, 'BoneShield')) and (not buff[classtable.BoneShieldBuff].up) and cooldown[classtable.BoneShield].ready then
         if not setSpell then setSpell = classtable.BoneShield end
     end
-    if (MaxDps:CheckSpellUsable(classtable.VampiricBlood, 'VampiricBlood')) and (curentHP <= 50) and cooldown[classtable.VampiricBlood].ready then
+    if (MaxDps:CheckSpellUsable(classtable.VampiricBlood, 'VampiricBlood')) and (healthPerc <= 50) and cooldown[classtable.VampiricBlood].ready then
         if not setSpell then setSpell = classtable.VampiricBlood end
     end
     if (MaxDps:CheckSpellUsable(classtable.RuneTap, 'RuneTap')) and (buff[classtable.WilloftheNecropolisBuff].up) and cooldown[classtable.RuneTap].ready then
         if not setSpell then setSpell = classtable.RuneTap end
     end
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (curentHP <= 50 and not cooldown[classtable.DeathStrike].ready) and cooldown[classtable.EmpowerRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (healthPerc <= 50 and not cooldown[classtable.DeathStrike].ready) and cooldown[classtable.EmpowerRuneWeapon].ready then
         if not setSpell then setSpell = classtable.EmpowerRuneWeapon end
     end
     if (targets >1) then
         Blood:aoe()
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (frost_runes.current == 2 or unholy_runes.current == 2 or curentHP <= 50 or not buff[classtable.BloodShieldBuff].up) and cooldown[classtable.DeathStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (DeathKnight:RuneTypeCount('Frost') == 2 or DeathKnight:RuneTypeCount('Unholy') == 2 or healthPerc <= 50 or not buff[classtable.BloodShieldBuff].up) and cooldown[classtable.DeathStrike].ready then
         if not setSpell then setSpell = classtable.DeathStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RuneStrike, 'RuneStrike')) and (runic_power.current >= RunicPowerMax - 10) and cooldown[classtable.RuneStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RuneStrike, 'RuneStrike')) and (RunicPower >= RunicPowerMax - 10) and cooldown[classtable.RuneStrike].ready then
         if not setSpell then setSpell = classtable.RuneStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap')) and (( frost_runes.current == 1 or unholy_runes.current == 1 or death_runes.current == 1 ) and not cooldown[classtable.DeathStrike].ready) and cooldown[classtable.BloodTap].ready then
+    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap')) and (( DeathKnight:RuneTypeCount('Frost') == 1 or DeathKnight:RuneTypeCount('Unholy') == 1 or DeathKnight:RuneTypeCount('Death') == 1 ) and not cooldown[classtable.DeathStrike].ready) and cooldown[classtable.BloodTap].ready then
         if not setSpell then setSpell = classtable.BloodTap end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and cooldown[classtable.DeathStrike].ready then
         if not setSpell then setSpell = classtable.DeathStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RuneTap, 'RuneTap')) and (curentHP <= 80 and blood_runes.current == 2 and death_runes.current_blood == 0) and cooldown[classtable.RuneTap].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RuneTap, 'RuneTap')) and (healthPerc <= 80 and DeathKnight:RuneTypeCount('Blood') == 2 and DeathKnight:RuneTypeDeathCount('Blood') == 0) and cooldown[classtable.RuneTap].ready then
         if not setSpell then setSpell = classtable.RuneTap end
     end
     if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (buff[classtable.CrimsonScourgeBuff].up) and cooldown[classtable.BloodBoil].ready then
         if not setSpell then setSpell = classtable.BloodBoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathPact, 'DeathPact')) and (buff[classtable.RaiseDeadBuff].remains <5 or curentHP <= 30) and cooldown[classtable.DeathPact].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathPact, 'DeathPact')) and (buff[classtable.RaiseDeadBuff].remains <5 or healthPerc <= 30) and cooldown[classtable.DeathPact].ready then
         if not setSpell then setSpell = classtable.DeathPact end
     end
-    if (MaxDps:CheckSpellUsable(classtable.HeartStrike, 'HeartStrike')) and (blood_runes.current == 2 and death_runes.current_blood == 0) and cooldown[classtable.HeartStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.HeartStrike, 'HeartStrike')) and (DeathKnight:RuneTypeCount('Blood') == 2 and DeathKnight:RuneTypeDeathCount('Blood') == 0) and cooldown[classtable.HeartStrike].ready then
         if not setSpell then setSpell = classtable.HeartStrike end
     end
     if (MaxDps:CheckSpellUsable(classtable.IcyTouch, 'IcyTouch')) and (not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.IcyTouch].ready then
@@ -272,7 +272,7 @@ function Blood:callaction()
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready then
         if not setSpell then setSpell = classtable.HornofWinter end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and cooldown[classtable.RaiseDead].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' )) and cooldown[classtable.RaiseDead].ready then
         if not setSpell then setSpell = classtable.RaiseDead end
     end
 end
@@ -306,21 +306,21 @@ function DeathKnight:Blood()
     RunicPower = UnitPower('player', RunicPowerPT)
     RunicPowerMax = UnitPowerMax('player', RunicPowerPT)
     RunicPowerDeficit = RunicPowerMax - RunicPower
+    ibf_damage = maxHP * ( 40 ) * 0.01
+    rt_damage = maxHP * ( 30 ) * 0.01
+    vb_damage = maxHP * ( 50 ) * 0.01
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
-    classtable.BloodPresenceBuff = 48263
     classtable.BloodPlagueDeBuff = 55078
     classtable.FrostFeverDeBuff = 55095
-    classtable.CrimsonScourgeBuff = 81141
-    classtable.BloodShieldBuff = 77535
-    classtable.BoneShieldBuff = 49222
-    classtable.WilloftheNecropolisBuff = 0
-    classtable.RaiseDeadBuff = 0
     classtable.BloodPresence = 48263
     classtable.BoneShield = 49222
+    classtable.ArmyoftheDead = 42650
     classtable.RaiseDead = 46584
+    classtable.HornofWinter = 57330
+    classtable.DeathandDecay = 43265
     classtable.Outbreak = 77575
     classtable.Pestilence = 50842
     classtable.HeartStrike = 55050

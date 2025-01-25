@@ -314,8 +314,6 @@ function DeathKnight:Blood()
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
     classtable.BloodPresenceBuff = 48263
-    classtable.BloodPlagueBuff = 55078
-    classtable.FrostFeverBuff = 55095
     classtable.BoneShieldBuff = 49222
     classtable.WilloftheNecropolisBuff = 96171
     classtable.BloodShieldBuff = 77535

@@ -262,6 +262,12 @@ function DeathKnight:Frost()
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
+    classtable.UnholyPresenceBuff = 48265
+    classtable.UnholyStrengthBuff = 53365
+    classtable.PillarofFrostBuff = 51271
+    classtable.FreezingFogBuff = 59052
+    classtable.KillingMachineBuff = 51124
+    classtable.HornofWinterBuff = 57330
     classtable.FrostFeverDeBuff = 55095
     classtable.BloodPlagueDeBuff = 55078
     classtable.UnholyPresence = 48265

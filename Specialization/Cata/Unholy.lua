@@ -288,6 +288,14 @@ function DeathKnight:Unholy()
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
+    classtable.PresenceBuff = 48263
+    classtable.UnholyStrengthBuff = 53365
+    classtable.UnholyFrenzyBuff = 49016
+    classtable.RunicCorruptionBuff = 51460
+    classtable.DarkTransformationBuff = 63560
+    classtable.ShadowInfusionBuff = 91342
+    classtable.SuddenDoomBuff = 81340
+    classtable.HornofWinterBuff = 57330
     classtable.FrostFeverDeBuff = 55095
     classtable.BloodPlagueDeBuff = 55078
     classtable.UnholyPresence = 48265

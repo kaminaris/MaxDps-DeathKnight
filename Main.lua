@@ -120,12 +120,13 @@ function DeathKnight:TimeToRunes(desiredRunes)
 	local runes = {}
 	local readyRuneCount = 0
 	local duration = 1
-        for i = 1, 6 do
-            _, refresh, _ = GetRuneCooldown(i)
-            if type(refresh) == "number" and refresh > 0 then
-                duration = refresh
-            end
+	local refresh
+    for i = 1, 6 do
+        _, refresh, _ = GetRuneCooldown(i)
+        if type(refresh) == "number" and refresh > 0 then
+            duration = refresh
         end
+    end
 	for i = 1, 6 do
 		local start, _, runeReady = GetRuneCooldown(i)
 		if type(start) ~= "number" and not runeReady then
@@ -170,4 +171,123 @@ function DeathKnight:TimeToRunes(desiredRunes)
 	-- Otherwise, we need to wait for the slowest of our three regenerating runes, plus the full regen time needed for the remaining rune(s)
 	local rune = runes[readyRuneCount + 3]
 	return rune.duration + rune.start - time + rune.duration
+end
+
+function DeathKnight:TimeToRunesCata(desiredAmount,runeType)
+    local runeCount = 0
+    local totalTime = 0
+    local runeCooldowns = {}
+	--1 : RUNETYPE_BLOOD
+    --2 : RUNETYPE_CHROMATIC
+    --3 : RUNETYPE_FROST
+    --4 : RUNETYPE_DEATH
+	if runeType == "Blood" then
+		runeType = 1
+	end
+	if runeType == "Unholy" then -- ("CHROMATIC" refers to Unholy runes)
+		runeType = 2
+	end
+	if runeType == "Frost" then
+		runeType = 3
+	end
+	if runeType == "Death" then
+		runeType = 4
+	end
+
+    -- Iterate over the possible rune IDs (assuming there are 6 runes total, 2 for each type)
+    for runeId = 1, 6 do
+        local runeTypeForId = GetRuneType(runeId)
+
+        -- Check if the rune matches the desired rune type
+        if runeTypeForId == runeType or runeTypeForId == 4 then
+            table.insert(runeCooldowns, select(2,GetRuneCooldown(runeId)))  -- Store the cooldown of matching runes
+        end
+    end
+
+    -- Sort the cooldowns in ascending order to prioritize the quickest available runes
+    table.sort(runeCooldowns)
+
+    -- Calculate the total time until the desired amount of runes are accumulated
+    while runeCount < desiredAmount do
+        if runeCooldowns[runeCount + 1] then
+            totalTime = totalTime + runeCooldowns[runeCount + 1]  -- Add the cooldown time for the next available rune
+            runeCount = runeCount + 1
+        else
+            break
+        end
+    end
+
+    return totalTime
+end
+
+function DeathKnight:RuneTypeCount(runeType)
+	--1 : RUNETYPE_BLOOD
+    --2 : RUNETYPE_CHROMATIC
+    --3 : RUNETYPE_FROST
+    --4 : RUNETYPE_DEATH
+	if runeType == "Blood" then
+		runeType = 1
+	end
+	if runeType == "Unholy" then -- ("CHROMATIC" refers to Unholy runes)
+		runeType = 2
+	end
+	if runeType == "Frost" then
+		runeType = 3
+	end
+	if runeType == "Death" then
+		runeType = 4
+	end
+	local count = 0
+	for i = 1, 6 do
+		local runeTypeForId = GetRuneType(i)
+		if runeTypeForId == runeType or runeTypeForId == 4 then
+		    local start, _, runeReady = GetRuneCooldown(i)
+			if runeReady then
+				count = count + 1
+			end
+		end
+	end
+	return count
+end
+
+function DeathKnight:RuneTypeDeathCount(runeType)
+	--1 : RUNETYPE_BLOOD
+    --2 : RUNETYPE_CHROMATIC
+    --3 : RUNETYPE_FROST
+    --4 : RUNETYPE_DEATH
+	if runeType == "Blood" then
+		runeType = 1
+	end
+	if runeType == "Unholy" then -- ("CHROMATIC" refers to Unholy runes)
+		runeType = 2
+	end
+	if runeType == "Frost" then
+		runeType = 3
+	end
+	if runeType == "Death" then
+		runeType = 4
+	end
+	local count = 0
+	if runeType == 1 then
+	    for i = 1, 2 do
+			if GetRuneType(i) == 4 then
+				count = count + 1
+			end
+	    end
+    end
+	if runeType == 2 then
+	    for i = 3, 4 do
+			if GetRuneType(i) == 4 then
+				count = count + 1
+			end
+	    end
+    end
+	if runeType == 3 then
+	    for i = 5, 6 do
+			if GetRuneType(i) == 4 then
+				count = count + 1
+			end
+	    end
+    end
+	return count
 end

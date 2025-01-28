@@ -179,7 +179,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' ) and buff[classtable.PillarofFrostBuff].up and buff[classtable.UnholyStrengthBuff].up and buff[classtable.SynapseSpringsBuff].up) and cooldown[classtable.RaiseDead].ready then
         if not setSpell then setSpell = classtable.RaiseDead end
     end
-    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap')) and (DeathKnight:RuneTypeCount('Death') <= 1 and DeathKnight:TimeToRunesCata('Blood',1) >5.5) and cooldown[classtable.BloodTap].ready then
+    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap')) and (DeathKnight:RuneTypeCount('Death') <= 1 and DeathKnight:TimeToRunesCata(1,'Blood') >5.5) and cooldown[classtable.BloodTap].ready then
         if not setSpell then setSpell = classtable.BloodTap end
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (RunicPower >= 105) and cooldown[classtable.FrostStrike].ready then
@@ -224,7 +224,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready then
         if not setSpell then setSpell = classtable.HornofWinter end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (DeathKnight:RuneTypeCount('Frost') == 0 and DeathKnight:RuneTypeCount('Death') == 0 and DeathKnight:RuneTypeCount('Unholy') >= 1 and DeathKnight:TimeToRunesCata('Frost',1) >2.5 and DeathKnight:TimeToRunesCata('Blood',1) >2.5) and cooldown[classtable.PlagueStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (DeathKnight:RuneTypeCount('Frost') == 0 and DeathKnight:RuneTypeCount('Death') == 0 and DeathKnight:RuneTypeCount('Unholy') >= 1 and DeathKnight:TimeToRunesCata(1,'Frost') >2.5 and DeathKnight:TimeToRunesCata(1,'Blood') >2.5) and cooldown[classtable.PlagueStrike].ready then
         if not setSpell then setSpell = classtable.PlagueStrike end
     end
 end

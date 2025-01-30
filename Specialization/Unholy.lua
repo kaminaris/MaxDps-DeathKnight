@@ -315,7 +315,7 @@ function Unholy:cds_aoe_san()
     if (MaxDps:CheckSpellUsable(classtable.VileContagion, 'VileContagion') and talents[classtable.VileContagion]) and (debuff[classtable.FesteringWoundDeBuff].count >= 4 and ( targets >4 or (targets <2) and ttd >4 ) and ( (targets >1) and targets <= 11 or cooldown[classtable.DeathandDecay].remains <3 or buff[classtable.DeathandDecayBuff].up and debuff[classtable.FesteringWoundDeBuff].count >= 4 ) or targets >1 and debuff[classtable.FesteringWoundDeBuff].count == 6) and cooldown[classtable.VileContagion].ready then
         if not setSpell then setSpell = classtable.VileContagion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (( debuff[classtable.VirulentPlagueDeBuff].refreshable or talents[classtable.Morbidity] and not buff[classtable.GiftoftheSanlaynBuff].up and talents[classtable.Superstrain] and debuff[classtable.FrostFeverDeBuff].refreshable and debuff[classtable.BloodPlagueDeBuff].refreshable ) and ( not talents[classtable.UnholyBlight] or talents[classtable.UnholyBlight] and cooldown[classtable.DarkTransformation].remains >15 % ( ( 2 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) ) and ( not talents[classtable.RaiseAbomination] or talents[classtable.RaiseAbomination] and cooldown[classtable.RaiseAbomination].remains >15 % ( ( 2 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) )) and cooldown[classtable.Outbreak].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (( debuff[classtable.VirulentPlagueDeBuff].refreshable or talents[classtable.Morbidity] and not buff[classtable.GiftoftheSanlaynBuff].up and talents[classtable.Superstrain] and debuff[classtable.FrostFeverDeBuff].refreshable and debuff[classtable.BloodPlagueDeBuff].refreshable ) and ( not talents[classtable.UnholyBlight] or talents[classtable.UnholyBlight] and cooldown[classtable.DarkTransformation].remains >15 / ( ( 2 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) ) and ( not talents[classtable.RaiseAbomination] or talents[classtable.RaiseAbomination] and cooldown[classtable.RaiseAbomination].remains >15 / ( ( 2 * (talents[classtable.Superstrain] and talents[classtable.Superstrain] or 0) ) + ( 2 * (talents[classtable.EbonFever] and talents[classtable.EbonFever] or 0) ) + ( 2 * (talents[classtable.Plaguebringer] and talents[classtable.Plaguebringer] or 0) ) ) )) and cooldown[classtable.Outbreak].ready then
         if not setSpell then setSpell = classtable.Outbreak end
     end
     if (MaxDps:CheckSpellUsable(classtable.Apocalypse, 'Apocalypse') and talents[classtable.Apocalypse]) and (targets >1 and Runes <= 3) and cooldown[classtable.Apocalypse].ready then
@@ -549,10 +549,8 @@ function DeathKnight:Unholy()
     RunicPowerMax = UnitPowerMax('player', RunicPowerPT)
     RunicPowerDeficit = RunicPowerMax - RunicPower
     classtable.VampiricStrike = 433895
-    --classtable.WoundSpender = ((MaxDps:FindSpell(classtable.VampiricStrike) and classtable.VampiricStrike) or (MaxDps:FindSpell(classtable.ClawingShadows) and classtable.ClawingShadows) or classtable.ScourgeStrike)
     classtable.WoundSpender = IsSpellKnownOrOverridesKnown(classtable.ScourgeStrike) and C_Spell.GetSpellInfo(classtable.ScourgeStrike) and ( C_Spell.GetSpellInfo(C_Spell.GetSpellInfo(classtable.ScourgeStrike).name).spellID ) --55090
     classtable.FesteringScythe = 458128
-    classtable.DnD = talents[classtable.Defile] and classtable.Defile or not talents[classtable.Defile] and classtable.DeathandDecay
     if buff[classtable.FesteringScytheBuff].up then
         classtable.FesteringStrike = classtable.FesteringScythe
     else
@@ -562,32 +560,38 @@ function DeathKnight:Unholy()
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
-    classtable.FesteringScytheBuff = 458123
-    classtable.FesteringWoundDeBuff = 194310
-    classtable.DeathandDecayBuff = 188290
-    classtable.ChainsofIceTrollbaneSlowDeBuff = 444826
-    classtable.VampiricStrikeBuff = 433901
-    classtable.VirulentPlagueDeBuff = 191587
     classtable.SuddenDoomBuff = 81340
+    classtable.EssenceoftheBloodQueenBuff = 433925
+    classtable.BloodFuryBuff = 20572
+    classtable.DeathandDecayBuff = 188290
+    classtable.BerserkingBuff = 26297
+    classtable.UnholyStrengthBuff = 53365
+    classtable.FestermightBuff = 377591
+    classtable.FirebloodBuff = 273104
+    classtable.DarkTransformationBuff = 63560
+    classtable.CommanderoftheDeadBuff = 390260
+    classtable.GiftoftheSanlaynBuff = 434153
+    classtable.FesteringScytheBuff = 458123
+    classtable.VampiricStrikeBuff = 433899
+    classtable.AFeastofSoulsBuff = 440861
+    classtable.InflictionofSorrowBuff = 460049
+    classtable.RunicCorruptionBuff = 51460
+    classtable.ErrantManaforgeEmissionBuff = 449952
+    classtable.CrypticInstructionsBuff = 449946
+    classtable.RealigningNexusConvergenceDivergenceBuff = 449947
+    classtable.FesteringWoundDeBuff = 194310
+    classtable.RottenTouchDeBuff = 390276
+    classtable.ChainsofIceTrollbaneSlowDeBuff = 444826
+    classtable.VirulentPlagueDeBuff = 191587
     classtable.DeathRotDeBuff = 377540
-    classtable.AFeastofSoulsBuff = 444072
-    classtable.DarkTransformationBuff = 377588
     classtable.FrostFeverDeBuff = 55095
     classtable.BloodPlagueDeBuff = 55078
-    classtable.FestermightBuff = 377591
-    classtable.GiftoftheSanlaynBuff = 434152
-    classtable.InflictionofSorrowBuff = 434143
-    classtable.RunicCorruptionBuff = 51460
-    classtable.RottenTouchDeBuff = 390276
-    classtable.EssenceoftheBloodQueenBuff = 433925
-    classtable.CommanderoftheDeadBuff = 390260
+    classtable.MarkofFyralathDeBuff = 414532
 
     local function debugg()
         talents[classtable.VampiricStrike] = 1
         talents[classtable.SummonGargoyle] = 1
         talents[classtable.Festermight] = 1
-        talents[classtable.ArmyoftheDead] = 1
-        talents[classtable.RaiseAbomination] = 1
         talents[classtable.CommanderoftheDead] = 1
         talents[classtable.GiftoftheSanlayn] = 1
         talents[classtable.BurstingSores] = 1
@@ -600,8 +604,10 @@ function DeathKnight:Unholy()
         talents[classtable.Superstrain] = 1
         talents[classtable.UnholyBlight] = 1
         talents[classtable.Plaguebringer] = 1
+        talents[classtable.RaiseAbomination] = 1
         talents[classtable.Morbidity] = 1
         talents[classtable.UnholyGround] = 1
+        talents[classtable.ArmyoftheDead] = 1
     end
 
 

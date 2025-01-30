@@ -389,19 +389,19 @@ function Frost:callaction()
         true_breath_cooldown = cooldown[classtable.PillarofFrost].remains
     end
     if RunicPower <35 and Runes <2 and cooldown[classtable.PillarofFrost].remains <10 then
-        oblit_pooling_time = ( ( cooldown[classtable.PillarofFrost].remains + 1 ) % gcd ) % ( ( Runes + 1 ) * ( ( RunicPower + 5 ) ) ) * 100
+        oblit_pooling_time = ( ( cooldown[classtable.PillarofFrost].remains + 1 ) / gcd ) / ( ( Runes + 1 ) * ( ( RunicPower + 5 ) ) ) * 100
     else
         oblit_pooling_time = 3
     end
     if RunicPowerDeficit >10 and true_breath_cooldown <10 then
-        breath_pooling_time = ( ( true_breath_cooldown + 1 ) % gcd ) % ( ( Runes + 1 ) * ( RunicPower + 20 ) ) * 100
+        breath_pooling_time = ( ( true_breath_cooldown + 1 ) / gcd ) / ( ( Runes + 1 ) * ( RunicPower + 20 ) ) * 100
     else
         breath_pooling_time = 2
     end
     pooling_runes = Runes <oblit_rune_pooling and talents[classtable.Obliteration] and ( not talents[classtable.BreathofSindragosa] or true_breath_cooldown >0 ) and cooldown[classtable.PillarofFrost].remains <oblit_pooling_time
     pooling_runic_power = talents[classtable.BreathofSindragosa] and ( true_breath_cooldown <breath_pooling_time or ttd <30 and cooldown[classtable.BreathofSindragosa].ready ) or talents[classtable.Obliteration] and ( not talents[classtable.BreathofSindragosa] or cooldown[classtable.BreathofSindragosa].remains >30 ) and RunicPower <35 and cooldown[classtable.PillarofFrost].remains <oblit_pooling_time
     ga_priority = ( not talents[classtable.ShatteredFrost] and talents[classtable.ShatteringBlade] and targets >= 4 ) or ( not talents[classtable.ShatteredFrost] and not talents[classtable.ShatteringBlade] and targets >= 2 )
-    breath_dying = RunicPower <breath_rp_cost * 2 * gcd and DeathKnight:TimeToRunes(2) >RunicPower % breath_rp_cost
+    breath_dying = RunicPower <breath_rp_cost * 2 * gcd and DeathKnight:TimeToRunes(2) >RunicPower / breath_rp_cost
     fwf_buffs = ( buff[classtable.PillarofFrostBuff].remains <gcd or ( buff[classtable.UnholyStrengthBuff].up and buff[classtable.UnholyStrengthBuff].remains <gcd ) or ( (talents[classtable.Bonegrinder] and talents[classtable.Bonegrinder] or 0) == 2 and buff[classtable.BonegrinderFrostBuff].up and buff[classtable.BonegrinderFrostBuff].remains <gcd ) ) and ( targets >1 or debuff[classtable.RazoriceDeBuff].count == 5 or not wep_rune_check('Rune of Razorice') and ( not talents[classtable.GlacialAdvance] or not talents[classtable.Avalanche] or not talents[classtable.ArcticAssault] ) or talents[classtable.ShatteringBlade] )
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (not debuff[classtable.FrostFeverDeBuff].up and targets >= 2 and ( not talents[classtable.BreathofSindragosa] or not buff[classtable.BreathofSindragosaBuff].up ) and ( not talents[classtable.Obliteration] or talents[classtable.WitherAway] or talents[classtable.Obliteration] and ( not cooldown[classtable.PillarofFrost].ready or buff[classtable.PillarofFrostBuff].up and not buff[classtable.KillingMachineBuff].up ) )) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
@@ -439,7 +439,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.BreathofSindragosa, 'BreathofSindragosa') and talents[classtable.BreathofSindragosa]) and (not buff[classtable.BreathofSindragosaBuff].up and RunicPower >breath_rp_threshold and ( Runes <2 or RunicPower >80 ) and ( ( buff[classtable.PillarofFrostBuff].up or cooldown[classtable.PillarofFrost].remains >30 or cooldown[classtable.PillarofFrost].ready ) and sending_cds or ttd <30 ) or ( timeInCombat <10 and Runes <1 )) and cooldown[classtable.BreathofSindragosa].ready then
         MaxDps:GlowCooldown(classtable.BreathofSindragosa, cooldown[classtable.BreathofSindragosa].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.ReapersMark, 'ReapersMark')) and (( MaxDps:boss() or ttd >13 ) and not debuff[classtable.ReapersMarkDebuffDeBuff].up and ( buff[classtable.PillarofFrostBuff].up or cooldown[classtable.PillarofFrost].remains >5 )) and cooldown[classtable.ReapersMark].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ReapersMark, 'ReapersMark')) and (( MaxDps:boss() or ttd >13 ) and not debuff[classtable.ReapersMarkDeBuff].up and ( buff[classtable.PillarofFrostBuff].up or cooldown[classtable.PillarofFrost].remains >5 )) and cooldown[classtable.ReapersMark].ready then
         MaxDps:GlowCooldown(classtable.ReapersMark, cooldown[classtable.ReapersMark].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostwyrmsFury, 'FrostwyrmsFury') and talents[classtable.FrostwyrmsFury]) and ((MaxDps.ActiveHeroTree == 'rideroftheapocalypse') and talents[classtable.ApocalypseNow] and sending_cds and ( not talents[classtable.BreathofSindragosa] and buff[classtable.PillarofFrostBuff].up or buff[classtable.BreathofSindragosaBuff].up ) or MaxDps:boss() and ttd <20) and cooldown[classtable.FrostwyrmsFury].ready then
@@ -519,29 +519,29 @@ function DeathKnight:Frost()
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
-    classtable.KillingMachineBuff = 51124
-    classtable.ColdHeartBuff = 281209
-    classtable.PillarofFrostBuff = 51271
-    classtable.UnholyStrengthBuff = 53365
-    classtable.BonegrinderFrostBuff = 377098
-    classtable.FrostFeverDeBuff = 55095
-    classtable.EmpowerRuneWeaponBuff = 47568
-    classtable.DeathandDecayBuff = 188290
     classtable.RimeBuff = 59052
-    classtable.ExterminateBuff = 441378
-    classtable.RazoriceDeBuff = 51714
-    classtable.AFeastofSoulsBuff = 440861
     classtable.UnleashedFrenzyBuff = 376907
     classtable.IcyTalonsBuff = 194879
+    classtable.PillarofFrostBuff = 51271
+    classtable.EmpowerRuneWeaponBuff = 47568
+    classtable.UnholyStrengthBuff = 53365
+    classtable.BonegrinderFrostBuff = 377103
     classtable.BreathofSindragosaBuff = 152279
+    classtable.KillingMachineBuff = 51124
     classtable.GatheringStormBuff = 194912
     classtable.RemorselessWinterBuff = 196770
-    classtable.ReapersMarkDebuffDeBuff = 439594
+    classtable.DeathandDecayBuff = 188290
+    classtable.ColdHeartBuff = 281208
+    classtable.ExterminateBuff = 441416
+    classtable.AFeastofSoulsBuff = 440861
+    classtable.RazoriceDeBuff = 51714
+    classtable.FrostFeverDeBuff = 55095
+    classtable.ReapersMarkDeBuff = 434765
 
     local function debugg()
+        talents[classtable.BreathofSindragosa] = 1
         talents[classtable.PillarofFrost] = 1
         talents[classtable.Obliteration] = 1
-        talents[classtable.BreathofSindragosa] = 1
         talents[classtable.WitherAway] = 1
         talents[classtable.EmpowerRuneWeapon] = 1
         talents[classtable.ArcticAssault] = 1

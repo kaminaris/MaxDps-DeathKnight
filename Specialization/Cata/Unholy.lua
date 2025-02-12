@@ -145,7 +145,7 @@ end
 
 
 function Unholy:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.UnholyPresence, 'UnholyPresence')) and (not buff[classtable.UnholyPresenceBuff].up) and cooldown[classtable.UnholyPresence].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.UnholyPresence, 'UnholyPresence')) and (not buff[classtable.UnholyPresence].up) and cooldown[classtable.UnholyPresence].ready and not UnitAffectingCombat('player') then
         if not setSpell then setSpell = classtable.UnholyPresence end
     end
     if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' ) and (talents[classtable.MasterofGhouls] and true or false)) and cooldown[classtable.RaiseDead].ready and not UnitAffectingCombat('player') then

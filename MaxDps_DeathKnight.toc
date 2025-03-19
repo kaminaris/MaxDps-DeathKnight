@@ -23,6 +23,7 @@ Specialization/Unholy.lua
 #@end-retail@
 
 #@version-cata@
+Specialization/Cata/Blood.lua
 Specialization/Cata/Frost.lua
 Specialization/Cata/Unholy.lua
 #@end-version-cata@

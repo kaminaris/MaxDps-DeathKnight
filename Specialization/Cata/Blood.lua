@@ -254,7 +254,7 @@ function Blood:callaction()
     if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (buff[classtable.CrimsonScourgeBuff].up) and cooldown[classtable.BloodBoil].ready then
         if not setSpell then setSpell = classtable.BloodBoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.DeathPact, 'DeathPact')) and (buff[classtable.RaiseDeadBuff].remains <5 or healthPerc <= 30) and cooldown[classtable.DeathPact].ready then
+    if (MaxDps:CheckSpellUsable(classtable.DeathPact, 'DeathPact')) and ((GetTotemDuration("Risen Ghoul") <5 and GetTotemDuration("Risen Ghoul") >1) or (healthPerc <= 30 and GetTotemDuration("Risen Ghoul") >1)) and cooldown[classtable.DeathPact].ready then
         if not setSpell then setSpell = classtable.DeathPact end
     end
     if (MaxDps:CheckSpellUsable(classtable.HeartStrike, 'HeartStrike')) and (DeathKnight:RuneTypeCount('Blood') == 2 and DeathKnight:RuneTypeDeathCount('Blood') == 0) and cooldown[classtable.HeartStrike].ready then

@@ -96,7 +96,7 @@ local rp_buffs = false
 local cooldown_check = false
 local true_breath_cooldown = 0
 local oblit_pooling_time = 0
-local breath_pooling_time = false
+local breath_pooling_time = 0
 local pooling_runes = false
 local pooling_runic_power = false
 local ga_priority = false
@@ -389,7 +389,7 @@ function Frost:callaction()
     if RunicPowerDeficit >10 and true_breath_cooldown <10 then
         breath_pooling_time = ( ( true_breath_cooldown + 1 ) / gcd ) / ( ( Runes + 1 ) * ( RunicPower + 20 ) ) * 100
     else
-        breath_pooling_time = false
+        breath_pooling_time = 0
     end
     pooling_runes = Runes <oblit_rune_pooling and talents[classtable.Obliteration] and ( not talents[classtable.BreathofSindragosa] or true_breath_cooldown >0 ) and cooldown[classtable.PillarofFrost].remains <oblit_pooling_time
     pooling_runic_power = talents[classtable.BreathofSindragosa] and ( true_breath_cooldown <breath_pooling_time or ttd <30 and cooldown[classtable.BreathofSindragosa].ready ) or talents[classtable.Obliteration] and ( not talents[classtable.BreathofSindragosa] or cooldown[classtable.BreathofSindragosa].remains >30 ) and RunicPower <35 and cooldown[classtable.PillarofFrost].remains <oblit_pooling_time

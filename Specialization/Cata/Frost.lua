@@ -158,11 +158,13 @@ end
 
 
 local function ClearCDs()
+    MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, false)
 end
 
 function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (DeathKnight:RuneTypeCount('Blood') == 0 and DeathKnight:RuneTypeCount('Frost') == 0 and DeathKnight:RuneTypeCount('Unholy') == 0) and cooldown[classtable.EmpowerRuneWeapon].ready then
-        if not setSpell then setSpell = classtable.EmpowerRuneWeapon end
+        --if not setSpell then setSpell = classtable.EmpowerRuneWeapon end
+        MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, true)
     end
     if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost')) and (buff[classtable.UnholyStrengthBuff].up) and cooldown[classtable.PillarofFrost].ready then
         if not setSpell then setSpell = classtable.PillarofFrost end

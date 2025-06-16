@@ -206,6 +206,7 @@ end
 
 local function ClearCDs()
     MaxDps:GlowCooldown(classtable.MindFreeze, false)
+    MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, false)
 end
 
 function Blood:callaction()
@@ -231,7 +232,8 @@ function Blood:callaction()
         if not setSpell then setSpell = classtable.RuneTap end
     end
     if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (healthPerc <= 50 and not cooldown[classtable.DeathStrike].ready) and cooldown[classtable.EmpowerRuneWeapon].ready then
-        if not setSpell then setSpell = classtable.EmpowerRuneWeapon end
+        --if not setSpell then setSpell = classtable.EmpowerRuneWeapon end
+        MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, true)
     end
     if (targets >1) then
         Blood:aoe()

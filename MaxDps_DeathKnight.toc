@@ -27,3 +27,8 @@ Specialization/Cata/Blood.lua
 Specialization/Cata/Frost.lua
 Specialization/Cata/Unholy.lua
 #@end-version-cata@
+
+#@version-mists@
+Specialization/Mop/Frost.lua
+Specialization/Mop/Unholy.lua
+#@end-version-mists@

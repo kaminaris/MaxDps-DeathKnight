@@ -56,8 +56,6 @@ local maxHP
 local healthPerc
 local timeInCombat
 local className, classFilename, classId = UnitClass('player')
-local currentSpec = GetSpecialization()
-local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or 'None'
 local classtable
 local LibRangeCheck = LibStub('LibRangeCheck-3.0', true)
 
@@ -153,9 +151,6 @@ function Unholy:precombat()
     if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' )) and cooldown[classtable.RaiseDead].ready and not UnitAffectingCombat('player') then
         MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.GolembloodPotion, 'GolembloodPotion')) and cooldown[classtable.GolembloodPotion].ready and not UnitAffectingCombat('player') then
-        if not setSpell then setSpell = classtable.GolembloodPotion end
-    end
 end
 
 
@@ -170,9 +165,6 @@ local function ClearCDs()
 end
 
 function Unholy:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.GolembloodPotion, 'GolembloodPotion')) and (buff[classtable.DarkTransformationBuff].up and ttd <= 35) and cooldown[classtable.GolembloodPotion].ready then
-        if not setSpell then setSpell = classtable.GolembloodPotion end
-    end
     if (MaxDps:CheckSpellUsable(classtable.UnholyFrenzy, 'UnholyFrenzy')) and (timeInCombat >= 4) and cooldown[classtable.UnholyFrenzy].ready then
         if not setSpell then setSpell = classtable.UnholyFrenzy end
     end

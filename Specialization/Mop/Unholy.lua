@@ -139,9 +139,9 @@ end
 
 
 function Unholy:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and cooldown[classtable.Presence].ready and not UnitAffectingCombat('player') then
-        if not setSpell then setSpell = classtable.Presence end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and cooldown[classtable.Presence].ready and not UnitAffectingCombat('player') then
+    --    if not setSpell then setSpell = classtable.Presence end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready and not UnitAffectingCombat('player') then
         MaxDps:GlowCooldown(classtable.HornofWinter, cooldown[classtable.HornofWinter].ready)
     end
@@ -192,10 +192,10 @@ function Unholy:callaction()
     if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (ttd <= 60 and buff[classtable.MoguPowerPotionBuff].up) and cooldown[classtable.EmpowerRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')) and (unholy == 2 and RunicPower <90) and cooldown[classtable.ScourgeStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')) and (DeathKnight:RuneTypeCount("unholy") == 2 and RunicPower <90) and cooldown[classtable.ScourgeStrike].ready then
         if not setSpell then setSpell = classtable.ScourgeStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (blood == 2 and frost == 2 and RunicPower <90) and cooldown[classtable.FesteringStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (DeathKnight:RuneTypeCount("blood") == 2 and DeathKnight:RuneTypeCount("frost") == 2 and RunicPower <90) and cooldown[classtable.FesteringStrike].ready then
         if not setSpell then setSpell = classtable.FesteringStrike end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (RunicPower >90) and cooldown[classtable.DeathCoil].ready then
@@ -264,6 +264,11 @@ function DeathKnight:Unholy()
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
+
+    classtable.FrostFeverDeBuff = 55095
+    classtable.BloodPlagueDeBuff = 55078
+    classtable.MoguPowerPotionBuff = 447200
+    classtable.SuddenDoomBuff = 81340
 
     local function debugg()
         talents[classtable.UnholyBlight] = 1

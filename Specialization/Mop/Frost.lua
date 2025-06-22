@@ -139,9 +139,9 @@ end
 
 
 function Frost:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and cooldown[classtable.Presence].ready and not UnitAffectingCombat('player') then
-        if not setSpell then setSpell = classtable.Presence end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and cooldown[classtable.Presence].ready and not UnitAffectingCombat('player') then
+    --    if not setSpell then setSpell = classtable.Presence end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready and not UnitAffectingCombat('player') then
         MaxDps:GlowCooldown(classtable.HornofWinter, cooldown[classtable.HornofWinter].ready)
     end
@@ -179,7 +179,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (not debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.PlagueStrike].ready then
         if not setSpell then setSpell = classtable.PlagueStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueLeech, 'PlagueLeech') and talents[classtable.PlagueLeech]) and ((talents[classtable.PlagueLeech] and true or false) and ( ( cooldown[classtable.Outbreak].remains <1 ) or ( buff[classtable.RimeBuff].up and debuff[classtable.BloodPlagueDeBuff].remains <3 and ( unholy >= 1 or death >= 1 ) ) )) and cooldown[classtable.PlagueLeech].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PlagueLeech, 'PlagueLeech') and talents[classtable.PlagueLeech]) and ((talents[classtable.PlagueLeech] and true or false) and ( ( cooldown[classtable.Outbreak].remains <1 ) or ( buff[classtable.RimeBuff].up and debuff[classtable.BloodPlagueDeBuff].remains <3 and ( DeathKnight:RuneTypeCount("unholy") >= 1 or DeathKnight:RuneTypeCount("death") >= 1 ) ) )) and cooldown[classtable.PlagueLeech].ready then
         if not setSpell then setSpell = classtable.PlagueLeech end
     end
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up) and cooldown[classtable.HowlingBlast].ready then
@@ -244,6 +244,14 @@ function DeathKnight:Frost()
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
+
+    classtable.FrostStrike = 49143
+
+    classtable.FrostFeverDeBuff = 55095
+    classtable.BloodPlagueDeBuff = 55078
+    --classtable.RimeBuff
+    classtable.KillingMachineBuff = 51124
+    classtable.MoguPowerPotionBuff = 447200
 
     local function debugg()
         talents[classtable.UnholyBlight] = 1

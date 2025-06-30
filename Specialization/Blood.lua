@@ -69,6 +69,8 @@ local RunicPowerDeficit
 local ibf_damage
 local rt_damage
 local vb_damage
+local UTS
+local incoming_damage_5
 
 local Blood = {}
 
@@ -376,13 +378,13 @@ function Blood:callaction()
     if (MaxDps:CheckSpellUsable(classtable.MindFreeze, 'MindFreeze')) and cooldown[classtable.MindFreeze].ready then
         MaxDps:GlowCooldown(classtable.MindFreeze, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
     end
-    if (MaxDps:CheckSpellUsable(classtable.IceboundFortitude, 'IceboundFortitude')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and MaxDps.incoming_damage_5 >= ibf_damage and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up )) and cooldown[classtable.IceboundFortitude].ready then
+    if (MaxDps:CheckSpellUsable(classtable.IceboundFortitude, 'IceboundFortitude')) and ((UTS == 2 or UTS == 3) and incoming_damage_5 >= ibf_damage and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up )) and cooldown[classtable.IceboundFortitude].ready then
         MaxDps:GlowCooldown(classtable.IceboundFortitude, cooldown[classtable.IceboundFortitude].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.VampiricBlood, 'VampiricBlood')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and MaxDps.incoming_damage_5 >= vb_damage and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.VampiricBlood].ready then
+    if (MaxDps:CheckSpellUsable(classtable.VampiricBlood, 'VampiricBlood')) and ((UTS == 2 or UTS == 3) and incoming_damage_5 >= vb_damage and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.VampiricBlood].ready then
         MaxDps:GlowCooldown(classtable.VampiricBlood, cooldown[classtable.VampiricBlood].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.RuneTap, 'RuneTap')) and ((UnitThreatSituation('player') == 2 or UnitThreatSituation('player') == 3) and MaxDps.incoming_damage_5 >= rt_damage and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.RuneTap].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RuneTap, 'RuneTap')) and ((UTS == 2 or UTS == 3) and incoming_damage_5 >= rt_damage and not ( buff[classtable.DancingRuneWeaponBuff].up or buff[classtable.VampiricBloodBuff].up or buff[classtable.IceboundFortitudeBuff].up )) and cooldown[classtable.RuneTap].ready then
         MaxDps:GlowCooldown(classtable.RuneTap, cooldown[classtable.RuneTap].ready)
     end
     if ((MaxDps.ActiveHeroTree == 'deathbringer')) then
@@ -422,6 +424,8 @@ function DeathKnight:Blood()
     RunicPower = UnitPower('player', RunicPowerPT)
     RunicPowerMax = UnitPowerMax('player', RunicPowerPT)
     RunicPowerDeficit = RunicPowerMax - RunicPower
+    UTS = UnitThreatSituation('player') or 0
+    incoming_damage_5 = MaxDps.incoming_damage_5 or 0
     ibf_damage = maxHP * ( 40 ) * 0.01
     rt_damage = maxHP * ( 30 ) * 0.01
     vb_damage = maxHP * ( 50 ) * 0.01

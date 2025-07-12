@@ -139,13 +139,13 @@ end
 
 
 function Frost:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and (not buff[classtable.PresenceBuff].up) and cooldown[classtable.Presence].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and (not buff[classtable.PresenceBuff].up) and cooldown[classtable.Presence].ready then
         if not setSpell then setSpell = classtable.Presence end
     end
-    if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and (not buff[classtable.HornofWinterBuff].up) and cooldown[classtable.HornofWinter].ready then
         MaxDps:GlowCooldown(classtable.HornofWinter, cooldown[classtable.HornofWinter].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArmyoftheDead, 'ArmyoftheDead')) and cooldown[classtable.ArmyoftheDead].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.ArmyoftheDead, 'ArmyoftheDead')) and cooldown[classtable.ArmyoftheDead].ready then
         MaxDps:GlowCooldown(classtable.ArmyoftheDead, cooldown[classtable.ArmyoftheDead].ready)
     end
 end
@@ -255,6 +255,7 @@ function DeathKnight:Frost()
     classtable.KillingMachineBuff = 51124
     classtable.MoguPowerPotionBuff = 447200
     classtable.BloodChargeBuff = 114851
+    classtable.HornofWinterBuff = 57330
 
     local function debugg()
         talents[classtable.UnholyBlight] = 1

@@ -139,9 +139,9 @@ end
 
 
 function Frost:precombat()
-    --if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and cooldown[classtable.Presence].ready and not UnitAffectingCombat('player') then
-    --    if not setSpell then setSpell = classtable.Presence end
-    --end
+    if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and (not buff[classtable.PresenceBuff].up) and cooldown[classtable.Presence].ready and not UnitAffectingCombat('player') then
+        if not setSpell then setSpell = classtable.Presence end
+    end
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready and not UnitAffectingCombat('player') then
         MaxDps:GlowCooldown(classtable.HornofWinter, cooldown[classtable.HornofWinter].ready)
     end
@@ -197,7 +197,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (buff[classtable.KillingMachineBuff].up) and cooldown[classtable.Obliterate].ready then
         if not setSpell then setSpell = classtable.Obliterate end
     end
-    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap') and talents[classtable.BloodTap]) and ((talents[classtable.BloodTap] and true or false)) and cooldown[classtable.BloodTap].ready then
+    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap') and talents[classtable.BloodTap]) and ((talents[classtable.BloodTap] and buff[classtable.BloodChargeBuff].count >=5  or false)) and cooldown[classtable.BloodTap].ready then
         MaxDps:GlowCooldown(classtable.BloodTap, cooldown[classtable.BloodTap].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and cooldown[classtable.FrostStrike].ready then
@@ -246,12 +246,15 @@ function DeathKnight:Frost()
     --end
 
     classtable.FrostStrike = 49143
+    classtable.Presence = 48266
+    classtable.PresenceBuff = 48266
 
     classtable.FrostFeverDeBuff = 55095
     classtable.BloodPlagueDeBuff = 55078
     --classtable.RimeBuff
     classtable.KillingMachineBuff = 51124
     classtable.MoguPowerPotionBuff = 447200
+    classtable.BloodChargeBuff = 114851
 
     local function debugg()
         talents[classtable.UnholyBlight] = 1

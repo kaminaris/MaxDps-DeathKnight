@@ -139,9 +139,9 @@ end
 
 
 function Unholy:precombat()
-    --if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and cooldown[classtable.Presence].ready and not UnitAffectingCombat('player') then
-    --    if not setSpell then setSpell = classtable.Presence end
-    --end
+    if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and (not buff[classtable.PresenceBuff].up) and cooldown[classtable.Presence].ready and not UnitAffectingCombat('player') then
+        if not setSpell then setSpell = classtable.Presence end
+    end
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready and not UnitAffectingCombat('player') then
         MaxDps:GlowCooldown(classtable.HornofWinter, cooldown[classtable.HornofWinter].ready)
     end
@@ -204,7 +204,7 @@ function Unholy:callaction()
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (buff[classtable.SuddenDoomBuff].up) and cooldown[classtable.DeathCoil].ready then
         if not setSpell then setSpell = classtable.DeathCoil end
     end
-    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap') and talents[classtable.BloodTap]) and ((talents[classtable.BloodTap] and true or false)) and cooldown[classtable.BloodTap].ready then
+    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap') and talents[classtable.BloodTap]) and ((talents[classtable.BloodTap] and buff[classtable.BloodChargeBuff].count >=5  or false)) and cooldown[classtable.BloodTap].ready then
         MaxDps:GlowCooldown(classtable.BloodTap, cooldown[classtable.BloodTap].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')) and cooldown[classtable.ScourgeStrike].ready then
@@ -265,6 +265,10 @@ function DeathKnight:Unholy()
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
 
+    classtable.Presence = 48265
+    classtable.PresenceBuff = 48265
+
+    classtable.BloodChargeBuff = 114851
     classtable.FrostFeverDeBuff = 55095
     classtable.BloodPlagueDeBuff = 55078
     classtable.MoguPowerPotionBuff = 447200

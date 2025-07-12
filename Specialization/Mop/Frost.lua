@@ -251,7 +251,7 @@ function DeathKnight:Frost()
 
     classtable.FrostFeverDeBuff = 55095
     classtable.BloodPlagueDeBuff = 55078
-    --classtable.RimeBuff
+    classtable.RimeBuff = 59052
     classtable.KillingMachineBuff = 51124
     classtable.MoguPowerPotionBuff = 447200
     classtable.BloodChargeBuff = 114851

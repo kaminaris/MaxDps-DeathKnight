@@ -30,6 +30,7 @@ Specialization/Cata/Unholy.lua
 #@end-version-cata@
 
 #@version-mists@
+Specialization/MoP/Blood.lua
 Specialization/Mop/Frost.lua
 Specialization/Mop/Unholy.lua
 #@end-version-mists@

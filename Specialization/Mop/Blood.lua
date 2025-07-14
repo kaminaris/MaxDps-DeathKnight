@@ -135,6 +135,7 @@ function DeathKnight:Blood()
     RunicPower = UnitPower('player', RunicPowerPT)
     RunicPowerMax = UnitPowerMax('player', RunicPowerPT)
     RunicPowerDeficit = RunicPowerMax - RunicPower
+    classtable = MaxDps.SpellTable
 
     classtable.DeathStrike = 49998
     classtable.Outbreak = 77575

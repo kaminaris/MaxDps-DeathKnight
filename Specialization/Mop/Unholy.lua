@@ -164,7 +164,24 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.BloodTap, false)
 end
 
+local function numDepletedRunes(skipDeath)
+    local depleted = 0
+    for slot = 1, 6 do
+        local runeTypeForId = GetRuneType(i)
+        if (skipDeath and runeTypeForId == 4) or (not skipDeath) then
+            local _, _, runeReady = GetRuneCooldown(slot)
+            if not runeReady then
+                depleted = depleted + 1
+            end
+        end
+    end
+    return depleted
+end
+
 function Unholy:callaction()
+    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and ( (targethealthPerc < 35 and ttd >6) or (targethealthPerc < 35 and ttd < 4) ) and cooldown[classtable.SoulReaper].ready then
+        MaxDps:GlowCooldown(classtable.SoulReaper, cooldown[classtable.SoulReaper].ready)
+    end
     if (MaxDps:CheckSpellUsable(classtable.UnholyFrenzy, 'UnholyFrenzy')) and (timeInCombat >= 4) and cooldown[classtable.UnholyFrenzy].ready then
         if not setSpell then setSpell = classtable.UnholyFrenzy end
     end
@@ -174,13 +191,13 @@ function Unholy:callaction()
     if (MaxDps:CheckSpellUsable(classtable.UnholyBlight, 'UnholyBlight') and talents[classtable.UnholyBlight]) and ((talents[classtable.UnholyBlight] and true or false) and ( debuff[classtable.FrostFeverDeBuff].remains <3 or debuff[classtable.BloodPlagueDeBuff].remains <3 )) and cooldown[classtable.UnholyBlight].ready then
         if not setSpell then setSpell = classtable.UnholyBlight end
     end
+    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (not debuff[classtable.BloodPlagueDeBuff].up or not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.PlagueStrike].ready then
+        if not setSpell then setSpell = classtable.PlagueStrike end
+    end
     if (MaxDps:CheckSpellUsable(classtable.IcyTouch, 'IcyTouch')) and (not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.IcyTouch].ready then
         if not setSpell then setSpell = classtable.IcyTouch end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (not debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.PlagueStrike].ready then
-        if not setSpell then setSpell = classtable.PlagueStrike end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueLeech, 'PlagueLeech') and talents[classtable.PlagueLeech]) and ((talents[classtable.PlagueLeech] and true or false) and ( cooldown[classtable.Outbreak].remains <1 )) and cooldown[classtable.PlagueLeech].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PlagueLeech, 'PlagueLeech') and talents[classtable.PlagueLeech]) and (numDepletedRunes(true) >= 2 and DeathKnight:RuneTypeCount("Death") == 0) and ((talents[classtable.PlagueLeech] and true or false) and ( debuff[classtable.FrostFeverDeBuff].up or debuff[classtable.BloodPlagueDeBuff].up ) and ( cooldown[classtable.Outbreak].remains <1 )) and cooldown[classtable.PlagueLeech].ready then
         if not setSpell then setSpell = classtable.PlagueLeech end
     end
     if (MaxDps:CheckSpellUsable(classtable.SummonGargoyle, 'SummonGargoyle')) and cooldown[classtable.SummonGargoyle].ready then

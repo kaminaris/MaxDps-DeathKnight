@@ -167,7 +167,7 @@ end
 local function numDepletedRunes(skipDeath)
     local depleted = 0
     for slot = 1, 6 do
-        local runeTypeForId = GetRuneType(i)
+        local runeTypeForId = GetRuneType(slot)
         if (skipDeath and runeTypeForId == 4) or (not skipDeath) then
             local _, _, runeReady = GetRuneCooldown(slot)
             if not runeReady then

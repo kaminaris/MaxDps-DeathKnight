@@ -179,7 +179,7 @@ local function numDepletedRunes(skipDeath)
 end
 
 function Unholy:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and ( (targethealthPerc < 35 and ttd >6) or (targethealthPerc < 35 and ttd < 4) ) and cooldown[classtable.SoulReaper].ready then
+    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targethealthPerc < 35) and cooldown[classtable.SoulReaper].ready then
         MaxDps:GlowCooldown(classtable.SoulReaper, cooldown[classtable.SoulReaper].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.UnholyFrenzy, 'UnholyFrenzy')) and (timeInCombat >= 4) and cooldown[classtable.UnholyFrenzy].ready then

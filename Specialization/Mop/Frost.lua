@@ -85,6 +85,8 @@ end
 local function wep_rune_check(type)
     local MHitemLink=GetInventoryItemLink('player',16)
     local OHitemLink=GetInventoryItemLink('player',17)
+    local MHenchant = ""
+    local OHenchant = ""
     if MHitemLink ~= nil then
         local _,_,enchant=strsplit(':',MHitemLink)
         if enchant ~= nil and enchant ~= '' then
@@ -160,7 +162,54 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.BloodTap, false)
 end
 
-function Frost:callaction()
+function Frost:Aoe()
+    -- Howling Blast
+    if MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast') and cooldown[classtable.HowlingBlast].ready then
+        if not setSpell then setSpell = classtable.HowlingBlast end
+    end
+
+    -- Death and Decay
+    if MaxDps:CheckSpellUsable(classtable.DeathAndDecay, 'DeathAndDecay') and cooldown[classtable.DeathAndDecay].ready then
+        if not setSpell then setSpell = classtable.DeathAndDecay end
+    end
+
+    -- Pillar of Frost
+    if MaxDps:CheckSpellUsable(classtable.PillarOfFrost, 'PillarOfFrost') and cooldown[classtable.PillarOfFrost].ready then
+        MaxDps:GlowCooldown(classtable.PillarOfFrost, true)
+    end
+
+    -- Wild Mushroom: Plague (only if Symbiosis from Druid)
+    --if MaxDps:CheckSpellUsable(classtable.WildMushroomPlague, 'WildMushroomPlague') and buff[classtable.SymbiosisBuff] and cooldown[classtable.WildMushroomPlague].ready then
+    --    if not setSpell then setSpell = classtable.WildMushroomPlague end
+    --end
+
+    -- Frost Strike
+    if MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike') and cooldown[classtable.FrostStrike].ready then
+        if not setSpell then setSpell = classtable.FrostStrike end
+    end
+
+    -- Plague Strike (for longer-living targets)
+    if MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike') and ttd > 10 and cooldown[classtable.PlagueStrike].ready then
+        if not setSpell then setSpell = classtable.PlagueStrike end
+    end
+
+    -- Pestilence (for disease spreading on long-lived packs)
+    if MaxDps:CheckSpellUsable(classtable.Pestilence, 'Pestilence') and ttd > 10 and cooldown[classtable.Pestilence].ready then
+        if not setSpell then setSpell = classtable.Pestilence end
+    end
+
+    -- Obliterate
+    if MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate') and cooldown[classtable.Obliterate].ready then
+        if not setSpell then setSpell = classtable.Obliterate end
+    end
+
+    -- Horn of Winter as filler
+    if MaxDps:CheckSpellUsable(classtable.HornOfWinter, 'HornOfWinter') and cooldown[classtable.HornOfWinter].ready then
+        if not setSpell then setSpell = classtable.HornOfWinter end
+    end
+end
+
+function Frost:Single()
     if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targethealthPerc < 35) and cooldown[classtable.SoulReaper].ready then
         MaxDps:GlowCooldown(classtable.SoulReaper, cooldown[classtable.SoulReaper].ready)
     end
@@ -213,6 +262,13 @@ function Frost:callaction()
         MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
 end
+
+function Frost:callaction()
+    if targets > 2 then
+        Frost:Aoe()
+    end
+    Frost:Single()
+end
 function DeathKnight:Frost()
     fd = MaxDps.FrameData
     ttd = (fd.timeToDie and fd.timeToDie) or 500
@@ -223,9 +279,9 @@ function DeathKnight:Frost()
     debuff = fd.debuff
     talents = fd.talents
     targets = MaxDps:SmartAoe()
-    Mana = UnitPower('player', ManaPT)
-    ManaMax = UnitPowerMax('player', ManaPT)
-    ManaDeficit = ManaMax - Mana
+    --Mana = UnitPower('player', ManaPT)
+    --ManaMax = UnitPowerMax('player', ManaPT)
+    --ManaDeficit = ManaMax - Mana
     targetHP = UnitHealth('target')
     targetmaxHP = UnitHealthMax('target')
     targethealthPerc = (targetHP >0 and targetmaxHP >0 and (targetHP / targetmaxHP) * 100) or 100

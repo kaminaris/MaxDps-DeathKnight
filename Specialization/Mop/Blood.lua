@@ -98,7 +98,7 @@ function Blood:aoe()
     if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (debuff[classtable.FrostFeverDeBuff].remains <3 or debuff[classtable.BloodPlagueDeBuff].remains <3) and cooldown[classtable.Outbreak].ready then
         if not setSpell then setSpell = classtable.Outbreak end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Pestilence, 'Pestilence')) and (debuff[classtable.FrostFeverDeBuff].remains >2 or debuff[classtable.BloodPlagueDeBuff].remains >2 and (MaxDps:DebuffCount(classtable.FrostFeverDeBuff) < targets or MaxDps:DebuffCount(classtable.BloodPlagueDeBuff) < targets) ) and cooldown[classtable.Pestilence].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Pestilence, 'Pestilence') and not talents[classtable.RoilingBlood]) and (debuff[classtable.FrostFeverDeBuff].remains >2 or debuff[classtable.BloodPlagueDeBuff].remains >2 and (MaxDps:DebuffCount(classtable.FrostFeverDeBuff) < targets or MaxDps:DebuffCount(classtable.BloodPlagueDeBuff) < targets) ) and cooldown[classtable.Pestilence].ready then
         if not setSpell then setSpell = classtable.Pestilence end
     end
     if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (buff[classtable.CrimsonScourgeBuff].up) and cooldown[classtable.BloodBoil].ready then

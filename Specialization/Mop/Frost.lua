@@ -169,13 +169,13 @@ function Frost:Aoe()
     end
 
     -- Death and Decay
-    if MaxDps:CheckSpellUsable(classtable.DeathAndDecay, 'DeathAndDecay') and cooldown[classtable.DeathAndDecay].ready then
-        if not setSpell then setSpell = classtable.DeathAndDecay end
+    if MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay') and cooldown[classtable.DeathandDecay].ready then
+        if not setSpell then setSpell = classtable.DeathandDecay end
     end
 
     -- Pillar of Frost
-    if MaxDps:CheckSpellUsable(classtable.PillarOfFrost, 'PillarOfFrost') and cooldown[classtable.PillarOfFrost].ready then
-        MaxDps:GlowCooldown(classtable.PillarOfFrost, true)
+    if MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost') and cooldown[classtable.PillarofFrost].ready then
+        MaxDps:GlowCooldown(classtable.PillarofFrost, true)
     end
 
     -- Wild Mushroom: Plague (only if Symbiosis from Druid)
@@ -204,8 +204,8 @@ function Frost:Aoe()
     end
 
     -- Horn of Winter as filler
-    if MaxDps:CheckSpellUsable(classtable.HornOfWinter, 'HornOfWinter') and cooldown[classtable.HornOfWinter].ready then
-        if not setSpell then setSpell = classtable.HornOfWinter end
+    if MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter') and cooldown[classtable.HornofWinter].ready then
+        if not setSpell then setSpell = classtable.HornofWinter end
     end
 end
 

@@ -85,6 +85,8 @@ end
 local function wep_rune_check(type)
     local MHitemLink=GetInventoryItemLink('player',16)
     local OHitemLink=GetInventoryItemLink('player',17)
+    local MHenchant = ""
+    local OHenchant = ""
     if MHitemLink ~= nil then
         local _,_,enchant=strsplit(':',MHitemLink)
         if enchant ~= nil and enchant ~= '' then
@@ -178,10 +180,54 @@ local function numDepletedRunes(skipDeath)
     return depleted
 end
 
-function Unholy:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targethealthPerc < 35) and cooldown[classtable.SoulReaper].ready then
-        MaxDps:GlowCooldown(classtable.SoulReaper, cooldown[classtable.SoulReaper].ready)
+function Unholy:Aoe()
+    -- Death and Decay
+    if MaxDps:CheckSpellUsable(classtable.DeathAndDecay, 'DeathAndDecay') and cooldown[classtable.DeathAndDecay].ready then
+        if not setSpell then setSpell = classtable.DeathAndDecay end
     end
+
+    -- Blood Boil (only if Blood or Death runes are available)
+    if MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')
+        and (DeathKnight:RuneTypeCount("Blood") > 0 or DeathKnight:RuneTypeCount("Death") > 0)
+        and cooldown[classtable.BloodBoil].ready then
+        if not setSpell then setSpell = classtable.BloodBoil end
+    end
+
+    -- Dark Transformation
+    if MaxDps:CheckSpellUsable(classtable.DarkTransformation, 'DarkTransformation') and cooldown[classtable.DarkTransformation].ready then
+        MaxDps:GlowCooldown(classtable.DarkTransformation, true)
+    end
+
+    -- Death Coil when no runes are available
+    if MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')
+        and DeathKnight:RuneTypeCount("Blood") == 0 and DeathKnight:RuneTypeCount("Frost") == 0 and DeathKnight:RuneTypeCount("Unholy") == 0 and DeathKnight:RuneTypeCount("Death") == 0
+        and cooldown[classtable.DeathCoil].ready then
+        if not setSpell then setSpell = classtable.DeathCoil end
+    end
+
+    -- Icy Touch to convert excess Frost Runes to Death Runes
+    if MaxDps:CheckSpellUsable(classtable.IcyTouch, 'IcyTouch')
+        and runes.Frost > 0
+        and cooldown[classtable.IcyTouch].ready then
+        if not setSpell then setSpell = classtable.IcyTouch end
+    end
+
+    -- Scourge Strike when only Unholy runes and no Runic Power
+    if MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')
+        and DeathKnight:RuneTypeCount("Unholy") > 0 and DeathKnight:RuneTypeCount("Blood") == 0 and DeathKnight:RuneTypeCount("Frost") == 0 and DeathKnight:RuneTypeCount("Death") == 0
+        and RunicPower < 20 and cooldown[classtable.ScourgeStrike].ready then
+        if not setSpell then setSpell = classtable.ScourgeStrike end
+    end
+
+    -- Wild Mushroom: Plague (only with Symbiosis from Druid)
+    --if MaxDps:CheckSpellUsable(classtable.WildMushroomPlague, 'WildMushroomPlague')
+    --    and buff[classtable.SymbiosisBuff]
+    --    and cooldown[classtable.WildMushroomPlague].ready then
+    --    if not setSpell then setSpell = classtable.WildMushroomPlague end
+    --end
+end
+
+function Unholy:Single()
     if (MaxDps:CheckSpellUsable(classtable.UnholyFrenzy, 'UnholyFrenzy')) and (timeInCombat >= 4) and cooldown[classtable.UnholyFrenzy].ready then
         if not setSpell then setSpell = classtable.UnholyFrenzy end
     end
@@ -209,10 +255,10 @@ function Unholy:callaction()
     if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (ttd <= 60 and buff[classtable.MoguPowerPotionBuff].up) and cooldown[classtable.EmpowerRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')) and (DeathKnight:RuneTypeCount("unholy") == 2 and RunicPower <90) and cooldown[classtable.ScourgeStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ScourgeStrike, 'ScourgeStrike')) and (DeathKnight:RuneTypeCount("Unholy") == 2 and RunicPower <90) and cooldown[classtable.ScourgeStrike].ready then
         if not setSpell then setSpell = classtable.ScourgeStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (DeathKnight:RuneTypeCount("blood") == 2 and DeathKnight:RuneTypeCount("frost") == 2 and RunicPower <90) and cooldown[classtable.FesteringStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (DeathKnight:RuneTypeCount("Blood") == 2 and DeathKnight:RuneTypeCount("Frost") == 2 and RunicPower <90) and cooldown[classtable.FesteringStrike].ready then
         if not setSpell then setSpell = classtable.FesteringStrike end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathCoil, 'DeathCoil')) and (RunicPower >90) and cooldown[classtable.DeathCoil].ready then
@@ -240,6 +286,16 @@ function Unholy:callaction()
         MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
 end
+
+function Unholy:callaction()
+    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targethealthPerc < 35) and cooldown[classtable.SoulReaper].ready then
+        MaxDps:GlowCooldown(classtable.SoulReaper, cooldown[classtable.SoulReaper].ready)
+    end
+    if targets > 2 then
+        Unholy:Aoe()
+    end
+    Unholy:Single()
+end
 function DeathKnight:Unholy()
     fd = MaxDps.FrameData
     ttd = (fd.timeToDie and fd.timeToDie) or 500
@@ -250,9 +306,6 @@ function DeathKnight:Unholy()
     debuff = fd.debuff
     talents = fd.talents
     targets = MaxDps:SmartAoe()
-    Mana = UnitPower('player', ManaPT)
-    ManaMax = UnitPowerMax('player', ManaPT)
-    ManaDeficit = ManaMax - Mana
     targetHP = UnitHealth('target')
     targetmaxHP = UnitHealthMax('target')
     targethealthPerc = (targetHP >0 and targetmaxHP >0 and (targetHP / targetmaxHP) * 100) or 100

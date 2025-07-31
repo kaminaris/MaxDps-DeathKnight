@@ -231,7 +231,7 @@ function Frost:Single()
     if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (not debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.PlagueStrike].ready then
         if not setSpell then setSpell = classtable.PlagueStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueLeech, 'PlagueLeech') and talents[classtable.PlagueLeech]) and ((talents[classtable.PlagueLeech] and true or false) and ( ( cooldown[classtable.Outbreak].remains <1 ) or ( buff[classtable.RimeBuff].up and debuff[classtable.BloodPlagueDeBuff].remains <3 and ( DeathKnight:RuneTypeCount("unholy") >= 1 or DeathKnight:RuneTypeCount("death") >= 1 ) ) )) and cooldown[classtable.PlagueLeech].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PlagueLeech, 'PlagueLeech') and talents[classtable.PlagueLeech]) and ((talents[classtable.PlagueLeech] and true or false) and ( ( cooldown[classtable.Outbreak].remains <1 ) or ( buff[classtable.RimeBuff].up and debuff[classtable.BloodPlagueDeBuff].remains <3 and ( DeathKnight:RuneTypeCount("Unholy") >= 1 or DeathKnight:RuneTypeCount("Death") >= 1 ) ) )) and cooldown[classtable.PlagueLeech].ready then
         if not setSpell then setSpell = classtable.PlagueLeech end
     end
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up) and cooldown[classtable.HowlingBlast].ready then

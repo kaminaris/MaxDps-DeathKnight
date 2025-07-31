@@ -182,8 +182,8 @@ end
 
 function Unholy:Aoe()
     -- Death and Decay
-    if MaxDps:CheckSpellUsable(classtable.DeathAndDecay, 'DeathAndDecay') and cooldown[classtable.DeathAndDecay].ready then
-        if not setSpell then setSpell = classtable.DeathAndDecay end
+    if MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay') and cooldown[classtable.DeathandDecay].ready then
+        if not setSpell then setSpell = classtable.DeathandDecay end
     end
 
     -- Blood Boil (only if Blood or Death runes are available)
@@ -207,7 +207,7 @@ function Unholy:Aoe()
 
     -- Icy Touch to convert excess Frost Runes to Death Runes
     if MaxDps:CheckSpellUsable(classtable.IcyTouch, 'IcyTouch')
-        and runes.Frost > 0
+        and DeathKnight:RuneTypeCount("Frost") > 0
         and cooldown[classtable.IcyTouch].ready then
         if not setSpell then setSpell = classtable.IcyTouch end
     end

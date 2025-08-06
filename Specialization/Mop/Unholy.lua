@@ -237,7 +237,7 @@ function Unholy:Single()
     if (MaxDps:CheckSpellUsable(classtable.UnholyBlight, 'UnholyBlight') and talents[classtable.UnholyBlight]) and ((talents[classtable.UnholyBlight] and true or false) and ( debuff[classtable.FrostFeverDeBuff].remains <3 or debuff[classtable.BloodPlagueDeBuff].remains <3 )) and cooldown[classtable.UnholyBlight].ready then
         if not setSpell then setSpell = classtable.UnholyBlight end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (not debuff[classtable.BloodPlagueDeBuff].up or not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.PlagueStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and ( (UnitLevel('player') >= 68 and not debuff[classtable.BloodPlagueDeBuff].up or not debuff[classtable.FrostFeverDeBuff].up) or (not debuff[classtable.BloodPlagueDeBuff].up) ) and cooldown[classtable.PlagueStrike].ready then
         if not setSpell then setSpell = classtable.PlagueStrike end
     end
     if (MaxDps:CheckSpellUsable(classtable.IcyTouch, 'IcyTouch')) and (not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.IcyTouch].ready then

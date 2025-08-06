@@ -260,7 +260,7 @@ function Frost:precombat()
     else
         trinket_2_duration = 1
     end
-    if not trinket_1_buffs and trinket_2_buffs and (MaxDps:HasOnUseEffect('14') or not MaxDps:HasOnUseEffect('13')) or trinket_2_buffs and ((MaxDps:CheckTrinketCooldownDuration('14')%trinket_2_duration)*(1.5 + MaxDps:HasBuffEffect('14', 'strength'))*(trinket_2_sync)*(1+((MaxDps:CheckTrinketItemLevel('14') - MaxDps:CheckTrinketItemLevel('13'))%100)))>((MaxDps:CheckTrinketCooldownDuration('13')%trinket_1_duration)*(1.5 + MaxDps:HasBuffEffect('13', 'strength'))*(trinket_1_sync)*(1+((MaxDps:CheckTrinketItemLevel('13') - MaxDps:CheckTrinketItemLevel('14'))%100))) then
+    if not trinket_1_buffs and trinket_2_buffs and (MaxDps:HasOnUseEffect('14') or not MaxDps:HasOnUseEffect('13')) or trinket_2_buffs and ((MaxDps:CheckTrinketCooldownDuration('14')%trinket_2_duration)*(1.5 + (MaxDps:HasBuffEffect('14', 'strength') and 1 or 0))*(trinket_2_sync)*(1+((MaxDps:CheckTrinketItemLevel('14') - MaxDps:CheckTrinketItemLevel('13'))%100)))>((MaxDps:CheckTrinketCooldownDuration('13')%trinket_1_duration)*(1.5 + (MaxDps:HasBuffEffect('13', 'strength') and 1 or 0))*(trinket_1_sync)*(1+((MaxDps:CheckTrinketItemLevel('13') - MaxDps:CheckTrinketItemLevel('14'))%100))) then
         trinket_priority = 2
     else
         trinket_priority = true

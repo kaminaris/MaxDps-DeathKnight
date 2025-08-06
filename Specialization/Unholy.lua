@@ -298,17 +298,17 @@ function Unholy:precombat()
     else
         trinket_2_high_value = true
     end
-    if trinket_1_buffs and (talents[classtable.Apocalypse] and math.fmod(MaxDps:CheckTrinketCooldown('13').duration , cooldown[classtable.Apocalypse].duration) == 0 or talents[classtable.DarkTransformation] and math.fmod(MaxDps:CheckTrinketCooldown('13').duration , cooldown[classtable.DarkTransformation].duration) == 0) or MaxDps:CheckTrinketNames('TreacherousTransmitter') then
+    if trinket_1_buffs and (talents[classtable.Apocalypse] and math.fmod(MaxDps:CheckTrinketCooldownDuration('13') , cooldown[classtable.Apocalypse].duration) == 0 or talents[classtable.DarkTransformation] and math.fmod(MaxDps:CheckTrinketCooldownDuration('13') , cooldown[classtable.DarkTransformation].duration) == 0) or MaxDps:CheckTrinketNames('TreacherousTransmitter') then
         trinket_1_sync = 1
     else
         trinket_1_sync = 0.5
     end
-    if trinket_2_buffs and (talents[classtable.Apocalypse] and math.fmod(MaxDps:CheckTrinketCooldown('14').duration , cooldown[classtable.Apocalypse].duration) == 0 or talents[classtable.DarkTransformation] and math.fmod(MaxDps:CheckTrinketCooldown('14').duration , cooldown[classtable.DarkTransformation].duration) == 0) or MaxDps:CheckTrinketNames('TreacherousTransmitter') then
+    if trinket_2_buffs and (talents[classtable.Apocalypse] and math.fmod(MaxDps:CheckTrinketCooldownDuration('14') , cooldown[classtable.Apocalypse].duration) == 0 or talents[classtable.DarkTransformation] and math.fmod(MaxDps:CheckTrinketCooldownDuration('14') , cooldown[classtable.DarkTransformation].duration) == 0) or MaxDps:CheckTrinketNames('TreacherousTransmitter') then
         trinket_2_sync = 1
     else
         trinket_2_sync = 0.5
     end
-    if not trinket_1_buffs and trinket_2_buffs and (MaxDps:HasOnUseEffect('14') or not MaxDps:HasOnUseEffect('13')) or trinket_2_buffs and ((MaxDps:CheckTrinketCooldown('14').duration%trinket_2_duration)*(1.5 + MaxDps:HasBuffEffect('14', 'strength'))*(trinket_2_sync)*(trinket_2_high_value)*(1+((MaxDps:CheckTrinketItemLevel('14') - MaxDps:CheckTrinketItemLevel('13'))%100)))>((MaxDps:CheckTrinketCooldown('13').duration%trinket_1_duration)*(1.5 + MaxDps:HasBuffEffect('13', 'strength'))*(trinket_1_sync)*(trinket_1_high_value)*(1+((MaxDps:CheckTrinketItemLevel('13') - MaxDps:CheckTrinketItemLevel('14'))%100))) then
+    if not trinket_1_buffs and trinket_2_buffs and (MaxDps:HasOnUseEffect('14') or not MaxDps:HasOnUseEffect('13')) or trinket_2_buffs and ((MaxDps:CheckTrinketCooldownDuration('14')%trinket_2_duration)*(1.5 + MaxDps:HasBuffEffect('14', 'strength'))*(trinket_2_sync)*(trinket_2_high_value)*(1+((MaxDps:CheckTrinketItemLevel('14') - MaxDps:CheckTrinketItemLevel('13'))%100)))>((MaxDps:CheckTrinketCooldownDuration('13')%trinket_1_duration)*(1.5 + MaxDps:HasBuffEffect('13', 'strength'))*(trinket_1_sync)*(trinket_1_high_value)*(1+((MaxDps:CheckTrinketItemLevel('13') - MaxDps:CheckTrinketItemLevel('14'))%100))) then
         trinket_priority = 2
     else
         trinket_priority = true

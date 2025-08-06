@@ -317,7 +317,7 @@ function Frost:breath()
     if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (ttd >5 and MaxDps:GetTimeToPct(35) <5 and ttd >5 and targets == 1 and Runes >2) and cooldown[classtable.SoulReaper].ready then
         if not setSpell then setSpell = classtable.SoulReaper end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RemorselessWinter, 'RemorselessWinter')) and (breath_dying) and cooldown[classtable.RemorselessWinter].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RemorselessWinter, 'RemorselessWinter')) and (not talents[classtable.FrozenDominion] and breath_dying) and cooldown[classtable.RemorselessWinter].ready then
         if not setSpell then setSpell = classtable.RemorselessWinter end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and (not buff[classtable.DeathandDecayBuff].up and (st_planning and talents[classtable.UnholyGround] and RunicPowerDeficit >= 10 and not talents[classtable.Obliteration] or breath_dying)) and cooldown[classtable.DeathandDecay].ready then
@@ -541,7 +541,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.AbominationLimb, 'AbominationLimb')) and (not talents[classtable.Obliteration] and sending_cds) and cooldown[classtable.AbominationLimb].ready then
         MaxDps:GlowCooldown(classtable.AbominationLimb, cooldown[classtable.AbominationLimb].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.RemorselessWinter, 'RemorselessWinter')) and (rw_buffs and sending_cds and (not talents[classtable.ArcticAssault] or not buff[classtable.PillarofFrostBuff].up) and (cooldown[classtable.PillarofFrost].remains >20 or cooldown[classtable.PillarofFrost].remains <gcd*3 or (buff[classtable.GatheringStormBuff].count == 10 and buff[classtable.RemorselessWinterBuff].remains <gcd)) and ttd >10) and cooldown[classtable.RemorselessWinter].ready then
+    if (MaxDps:CheckSpellUsable(classtable.RemorselessWinter, 'RemorselessWinter')) and (not talents[classtable.FrozenDominion] and rw_buffs and sending_cds and (not talents[classtable.ArcticAssault] or not buff[classtable.PillarofFrostBuff].up) and (cooldown[classtable.PillarofFrost].remains >20 or cooldown[classtable.PillarofFrost].remains <gcd*3 or (buff[classtable.GatheringStormBuff].count == 10 and buff[classtable.RemorselessWinterBuff].remains <gcd)) and ttd >10) and cooldown[classtable.RemorselessWinter].ready then
         if not setSpell then setSpell = classtable.RemorselessWinter end
     end
     if (MaxDps:CheckSpellUsable(classtable.ChillStreak, 'ChillStreak')) and (sending_cds and (not talents[classtable.ArcticAssault] or not buff[classtable.PillarofFrostBuff].up)) and cooldown[classtable.ChillStreak].ready then
@@ -643,8 +643,10 @@ function DeathKnight:Frost()
     classtable = MaxDps.SpellTable
     local trinket1ID = GetInventoryItemID('player', 13)
     local trinket2ID = GetInventoryItemID('player', 14)
+    local MHID = GetInventoryItemID('player', 16)
     classtable.trinket1 = (trinket1ID and select(2,GetItemSpell(trinket1ID)) ) or 0
     classtable.trinket2 = (trinket2ID and select(2,GetItemSpell(trinket2ID)) ) or 0
+    classtable.main_hand = (MHID and select(2,GetItemSpell(MHID)) ) or 0
     Runes = UnitPower('player', RunesPT)
     RunesMax = UnitPowerMax('player', RunesPT)
     RunesDeficit = RunesMax - Runes

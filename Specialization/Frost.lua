@@ -146,7 +146,7 @@ local trinket_2_manual = false
 local rw_buffs = false
 local breath_rp_cost = 0
 local static_rime_buffs = false
-local breath_rp_threshold = false
+local breath_rp_threshold = 70
 local erw_breath_rp_trigger = 70
 local erw_breath_rune_trigger = 3
 local oblit_rune_pooling = 4
@@ -275,7 +275,7 @@ function Frost:precombat()
     rw_buffs = talents[classtable.GatheringStorm] or talents[classtable.BitingCold]
     breath_rp_cost = 17
     static_rime_buffs = talents[classtable.RageoftheFrozenChampion] or talents[classtable.Icebreaker] or talents[classtable.BindInDarkness]
-    breath_rp_threshold = false
+    breath_rp_threshold = 70
     erw_breath_rp_trigger = 70
     erw_breath_rune_trigger = 3
     oblit_rune_pooling = 4
@@ -501,7 +501,7 @@ function Frost:callaction()
     if RunicPowerDeficit >10 and true_breath_cooldown <10 then
         breath_pooling_time = ((true_breath_cooldown + 1)%gcd)%((Runes + 1)*(RunicPower + 20))*100
     else
-        breath_pooling_time = false
+        breath_pooling_time = 0
     end
     pooling_runes = Runes <oblit_rune_pooling and talents[classtable.Obliteration] and (not talents[classtable.BreathofSindragosa] or true_breath_cooldown >0) and cooldown[classtable.PillarofFrost].remains <oblit_pooling_time
     pooling_runic_power = talents[classtable.BreathofSindragosa] and (true_breath_cooldown <breath_pooling_time or ttd <30 and cooldown[classtable.BreathofSindragosa].ready) or talents[classtable.Obliteration] and (not talents[classtable.BreathofSindragosa] or cooldown[classtable.BreathofSindragosa].remains >30) and RunicPower <35 and cooldown[classtable.PillarofFrost].remains <oblit_pooling_time

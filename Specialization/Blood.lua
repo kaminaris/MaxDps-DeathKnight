@@ -346,6 +346,7 @@ end
 local function ClearCDs()
     MaxDps:GlowCooldown(classtable.MindFreeze, false)
     MaxDps:GlowCooldown(classtable.tome_of_lights_devotion, false)
+    MaxDps:GlowCooldown(classtable.unyielding_netherprism, false)
     MaxDps:GlowCooldown(classtable.bestinslots, false)
     MaxDps:GlowCooldown(classtable.VampiricBlood, false)
     MaxDps:GlowCooldown(classtable.RaiseDead, false)
@@ -366,7 +367,7 @@ function Blood:callaction()
         MaxDps:GlowCooldown(classtable.tome_of_lights_devotion, cooldown[classtable.tome_of_lights_devotion].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.unyielding_netherprism, 'unyielding_netherprism')) and (cooldown[classtable.DancingRuneWeapon].remains <1 or (MaxDps:GetPartyState() == 'raid') and MaxDps:boss() and ttd <= 20) and cooldown[classtable.unyielding_netherprism].ready then
-        if not setSpell then setSpell = classtable.unyielding_netherprism end
+        MaxDps:GlowCooldown(classtable.unyielding_netherprism, cooldown[classtable.unyielding_netherprism].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.bestinslots, 'bestinslots')) and cooldown[classtable.bestinslots].ready then
         MaxDps:GlowCooldown(classtable.bestinslots, cooldown[classtable.bestinslots].ready)

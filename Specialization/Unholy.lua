@@ -258,24 +258,24 @@ function Unholy:precombat()
     trinket_1_buffs = MaxDps:HasOnUseEffect('13') or MaxDps:CheckTrinketNames('TreacherousTransmitter') or MaxDps:CheckTrinketNames('UnyieldingNetherprism')
     trinket_2_buffs = MaxDps:HasOnUseEffect('14') or MaxDps:CheckTrinketNames('TreacherousTransmitter') or MaxDps:CheckTrinketNames('UnyieldingNetherprism')
     if MaxDps:CheckTrinketNames('TreacherousTransmitter') or MaxDps:CheckTrinketNames('FunhouseLens') or MaxDps:CheckTrinketNames('SignetofthePriory') or MaxDps:CheckTrinketNames('UnyieldingNetherprism') or MaxDps:CheckTrinketNames('CursedStoneIdol') then
-        trinket_1_duration = MaxDps:CheckTrinketNames('TreacherousTransmitter') * 15+MaxDps:CheckTrinketNames('FunhouseLens') * 15+MaxDps:CheckTrinketNames('SignetofthePriory') * 20+MaxDps:CheckTrinketNames('UnyieldingNetherprism') * 20+MaxDps:CheckTrinketNames('CursedStoneIdol') * 15
+        trinket_1_duration = MaxDps:CheckTrinketCooldownDuration('TreacherousTransmitter') * 15+MaxDps:CheckTrinketCooldownDuration('FunhouseLens') * 15+MaxDps:CheckTrinketCooldownDuration('SignetofthePriory') * 20+MaxDps:CheckTrinketCooldownDuration('UnyieldingNetherprism') * 20+MaxDps:CheckTrinketCooldownDuration('CursedStoneIdol') * 15
     else
         trinket_1_duration = 1
     end
     if MaxDps:CheckTrinketNames('TreacherousTransmitter') or MaxDps:CheckTrinketNames('FunhouseLens') or MaxDps:CheckTrinketNames('SignetofthePriory') or MaxDps:CheckTrinketNames('UnyieldingNetherprism') or MaxDps:CheckTrinketNames('CursedStoneIdol') then
-        trinket_2_duration = MaxDps:CheckTrinketNames('TreacherousTransmitter') * 15+MaxDps:CheckTrinketNames('FunhouseLens') * 15+MaxDps:CheckTrinketNames('SignetofthePriory') * 20+MaxDps:CheckTrinketNames('UnyieldingNetherprism') * 20+MaxDps:CheckTrinketNames('CursedStoneIdol') * 15
+        trinket_2_duration = MaxDps:CheckTrinketCooldownDuration('TreacherousTransmitter') * 15+MaxDps:CheckTrinketCooldownDuration('FunhouseLens') * 15+MaxDps:CheckTrinketCooldownDuration('SignetofthePriory') * 20+MaxDps:CheckTrinketCooldownDuration('UnyieldingNetherprism') * 20+MaxDps:CheckTrinketCooldownDuration('CursedStoneIdol') * 15
     else
         trinket_2_duration = 1
     end
     if MaxDps:CheckTrinketNames('TreacherousTransmitter') then
         trinket_1_high_value = 2
     else
-        trinket_1_high_value = true
+        trinket_1_high_value = 1
     end
     if MaxDps:CheckTrinketNames('TreacherousTransmitter') then
         trinket_2_high_value = 2
     else
-        trinket_2_high_value = true
+        trinket_2_high_value = 1
     end
     if trinket_1_buffs and (talents[classtable.Apocalypse] and math.fmod(MaxDps:CheckTrinketCooldownDuration('13') , cooldown[classtable.Apocalypse].duration) == 0 or talents[classtable.DarkTransformation] and math.fmod(MaxDps:CheckTrinketCooldownDuration('13') , cooldown[classtable.DarkTransformation].duration) == 0) or MaxDps:CheckTrinketNames('TreacherousTransmitter') then
         trinket_1_sync = 1
@@ -290,12 +290,12 @@ function Unholy:precombat()
     if not trinket_1_buffs and trinket_2_buffs and (MaxDps:HasOnUseEffect('14') or not MaxDps:HasOnUseEffect('13')) or trinket_2_buffs and ((MaxDps:CheckTrinketCooldownDuration('14')%trinket_2_duration)*(1.5 + (MaxDps:HasBuffEffect('14', 'strength') and 1 or 0))*(trinket_2_sync)*(trinket_2_high_value)*(1+((MaxDps:CheckTrinketItemLevel('14') - MaxDps:CheckTrinketItemLevel('13'))%100)))>((MaxDps:CheckTrinketCooldownDuration('13')%trinket_1_duration)*(1.5 + (MaxDps:HasBuffEffect('13', 'strength') and 1 or 0))*(trinket_1_sync)*(trinket_1_high_value)*(1+((MaxDps:CheckTrinketItemLevel('13') - MaxDps:CheckTrinketItemLevel('14'))%100))) then
         trinket_priority = 2
     else
-        trinket_priority = true
+        trinket_priority = 1
     end
     if not trinket_1_buffs and not trinket_2_buffs and MaxDps:CheckTrinketItemLevel('14') >= MaxDps:CheckTrinketItemLevel('13') then
         damage_trinket_priority = 2
     else
-        damage_trinket_priority = true
+        damage_trinket_priority = 1
     end
 end
 function Unholy:aoe()

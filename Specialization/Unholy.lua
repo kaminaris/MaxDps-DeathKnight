@@ -116,19 +116,19 @@ local trinket_1_buffs = false
 local trinket_2_buffs = false
 local trinket_1_duration = 0
 local trinket_2_duration = 0
-local trinket_1_high_value = false
-local trinket_2_high_value = false
+local trinket_1_high_value = 1
+local trinket_2_high_value = 1
 local trinket_1_sync = false
 local trinket_2_sync = false
-local trinket_priority = false
-local damage_trinket_priority = false
+local trinket_priority = 1
+local damage_trinket_priority = 1
 local st_planning = false
 local adds_remain = false
 local apoc_timing = 0
 local pop_wounds = false
 local pooling_runic_power = false
 local spend_rp = false
-local san_coil_mult = 0
+local san_coil_mult = 1
 local epidemic_targets = 0
 
 
@@ -396,7 +396,7 @@ function Unholy:aoe_setup()
     if (MaxDps:CheckSpellUsable(classtable.Epidemic, 'Epidemic')) and (debuff[classtable.VirulentPlagueDeBuff].up and not pooling_runic_power) and cooldown[classtable.Epidemic].ready then
         if not setSpell then setSpell = classtable.Epidemic end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) <8 and not MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) == targets) and cooldown[classtable.FesteringStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FesteringStrike, 'FesteringStrike')) and (MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) <8 and not (MaxDps:DebuffCounter(classtable.FesteringWoundDebuff, 1) == targets)) and cooldown[classtable.FesteringStrike].ready then
         if not setSpell then setSpell = classtable.FesteringStrike end
     end
     if (MaxDps:CheckSpellUsable(classtable.WoundSpender, 'WoundSpender')) and (buff[classtable.VampiricStrikeBuff].up) and cooldown[classtable.WoundSpender].ready then

@@ -115,7 +115,7 @@ local vb_damage
 
 local Blood = {}
 
-local bone_shield_refresh_value = 0
+local bone_shield_refresh_value = 7
 local rp_deficit_threshold = 0
 
 

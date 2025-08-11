@@ -118,15 +118,15 @@ local trinket_1_buffs = false
 local trinket_2_buffs = false
 local trinket_1_duration = 0
 local trinket_2_duration = 0
-local trinket_priority = false
-local damage_trinket_priority = false
-local trinket_1_manual = false
-local trinket_2_manual = false
+local trinket_priority = 1
+local damage_trinket_priority = 1
+local trinket_1_manual = 0
+local trinket_2_manual = 0
 local cooldown_check = false
 local fwf_buffs = false
 local rune_pooling = false
 local rp_pooling = false
-local frostscythe_prio = false
+local frostscythe_prio = 3
 
 
 local function twoh_check()
@@ -211,17 +211,17 @@ function Frost:precombat()
     end
     trinket_1_buffs = MaxDps:HasOnUseEffect('13') and not MaxDps:CheckTrinketNames('ImprovisedSeaforiumPacemaker') and (MaxDps:HasOnUseEffect('13') or MaxDps:HasBuffEffect('13', 'strength') or MaxDps:HasBuffEffect('13', 'mastery') or MaxDps:HasBuffEffect('13', 'versatility') or MaxDps:HasBuffEffect('13', 'haste') or MaxDps:HasBuffEffect('13', 'crit'))
     trinket_2_buffs = MaxDps:HasOnUseEffect('14') and not MaxDps:CheckTrinketNames('ImprovisedSeaforiumPacemaker') and (MaxDps:HasOnUseEffect('14') or MaxDps:HasBuffEffect('14', 'strength') or MaxDps:HasBuffEffect('14', 'mastery') or MaxDps:HasBuffEffect('14', 'versatility') or MaxDps:HasBuffEffect('14', 'haste') or MaxDps:HasBuffEffect('14', 'crit'))
-    trinket_1_duration = MaxDps:CheckTrinketBuffDuration('13')
-    trinket_2_duration = MaxDps:CheckTrinketBuffDuration('14')
+    trinket_1_duration = MaxDps:CheckTrinketBuffDuration('13', 'any')
+    trinket_2_duration = MaxDps:CheckTrinketBuffDuration('14', 'any')
     if not trinket_1_buffs and trinket_2_buffs and (MaxDps:HasOnUseEffect('14') or not MaxDps:HasOnUseEffect('13')) or trinket_2_buffs and ((MaxDps:CheckTrinketCooldownDuration('14')%trinket_2_duration)*(1.5 + (MaxDps:HasBuffEffect('14', 'strength') and 1 or 0))*(trinket_2_sync)*(1+((MaxDps:CheckTrinketItemLevel('14') - MaxDps:CheckTrinketItemLevel('13'))%100)))>((MaxDps:CheckTrinketCooldownDuration('13')%trinket_1_duration)*(1.5 + (MaxDps:HasBuffEffect('13', 'strength') and 1 or 0))*(trinket_1_sync)*(1+((MaxDps:CheckTrinketItemLevel('13') - MaxDps:CheckTrinketItemLevel('14'))%100))) then
         trinket_priority = 2
     else
-        trinket_priority = true
+        trinket_priority = 1
     end
     if not trinket_1_buffs and not trinket_2_buffs and MaxDps:CheckTrinketItemLevel('14') >= MaxDps:CheckTrinketItemLevel('13') then
         damage_trinket_priority = 2
     else
-        damage_trinket_priority = true
+        damage_trinket_priority = 1
     end
     trinket_1_manual = 0
     trinket_2_manual = 0

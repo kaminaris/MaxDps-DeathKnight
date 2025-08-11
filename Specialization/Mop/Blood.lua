@@ -159,7 +159,7 @@ function DeathKnight:Blood()
     classtable.RuneStrike = 56815
     classtable.HeartStrike = 55050
     classtable.DeathandDecay = 43265
-    classtable.BloodBoil = 50842
+    classtable.BloodBoil = 48721
     classtable.HornofWinter = 57330
     classtable.Pestilence = 50842
     classtable.FrostFeverDeBuff = 55095

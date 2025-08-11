@@ -260,12 +260,12 @@ function Unholy:precombat()
     if MaxDps:CheckTrinketNames('TreacherousTransmitter') or MaxDps:CheckTrinketNames('FunhouseLens') or MaxDps:CheckTrinketNames('SignetofthePriory') or MaxDps:CheckTrinketNames('UnyieldingNetherprism') or MaxDps:CheckTrinketNames('CursedStoneIdol') then
         trinket_1_duration = MaxDps:CheckTrinketCooldownDuration('TreacherousTransmitter') * 15+MaxDps:CheckTrinketCooldownDuration('FunhouseLens') * 15+MaxDps:CheckTrinketCooldownDuration('SignetofthePriory') * 20+MaxDps:CheckTrinketCooldownDuration('UnyieldingNetherprism') * 20+MaxDps:CheckTrinketCooldownDuration('CursedStoneIdol') * 15
     else
-        trinket_1_duration = 1
+        trinket_1_duration = MaxDps:CheckTrinketBuffDuration('13')
     end
     if MaxDps:CheckTrinketNames('TreacherousTransmitter') or MaxDps:CheckTrinketNames('FunhouseLens') or MaxDps:CheckTrinketNames('SignetofthePriory') or MaxDps:CheckTrinketNames('UnyieldingNetherprism') or MaxDps:CheckTrinketNames('CursedStoneIdol') then
         trinket_2_duration = MaxDps:CheckTrinketCooldownDuration('TreacherousTransmitter') * 15+MaxDps:CheckTrinketCooldownDuration('FunhouseLens') * 15+MaxDps:CheckTrinketCooldownDuration('SignetofthePriory') * 20+MaxDps:CheckTrinketCooldownDuration('UnyieldingNetherprism') * 20+MaxDps:CheckTrinketCooldownDuration('CursedStoneIdol') * 15
     else
-        trinket_2_duration = 1
+        trinket_2_duration = MaxDps:CheckTrinketBuffDuration('14')
     end
     if MaxDps:CheckTrinketNames('TreacherousTransmitter') then
         trinket_1_high_value = 2

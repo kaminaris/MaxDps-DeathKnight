@@ -227,10 +227,10 @@ function Frost:precombat()
     trinket_2_manual = 0
 end
 function Frost:aoe()
-    if (MaxDps:CheckSpellUsable(classtable.Frostscythe, 'Frostscythe')) and ((buff[classtable.KillingMachineBuff].at_max_stacks or (buff[classtable.KillingMachineBuff].up and Runes >= 3)) and targets >= frostscythe_prio) and cooldown[classtable.Frostscythe].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Frostscythe, 'Frostscythe')) and (((buff[classtable.KillingMachineBuff].count == 1) or (buff[classtable.KillingMachineBuff].up and Runes >= 3)) and targets >= frostscythe_prio) and cooldown[classtable.Frostscythe].ready then
         if not setSpell then setSpell = classtable.Frostscythe end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (buff[classtable.KillingMachineBuff].at_max_stacks or (buff[classtable.KillingMachineBuff].up and Runes >= 3)) and cooldown[classtable.Obliterate].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and ((buff[classtable.KillingMachineBuff].count == 1) or (buff[classtable.KillingMachineBuff].up and Runes >= 3)) and cooldown[classtable.Obliterate].ready then
         if not setSpell then setSpell = classtable.Obliterate end
     end
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up and talents[classtable.FrostboundWill] or not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.HowlingBlast].ready then
@@ -309,7 +309,7 @@ function Frost:cooldowns()
     end
 end
 function Frost:single_target()
-    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (buff[classtable.KillingMachineBuff].at_max_stacks or (buff[classtable.KillingMachineBuff].up and Runes >= 3)) and cooldown[classtable.Obliterate].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and ((buff[classtable.KillingMachineBuff].count == 1) or (buff[classtable.KillingMachineBuff].up and Runes >= 3)) and cooldown[classtable.Obliterate].ready then
         if not setSpell then setSpell = classtable.Obliterate end
     end
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up and talents[classtable.FrostboundWill]) and cooldown[classtable.HowlingBlast].ready then

@@ -257,7 +257,7 @@ function Blood:san_drw()
     if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (RunicPowerDeficit <36) and cooldown[classtable.DeathStrike].ready then
         if not setSpell then setSpell = classtable.DeathStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (not buff[classtable.BloodPlagueDeBuff].count >0) and cooldown[classtable.BloodBoil].ready then
+    if (MaxDps:CheckSpellUsable(classtable.BloodBoil, 'BloodBoil')) and (not (buff[classtable.BloodPlagueDeBuff].count >0)) and cooldown[classtable.BloodBoil].ready then
         if not setSpell then setSpell = classtable.BloodBoil end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathandDecay, 'DeathandDecay')) and ((targets <= 3 and buff[classtable.CrimsonScourgeBuff].up) or (targets >3 and not buff[classtable.DeathandDecayBuff].up)) and cooldown[classtable.DeathandDecay].ready then

@@ -120,8 +120,8 @@ local trinket_1_duration = 0
 local trinket_2_duration = 0
 local trinket_priority = 1
 local damage_trinket_priority = 1
-local trinket_1_manual = 0
-local trinket_2_manual = 0
+local trinket_1_manual = false
+local trinket_2_manual = false
 local cooldown_check = false
 local fwf_buffs = false
 local rune_pooling = false
@@ -223,8 +223,8 @@ function Frost:precombat()
     else
         damage_trinket_priority = 1
     end
-    trinket_1_manual = 0
-    trinket_2_manual = 0
+    trinket_1_manual = false
+    trinket_2_manual = false
 end
 function Frost:aoe()
     if (MaxDps:CheckSpellUsable(classtable.Frostscythe, 'Frostscythe')) and (((buff[classtable.KillingMachineBuff].count == 1) or (buff[classtable.KillingMachineBuff].up and Runes >= 3)) and targets >= frostscythe_prio) and cooldown[classtable.Frostscythe].ready then
@@ -236,10 +236,10 @@ function Frost:aoe()
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up and talents[classtable.FrostboundWill] or not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (debuff[classtable.RazoriceDeBuff].at_max_stacks and buff[classtable.FrostbaneBuff].up) and cooldown[classtable.FrostStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and ((debuff[classtable.RazoriceDeBuff].count == 5) and buff[classtable.FrostbaneBuff].up) and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (debuff[classtable.RazoriceDeBuff].at_max_stacks and talents[classtable.ShatteringBlade] and targets <5 and not rp_pooling and not talents[classtable.Frostbane]) and cooldown[classtable.FrostStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and ((debuff[classtable.RazoriceDeBuff].count == 5) and talents[classtable.ShatteringBlade] and targets <5 and not rp_pooling and not talents[classtable.Frostbane]) and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
     end
     if (MaxDps:CheckSpellUsable(classtable.Frostscythe, 'Frostscythe')) and (buff[classtable.KillingMachineBuff].up and not rune_pooling and targets >= frostscythe_prio) and cooldown[classtable.Frostscythe].ready then
@@ -315,7 +315,7 @@ function Frost:single_target()
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up and talents[classtable.FrostboundWill]) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (debuff[classtable.RazoriceDeBuff].at_max_stacks and talents[classtable.ShatteringBlade] and not rp_pooling) and cooldown[classtable.FrostStrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and ((debuff[classtable.RazoriceDeBuff].count == 5) and talents[classtable.ShatteringBlade] and not rp_pooling) and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
     end
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up) and cooldown[classtable.HowlingBlast].ready then

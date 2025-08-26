@@ -310,6 +310,9 @@ local function ClearCDs()
 end
 
 function Frost:callaction()
+    if (MaxDps:CheckSpellUsable(classtable.MindFreeze, 'MindFreeze')) and cooldown[classtable.MindFreeze].ready then
+        MaxDps:GlowCooldown(classtable.MindFreeze, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
+    end
     cooldown_check = (talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up) or not talents[classtable.PillarofFrost] or ttd <20
     fwf_buffs = (buff[classtable.PillarofFrostBuff].remains <gcd or (buff[classtable.UnholyStrengthBuff].up and buff[classtable.UnholyStrengthBuff].remains <gcd) or ((talents[classtable.Bonegrinder] and talents[classtable.Bonegrinder] or 0) == 2 and buff[classtable.BonegrinderFrostBuff].up and buff[classtable.BonegrinderFrostBuff].remains <gcd)) and (targets >1 or debuff[classtable.RazoriceDeBuff].count == 5 or talents[classtable.ShatteringBlade])
     rune_pooling = (MaxDps.ActiveHeroTree == 'deathbringer') and cooldown[classtable.ReapersMark].remains <6 and Runes <3
@@ -320,9 +323,6 @@ function Frost:callaction()
         frostscythe_prio = 3
     end
     breath_of_sindragosa_check = talents[classtable.BreathofSindragosa] and (cooldown[classtable.BreathofSindragosa].remains >20 or (cooldown[classtable.BreathofSindragosa].ready and RunicPower>=(60 - 20*(MaxDps.ActiveHeroTree == 'deathbringer' and 1 or 0))))
-    if (MaxDps:CheckSpellUsable(classtable.MindFreeze, 'MindFreeze')) and cooldown[classtable.MindFreeze].ready then
-        MaxDps:GlowCooldown(classtable.MindFreeze, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
-    end
     if (MaxDps:CheckSpellUsable(classtable.trinket1, 'trinket1')) and (not (MaxDps:CheckTrinketCastTime('13') >0) and trinket_1_buffs and not trinket_1_manual and buff[classtable.PillarofFrostBuff].up and (not MaxDps:HasOnUseEffect('14') or MaxDps:CheckTrinketCooldown('14') or trinket_priority == 1)) and cooldown[classtable.trinket1].ready then
         MaxDps:GlowCooldown(classtable.trinket1, cooldown[classtable.trinket1].ready)
     end
@@ -380,10 +380,10 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (talents[classtable.ReaperofSouls] and buff[classtable.ReaperofSoulsBuff].up and buff[classtable.KillingMachineBuff].count <2) and cooldown[classtable.SoulReaper].ready then
         if not setSpell then setSpell = classtable.SoulReaper end
     end
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and ((Runes <2 or not buff[classtable.KillingMachineBuff].up) and RunicPower <35+((talents[classtable.IcyOnslaught] and talents[classtable.IcyOnslaught] or 0) * buff[classtable.IcyOnslaughtBuff].count*5)) and cooldown[classtable.EmpowerRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and ((Runes <2 or not buff[classtable.KillingMachineBuff].up) and RunicPower <35+((talents[classtable.IcyOnslaught] and talents[classtable.IcyOnslaught] or 0) * buff[classtable.IcyOnslaughtBuff].count*5) and MaxDps:CooldownConsolidated(61304).remains <0.5) and cooldown[classtable.EmpowerRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (cooldown[classtable.EmpowerRuneWeapon].fullRecharge <= 6 and buff[classtable.KillingMachineBuff].count <1+(1 * (talents[classtable.KillingStreak] and talents[classtable.KillingStreak] or 0))) and cooldown[classtable.EmpowerRuneWeapon].ready then
+    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (cooldown[classtable.EmpowerRuneWeapon].fullRecharge <= 6 and buff[classtable.KillingMachineBuff].count <1+(1 * (talents[classtable.KillingStreak] and talents[classtable.KillingStreak] or 0)) and MaxDps:CooldownConsolidated(61304).remains <0.5) and cooldown[classtable.EmpowerRuneWeapon].ready then
         MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcanePulse, 'ArcanePulse')) and (cooldown_check) and cooldown[classtable.ArcanePulse].ready then

@@ -316,7 +316,7 @@ function Frost:callaction()
     cooldown_check = (talents[classtable.PillarofFrost] and buff[classtable.PillarofFrostBuff].up) or not talents[classtable.PillarofFrost] or ttd <20
     fwf_buffs = (buff[classtable.PillarofFrostBuff].remains <gcd or (buff[classtable.UnholyStrengthBuff].up and buff[classtable.UnholyStrengthBuff].remains <gcd) or ((talents[classtable.Bonegrinder] and talents[classtable.Bonegrinder] or 0) == 2 and buff[classtable.BonegrinderFrostBuff].up and buff[classtable.BonegrinderFrostBuff].remains <gcd)) and (targets >1 or debuff[classtable.RazoriceDeBuff].count == 5 or talents[classtable.ShatteringBlade])
     rune_pooling = (MaxDps.ActiveHeroTree == 'deathbringer') and cooldown[classtable.ReapersMark].remains <6 and Runes <3
-    rp_pooling = (talents[classtable.BreathofSindragosa] and cooldown[classtable.BreathofSindragosa].remains <4*gcd and RunicPower <60+(35 + 5*buff[classtable.IcyOnslaughtBuff].upMath)-(10 * Runes)) or false
+    rp_pooling = talents[classtable.BreathofSindragosa] and cooldown[classtable.BreathofSindragosa].remains <4*gcd and RunicPower <60+(35 + 5*buff[classtable.IcyOnslaughtBuff].upMath)-(10 * Runes)
     if (MaxDps and MaxDps.ActiveHeroTree == 'rideroftheapocalypse' and MaxDps.tier and MaxDps.tier[34].count >= 4 and 1 or 0) >0 and not (talents[classtable.CleavingStrikes] and buff[classtable.RemorselessWinterBuff].up) then
         frostscythe_prio = 4
     else

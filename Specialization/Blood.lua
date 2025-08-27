@@ -366,7 +366,7 @@ function Blood:callaction()
     if (MaxDps:CheckSpellUsable(classtable.tome_of_lights_devotion, 'tome_of_lights_devotion')) and (buff[classtable.InnerResilienceBuff].up) and cooldown[classtable.tome_of_lights_devotion].ready then
         MaxDps:GlowCooldown(classtable.tome_of_lights_devotion, cooldown[classtable.tome_of_lights_devotion].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.unyielding_netherprism, 'unyielding_netherprism')) and (cooldown[classtable.DancingRuneWeapon].remains <1 or (MaxDps:GetPartyState() == 'raid') and MaxDps:boss() and ttd <= 20) and cooldown[classtable.unyielding_netherprism].ready then
+    if (MaxDps:CheckSpellUsable(classtable.unyielding_netherprism, 'unyielding_netherprism')) and (cooldown[classtable.DancingRuneWeapon].remains <1 or MaxDps:boss() and ttd <= 20) and cooldown[classtable.unyielding_netherprism].ready then
         MaxDps:GlowCooldown(classtable.unyielding_netherprism, cooldown[classtable.unyielding_netherprism].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.bestinslots, 'bestinslots')) and cooldown[classtable.bestinslots].ready then

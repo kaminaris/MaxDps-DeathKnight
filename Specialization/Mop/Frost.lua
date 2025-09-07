@@ -210,56 +210,57 @@ function Frost:Aoe()
 end
 
 function Frost:Single()
-    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targethealthPerc < 35) and cooldown[classtable.SoulReaper].ready then
+    -- Execute Phase: Soul Reaper on cooldown if target will reach 35% HP within 5s
+    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (targethealthPerc < 40) and cooldown[classtable.SoulReaper].ready then
         MaxDps:GlowCooldown(classtable.SoulReaper, cooldown[classtable.SoulReaper].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost')) and cooldown[classtable.PillarofFrost].ready then
-        MaxDps:GlowCooldown(classtable.PillarofFrost, cooldown[classtable.PillarofFrost].ready)
-    end
-    if (MaxDps:CheckSpellUsable(classtable.RaiseDead, 'RaiseDead')) and (not UnitExists ( 'pet' )) and cooldown[classtable.RaiseDead].ready then
-        MaxDps:GlowCooldown(classtable.RaiseDead, cooldown[classtable.RaiseDead].ready)
-    end
-    if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (debuff[classtable.FrostFeverDeBuff].remains <3 or debuff[classtable.BloodPlagueDeBuff].remains <3) and cooldown[classtable.Outbreak].ready then
+
+    -- Apply diseases: Outbreak or Plague Strike if missing
+    if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (debuff[classtable.BloodPlagueDeBuff].remains < 3) and cooldown[classtable.Outbreak].ready then
         if not setSpell then setSpell = classtable.Outbreak end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.UnholyBlight, 'UnholyBlight') and talents[classtable.UnholyBlight]) and ((talents[classtable.UnholyBlight] and true or false) and ( debuff[classtable.FrostFeverDeBuff].remains <3 or debuff[classtable.BloodPlagueDeBuff].remains <3 )) and cooldown[classtable.UnholyBlight].ready then
-        if not setSpell then setSpell = classtable.UnholyBlight end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (not debuff[classtable.FrostFeverDeBuff].up) and cooldown[classtable.HowlingBlast].ready then
-        if not setSpell then setSpell = classtable.HowlingBlast end
     end
     if (MaxDps:CheckSpellUsable(classtable.PlagueStrike, 'PlagueStrike')) and (not debuff[classtable.BloodPlagueDeBuff].up) and cooldown[classtable.PlagueStrike].ready then
         if not setSpell then setSpell = classtable.PlagueStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PlagueLeech, 'PlagueLeech') and talents[classtable.PlagueLeech]) and ((talents[classtable.PlagueLeech] and true or false) and ( ( cooldown[classtable.Outbreak].remains <1 ) or ( buff[classtable.RimeBuff].up and debuff[classtable.BloodPlagueDeBuff].remains <3 and ( DeathKnight:RuneTypeCount("Unholy") >= 1 or DeathKnight:RuneTypeCount("Death") >= 1 ) ) )) and cooldown[classtable.PlagueLeech].ready then
-        if not setSpell then setSpell = classtable.PlagueLeech end
+
+    -- Pillar of Frost with other cooldowns
+    if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost')) and cooldown[classtable.PillarofFrost].ready then
+        MaxDps:GlowCooldown(classtable.PillarofFrost, cooldown[classtable.PillarofFrost].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up) and cooldown[classtable.HowlingBlast].ready then
+
+    -- Howling Blast: Rime proc or Death/Frost rune available
+    if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up or DeathKnight:RuneTypeCount("Frost") >= 1 or DeathKnight:RuneTypeCount("Death") >= 1) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (RunicPower <= 76) and cooldown[classtable.Obliterate].ready then
-        if not setSpell then setSpell = classtable.Obliterate end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and (ttd <= 60 and buff[classtable.MoguPowerPotionBuff].up) and cooldown[classtable.EmpowerRuneWeapon].ready then
-        MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
-    end
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (not buff[classtable.KillingMachineBuff].up) and cooldown[classtable.FrostStrike].ready then
+
+    -- Frost Strike: with Killing Machine
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and buff[classtable.KillingMachineBuff].up and cooldown[classtable.FrostStrike].ready then
         if not setSpell then setSpell = classtable.FrostStrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (buff[classtable.KillingMachineBuff].up) and cooldown[classtable.Obliterate].ready then
+
+    -- Obliterate: no Killing Machine, free Unholy runes, diseases won't expire
+    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (not buff[classtable.KillingMachineBuff].up) and (DeathKnight:RuneTypeCount("Unholy") >= 1) and (debuff[classtable.BloodPlagueDeBuff].remains > 3) and cooldown[classtable.Obliterate].ready then
         if not setSpell then setSpell = classtable.Obliterate end
     end
-    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap') and talents[classtable.BloodTap]) and ((talents[classtable.BloodTap] and buff[classtable.BloodChargeBuff].count >=5  or false)) and cooldown[classtable.BloodTap].ready then
+
+    -- Frost Strike: fallback when no runes or high Runic Power
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and (DeathKnight:Runes() == 0 or RunicPower >= 40) and cooldown[classtable.FrostStrike].ready then
+        if not setSpell then setSpell = classtable.FrostStrike end
+    end
+
+    -- Blood Tap: no runes or overcapping stacks
+    if (MaxDps:CheckSpellUsable(classtable.BloodTap, 'BloodTap') and talents[classtable.BloodTap]) and ((DeathKnight:Runes() == 0) or (buff[classtable.BloodChargeBuff].count >= 5)) and cooldown[classtable.BloodTap].ready then
         MaxDps:GlowCooldown(classtable.BloodTap, cooldown[classtable.BloodTap].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and cooldown[classtable.FrostStrike].ready then
-        if not setSpell then setSpell = classtable.FrostStrike end
+
+    -- Plague Leech: use when Outbreak is ready or Rime proc + Blood Plague low
+    if (MaxDps:CheckSpellUsable(classtable.PlagueLeech, 'PlagueLeech') and talents[classtable.PlagueLeech]) and ((cooldown[classtable.Outbreak].remains < 1) or (buff[classtable.RimeBuff].up and debuff[classtable.BloodPlagueDeBuff].remains < 3)) and cooldown[classtable.PlagueLeech].ready then
+        if not setSpell then setSpell = classtable.PlagueLeech end
     end
+
+    -- Horn of Winter: filler
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and cooldown[classtable.HornofWinter].ready then
         MaxDps:GlowCooldown(classtable.HornofWinter, cooldown[classtable.HornofWinter].ready)
-    end
-    if (MaxDps:CheckSpellUsable(classtable.EmpowerRuneWeapon, 'EmpowerRuneWeapon')) and cooldown[classtable.EmpowerRuneWeapon].ready then
-        MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, cooldown[classtable.EmpowerRuneWeapon].ready)
     end
 end
 

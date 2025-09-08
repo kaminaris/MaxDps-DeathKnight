@@ -91,6 +91,9 @@ end
 function DeathKnight:Runes(timeShift)
 	local count = 0
 	local time = GetTime()
+	if not timeShift then
+		timeShift = 0
+	end
 
 	for i = 1, 10 do
 		local start, duration, runeReady = GetRuneCooldown(i)

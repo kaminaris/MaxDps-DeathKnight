@@ -224,24 +224,24 @@ function Frost:Single()
         if not setSpell then setSpell = classtable.PlagueStrike end
     end
 
+    -- Frost Strike: with Killing Machine
+    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and buff[classtable.KillingMachineBuff].up and cooldown[classtable.FrostStrike].ready then
+        if not setSpell then setSpell = classtable.FrostStrike end
+    end
+
     -- Pillar of Frost with other cooldowns
     if (MaxDps:CheckSpellUsable(classtable.PillarofFrost, 'PillarofFrost')) and cooldown[classtable.PillarofFrost].ready then
         MaxDps:GlowCooldown(classtable.PillarofFrost, cooldown[classtable.PillarofFrost].ready)
     end
 
     -- Obliterate: no Killing Machine, free Unholy runes, diseases won't expire
-    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (not buff[classtable.KillingMachineBuff].up) and (DeathKnight:RuneTypeCount("Unholy") >= 1) and (debuff[classtable.BloodPlagueDeBuff].remains > 3) and cooldown[classtable.Obliterate].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Obliterate, 'Obliterate')) and (not buff[classtable.KillingMachineBuff].up) and (DeathKnight:RuneTypeCount("Unholy", true) >= 1) and (debuff[classtable.BloodPlagueDeBuff].remains > 3) and cooldown[classtable.Obliterate].ready then
         if not setSpell then setSpell = classtable.Obliterate end
     end
 
     -- Howling Blast: Rime proc or Death/Frost rune available
     if (MaxDps:CheckSpellUsable(classtable.HowlingBlast, 'HowlingBlast')) and (buff[classtable.RimeBuff].up or DeathKnight:RuneTypeCount("Frost") >= 1 or DeathKnight:RuneTypeCount("Death") >= 1) and cooldown[classtable.HowlingBlast].ready then
         if not setSpell then setSpell = classtable.HowlingBlast end
-    end
-
-    -- Frost Strike: with Killing Machine
-    if (MaxDps:CheckSpellUsable(classtable.FrostStrike, 'FrostStrike')) and buff[classtable.KillingMachineBuff].up and cooldown[classtable.FrostStrike].ready then
-        if not setSpell then setSpell = classtable.FrostStrike end
     end
 
     -- Frost Strike: fallback when no runes or high Runic Power

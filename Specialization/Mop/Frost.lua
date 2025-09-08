@@ -160,6 +160,7 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.RaiseDead, false)
     MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, false)
     MaxDps:GlowCooldown(classtable.BloodTap, false)
+    MaxDps:GlowCooldown(classtable.SoulReaper, false)
 end
 
 function Frost:Aoe()

@@ -61,6 +61,7 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.VampiricBlood, false)
     MaxDps:GlowCooldown(classtable.RuneTap, false)
     MaxDps:GlowCooldown(classtable.DancingRuneWeapon, false)
+    MaxDps:GlowCooldown(classtable.SoulReaper, false)
 end
 
 function Blood:single()
@@ -76,6 +77,9 @@ function Blood:single()
     end
     if (MaxDps:CheckSpellUsable(classtable.DeathStrike, 'DeathStrike')) and (DeathKnight:RuneTypeCount('Death') >= 1 and healthPerc < 80) and cooldown[classtable.DeathStrike].ready then
         if not setSpell then setSpell = classtable.DeathStrike end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.SoulReaper, 'SoulReaper')) and (RunicPower >= 10 and DeathKnight:RuneTypeCount('Frost') >= 1 and targethealthPerc < 35) and cooldown[classtable.SoulReaper].ready then
+        MaxDps:GlowCooldown(classtable.SoulReaper, cooldown[classtable.SoulReaper].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.HeartStrike, 'HeartStrike')) and (DeathKnight:RuneTypeCount('Blood') >= 1  or targethealthPerc < 35) and cooldown[classtable.HeartStrike].ready then
         if not setSpell then setSpell = classtable.HeartStrike end

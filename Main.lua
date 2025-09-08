@@ -223,7 +223,7 @@ function DeathKnight:TimeToRunesCata(desiredAmount,runeType)
     return totalTime
 end
 
-function DeathKnight:RuneTypeCount(runeType)
+function DeathKnight:RuneTypeCount(runeType, skipDeathRunes)
 	--1 : RUNETYPE_BLOOD
     --2 : RUNETYPE_CHROMATIC
     --3 : RUNETYPE_FROST
@@ -243,7 +243,7 @@ function DeathKnight:RuneTypeCount(runeType)
 	local count = 0
 	for i = 1, 6 do
 		local runeTypeForId = GetRuneType(i)
-		if runeTypeForId == runeType or runeTypeForId == 4 then
+		if runeTypeForId == runeType or (not skipDeathRunes and runeTypeForId == 4) then
 		    local start, _, runeReady = GetRuneCooldown(i)
 			if runeReady then
 				count = count + 1

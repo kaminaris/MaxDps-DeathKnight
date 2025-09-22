@@ -164,6 +164,7 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.DarkTransformation, false)
     MaxDps:GlowCooldown(classtable.EmpowerRuneWeapon, false)
     MaxDps:GlowCooldown(classtable.BloodTap, false)
+    MaxDps:GlowCooldown(classtable.UnholyFrenzy, false)
 end
 
 local function numDepletedRunes(skipDeath)
@@ -229,7 +230,7 @@ end
 
 function Unholy:Single()
     if (MaxDps:CheckSpellUsable(classtable.UnholyFrenzy, 'UnholyFrenzy')) and (timeInCombat >= 4) and cooldown[classtable.UnholyFrenzy].ready then
-        if not setSpell then setSpell = classtable.UnholyFrenzy end
+        MaxDps:GlowCooldown(classtable.UnholyFrenzy, true)
     end
     if (MaxDps:CheckSpellUsable(classtable.Outbreak, 'Outbreak')) and (debuff[classtable.FrostFeverDeBuff].remains <3 or debuff[classtable.BloodPlagueDeBuff].remains <3) and cooldown[classtable.Outbreak].ready then
         if not setSpell then setSpell = classtable.Outbreak end

@@ -734,7 +734,7 @@ function DeathKnight:Unholy()
     RunicPowerTimeToMax = RunicPowerDeficit / RunicPowerRegen
     SpellHaste = UnitSpellHaste('player')
     SpellCrit = GetCritChance()
-    classtable.WoundSpender = IsSpellKnownOrOverridesKnown(classtable.ScourgeStrike) and C_Spell.GetSpellInfo(classtable.ScourgeStrike) and ( C_Spell.GetSpellInfo(C_Spell.GetSpellInfo(classtable.ScourgeStrike).name).spellID ) --55090
+    classtable.WoundSpender = IsSpellKnownOrOverridesKnown(classtable.ScourgeStrike) and C_Spell.GetSpellInfo(classtable.ScourgeStrike) and ( C_Spell.GetSpellInfo(C_Spell.GetSpellInfo(classtable.ScourgeStrike).name).spellID ) or 55090 --55090
     classtable.FesteringScythe = 458128
     if buff[classtable.FesteringScytheBuff].up then
         classtable.FesteringStrike = classtable.FesteringScythe

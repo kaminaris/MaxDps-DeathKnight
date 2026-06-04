@@ -141,7 +141,7 @@ end
 
 
 function Frost:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and (not buff[classtable.PresenceBuff].up) and cooldown[classtable.Presence].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Presence, 'Presence')) and (not MaxDps:FindBuffAuraData(classtable.PresenceBuff).up) and cooldown[classtable.Presence].ready then
         if not setSpell then setSpell = classtable.Presence end
     end
     if (MaxDps:CheckSpellUsable(classtable.HornofWinter, 'HornofWinter')) and (not buff[classtable.HornofWinterBuff].up) and cooldown[classtable.HornofWinter].ready then

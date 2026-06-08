@@ -127,9 +127,9 @@ function Blood:callaction()
     MaxDps:GlowCooldown(classtable.RuneTap, cooldown[classtable.RuneTap].ready)
     MaxDps:GlowCooldown(classtable.DancingRuneWeapon, cooldown[classtable.DancingRuneWeapon].ready and ttd > 12)
     MaxDps:GlowCooldown(classtable.BoneShield, (cooldown[classtable.BoneShield].ready and (not buff[classtable.BoneShield].up or (buff[classtable.BoneShield].up and buff[classtable.BoneShield].remains < 3) or buff[classtable.BoneShield].count <= 1) ) )
-    if (MaxDps:CheckSpellUsable(classtable.BloodPresence, 'BloodPresence')) and (not MaxDps:FindBuffAuraData(classtable.BloodPresenceBuff).up) and cooldown[classtable.BloodPresence].ready then
-        if not setSpell then setSpell = classtable.BloodPresence end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.BloodPresence, 'BloodPresence')) and (not MaxDps:FindBuffAuraData(classtable.BloodPresenceBuff).up) and cooldown[classtable.BloodPresence].ready then
+    --    if not setSpell then setSpell = classtable.BloodPresence end
+    --end
     if targets > 1 then
         Blood:aoe()
     end

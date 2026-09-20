@@ -51,7 +51,8 @@ function DeathKnight:Unholy()
         end
     end
     if MaxDpsOptions.global.enableNewAuraSystem and MaxDps.SetupAuraContainer and aurasSetup then
-        --MaxDps:SetupAuraContainer()
+        --Use Death Coil or Epidemic With Sudden Doom Procs
+        MaxDps:SetupAuraContainer({[47541] = true, [207317] = true},{[81340] = true})
         aurasSetup = false
     end
     for itemID, spellID in pairs(usedTrinkets) do

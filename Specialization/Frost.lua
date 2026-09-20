@@ -51,7 +51,10 @@ function DeathKnight:Frost()
         end
     end
     if MaxDpsOptions.global.enableNewAuraSystem and MaxDps.SetupAuraContainer and aurasSetup then
-        --MaxDps:SetupAuraContainer()
+        --Use Howling Blast with Rime
+        MaxDps:SetupAuraContainer({[49184] = true},{[59052] = true})
+        --Use Obliterate or Frostscyth with Killing Machine
+        MaxDps:SetupAuraContainer({[49020] = true,[207230] = true},{[51124] = true})
         aurasSetup = false
     end
     for itemID, spellID in pairs(usedTrinkets) do

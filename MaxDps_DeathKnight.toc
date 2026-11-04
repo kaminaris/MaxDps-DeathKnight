@@ -1,4 +1,4 @@
-## Title: MaxDps_DeathKnight
+﻿## Title: MaxDps_DeathKnight
 ## Version: @project-version@
 ## Author: Kaminaris
 ## Interface: 120105
@@ -17,21 +17,15 @@
 ## X-Wago-ID: QNlqwY6e
 
 Main.lua
-#@retail@
-Config.lua
-Specialization/Blood.lua
-Specialization/Frost.lua
-Specialization/Unholy.lua
-#@end-retail@
+Config.lua [AllowLoadGameType standard]
+Specialization/Blood.lua [AllowLoadGameType standard]
+Specialization/Frost.lua [AllowLoadGameType standard]
+Specialization/Unholy.lua [AllowLoadGameType standard]
 
-#@version-cata@
-Specialization/Cata/Blood.lua
-Specialization/Cata/Frost.lua
-Specialization/Cata/Unholy.lua
-#@end-version-cata@
+Specialization/Cata/Blood.lua [AllowLoadGameType cata]
+Specialization/Cata/Frost.lua [AllowLoadGameType cata]
+Specialization/Cata/Unholy.lua [AllowLoadGameType cata]
 
-#@version-mists@
-Specialization/MoP/Blood.lua
-Specialization/Mop/Frost.lua
-Specialization/Mop/Unholy.lua
-#@end-version-mists@
+Specialization/MoP/Blood.lua [AllowLoadGameType mists]
+Specialization/Mop/Frost.lua [AllowLoadGameType mists]
+Specialization/Mop/Unholy.lua [AllowLoadGameType mists]
